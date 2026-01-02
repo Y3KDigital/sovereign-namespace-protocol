@@ -49,15 +49,18 @@ This repository contains an **early reference implementation** in Rust. The impl
 
 ⚠️ **The Rust code is NOT yet specification-conformant.** It demonstrates core concepts but uses Ed25519 (not post-quantum) and lacks sovereignty classes.
 
-**Specification-conformant implementation is the next phase.**
+**Specification-conformant implementation is in progress.**
 
 ### Architecture Overview
 
-Current crates (being refactored):
-- `namespace-core` — Core namespace logic
-- `rarity-engine` — Rarity calculation
+**Specification-Conformant Crates (New)**:
+- ✅ `snp-verifier` — Stateless verification (Dilithium5, SHA3-256, <20ms, chain-agnostic)
+
+**Pre-Specification Crates (Being Replaced)**:
+- `namespace-core` — Core namespace logic (uses Ed25519, will be replaced by snp-core)
+- `rarity-engine` — Rarity calculation (needs genesis binding)
 - `ipfs-integration` — Certificate storage
-- `certificate-gen` — Certificate signing
+- `certificate-gen` — Certificate signing (uses Ed25519, needs Dilithium5)
 - `smart-contract` — NFT minting interface
 - `api-server` — REST API
 
@@ -128,14 +131,15 @@ curl http://localhost:8080/namespaces/1.x/rarity
 ---
 
 ## Conformance Status
-
-| Specification Requirement | Current Implementation |
-|---------------------------|------------------------|
-| Post-quantum signatures (Dilithium5) | ❌ Uses Ed25519 |
+✅ snp-verifier (verification only) |
+| SHA3-256 hashing | ✅ snp-verifier |
 | Genesis ceremony | ❌ Not implemented |
 | Sovereignty classes | ❌ Not implemented |
-| Stateless verifier | ❌ Not implemented |
+| Stateless verifier | ✅ **COMPLETE** (snp-verifier) |
 | Vault derivation | ❌ Not implemented |
+| Constitutional enforcement | ⚠️ Partial |
+
+**First conformant component**: `snp-verifier` — Proves specifications are implementable
 | Constitutional enforcement | ⚠️ Partial |
 
 **Next phase**: Build specification-conformant reference implementation.

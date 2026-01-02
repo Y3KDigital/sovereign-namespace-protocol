@@ -1,0 +1,51 @@
+{
+  "version": "1.0.0",
+  "certificate_type": "namespace",
+  "identity": {
+    "namespace_id": "1.x",
+    "namespace_hash": "0x7f3a9b2c8d4e5f6a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a",
+    "address": "1NS7kPxQy3zRtYvW8mKjLnHpBqCsDfEuGh",
+    "genesis_hash": "0xabcdef0123456789abcdef0123456789abcdef0123456789abcdef0123456789"
+  },
+  "lineage": {
+    "parent": "/",
+    "parent_hash": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "depth": 0,
+    "merkle_proof": {
+      "path": [],
+      "root_hash": "0x7f3a9b2c8d4e5f6a1b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a"
+    }
+  },
+  "creation": {
+    "block_number": 1,
+    "timestamp": 1737072000,
+    "entropy": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef"
+  },
+  "sovereignty": {
+    "class": "Immutable",
+    "owner_public_key": "0xdeadbeef",
+    "class_proof": "0xcafebabe"
+  },
+  "rarity": {
+    "score": 950.5,
+    "tier": "Mythical",
+    "components": {
+      "position_rarity": 0.95,
+      "pattern_rarity": 0.85,
+      "hash_entropy": 0.72,
+      "temporal_rarity": 1.0,
+      "structural_rarity": 1.0
+    },
+    "algorithm_version": "v1"
+  },
+  "signature": {
+    "scheme": "Dilithium5",
+    "public_key": "0x00",
+    "signature": "0x00"
+  },
+  "ipfs": {
+    "cid": "QmYwAPJzv5CZsnA625s3Xf2nemtYgPpHdWEz79ojWnPbdG",
+    "pin_status": "pinned",
+    "content_hash": "0x0000000000000000000000000000000000000000000000000000000000000000"
+  }
+}

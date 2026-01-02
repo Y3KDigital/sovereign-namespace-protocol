@@ -1,0 +1,37 @@
+[package]
+name = "snp-verifier"
+version = "1.0.0"
+edition = "2021"
+description = "Stateless verification for Sovereign Namespace Protocol (SNP) v1.0"
+authors = ["SNP Contributors"]
+license = "MIT"
+
+[dependencies]
+# Post-quantum cryptography (spec-conformant)
+pqcrypto-dilithium = "0.5"
+pqcrypto-sphincsplus = "0.7"
+pqcrypto-traits = "0.3"
+
+# SHA3-256 (spec-required)
+sha3 = "0.10"
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Hex encoding
+hex = "0.4"
+
+# Base58 for addresses
+bs58 = "0.5"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# CLI
+clap = { version = "4.5", features = ["derive"] }
+
+[[bin]]
+name = "snp-verify"
+path = "src/main.rs"
