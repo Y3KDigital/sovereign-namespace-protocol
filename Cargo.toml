@@ -1,11 +1,5 @@
 [workspace]
 members = [
-    "namespace-core",
-    "rarity-engine",
-    "ipfs-integration",
-    "certificate-gen",
-    "smart-contract",
-    "api-server",
     "snp-verifier",
     "snp-genesis-cli",
     "snp-core",

@@ -39,8 +39,8 @@ pub fn transfer(
     save_json(output, &transition)?;
     
     println!("{}", "✅ Transfer transition created successfully!".green());
-    println!("  {} {}", "Namespace:".bold(), format!("0x{}", hex::encode(&namespace.id[..8])));
-    println!("  {} {}", "New Owner:".bold(), format!("0x{}", hex::encode(&new_owner_hash[..8])));
+    println!("  {} 0x{}", "Namespace:".bold(), hex::encode(&namespace.id[..8]));
+    println!("  {} 0x{}", "New Owner:".bold(), hex::encode(&new_owner_hash[..8]));
     println!("  {} {}", "Timestamp:".bold(), timestamp);
     println!("  {} {}", "Nonce:".bold(), nonce);
     println!("  {} {}", "Saved to:".bold(), output);
@@ -89,7 +89,7 @@ pub fn delegate(
     save_json(output, &transition)?;
     
     println!("{}", "✅ Delegation transition created successfully!".green());
-    println!("  {} {}", "Namespace:".bold(), format!("0x{}", hex::encode(&namespace.id[..8])));
+    println!("  {} 0x{}", "Namespace:".bold(), hex::encode(&namespace.id[..8]));
     println!("  {} {}", "Delegates:".bold(), delegate_hashes.len());
     println!("  {} {} of {}", "Threshold:".bold(), threshold, delegate_hashes.len());
     println!("  {} {}", "Timestamp:".bold(), timestamp);
@@ -139,9 +139,9 @@ pub fn inherit(
     save_json(output, &transition)?;
     
     println!("{}", "✅ Succession transition created successfully!".green());
-    println!("  {} {}", "Namespace:".bold(), format!("0x{}", hex::encode(&namespace.id[..8])));
-    println!("  {} {}", "Heir:".bold(), format!("0x{}", hex::encode(&heir_hash[..8])));
-    println!("  {} {}", "Condition:".bold(), format!("0x{}", hex::encode(&condition_hash[..8])));
+    println!("  {} 0x{}", "Namespace:".bold(), hex::encode(&namespace.id[..8]));
+    println!("  {} 0x{}", "Heir:".bold(), hex::encode(&heir_hash[..8]));
+    println!("  {} 0x{}", "Condition:".bold(), hex::encode(&condition_hash[..8]));
     println!("  {} {}", "Timestamp:".bold(), timestamp);
     println!("  {} {}", "Nonce:".bold(), nonce);
     println!("  {} {}", "Saved to:".bold(), output);
@@ -186,7 +186,7 @@ pub fn seal(
     save_json(output, &transition)?;
     
     println!("{}", "✅ Seal transition created successfully!".green());
-    println!("  {} {}", "Namespace:".bold(), format!("0x{}", hex::encode(&namespace.id[..8])));
+    println!("  {} 0x{}", "Namespace:".bold(), hex::encode(&namespace.id[..8]));
     println!("  {} SEALED (irreversible)", "Status:".bold().red());
     println!("  {} {}", "Timestamp:".bold(), timestamp);
     println!("  {} {}", "Nonce:".bold(), nonce);
@@ -215,7 +215,7 @@ pub fn verify(
     
     if is_valid {
         println!("{}", "✅ Transition is VALID".green().bold());
-        println!("  {} {}", "Namespace:".bold(), format!("0x{}", hex::encode(&transition.namespace_id[..8])));
+        println!("  {} 0x{}", "Namespace:".bold(), hex::encode(&transition.namespace_id[..8]));
         println!("  {} {:?}", "Type:".bold(), transition.transition_type);
         println!("  {} {}", "Timestamp:".bold(), transition.timestamp);
         println!("  {} {}", "Nonce:".bold(), transition.proof.nonce);

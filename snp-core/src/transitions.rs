@@ -351,7 +351,7 @@ impl SovereigntyTransition {
     /// Create signing message
     fn create_signing_message(
         namespace_id: &[u8; 32],
-        transition_type: &TransitionType,
+        _transition_type: &TransitionType,
         proof: &TransitionProof,
         timestamp: u64,
     ) -> Vec<u8> {
@@ -397,7 +397,7 @@ mod hex_bytes {
 mod hex_vec {
     use serde::{Deserialize, Deserializer, Serializer};
 
-    pub fn serialize<S>(items: &Vec<[u8; 32]>, serializer: S) -> Result<S::Ok, S::Error>
+    pub fn serialize<S>(items: &[[u8; 32]], serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
