@@ -6,7 +6,7 @@
 
 ## Core Documents (Canonical Order)
 
-### 1. [CONSTITUTION.md](CONSTITUTION.md)
+### 1. [CONSTITUTION.md](specs/CONSTITUTION.md)
 **Purpose**: Immutable axioms and prohibited features
 
 **Defines**:
@@ -20,7 +20,7 @@
 
 ---
 
-### 2. [GENESIS_SPEC.md](GENESIS_SPEC.md)
+### 2. [GENESIS_SPEC.md](specs/GENESIS_SPEC.md)
 **Purpose**: One-time genesis ceremony protocol
 
 **Defines**:
@@ -34,7 +34,7 @@
 
 ---
 
-### 3. [CRYPTO_PROFILE.md](CRYPTO_PROFILE.md)
+### 3. [CRYPTO_PROFILE.md](specs/CRYPTO_PROFILE.md)
 **Purpose**: Post-quantum cryptographic primitives
 
 **Defines**:
@@ -48,7 +48,7 @@
 
 ---
 
-### 4. [NAMESPACE_OBJECT.md](NAMESPACE_OBJECT.md)
+### 4. [NAMESPACE_OBJECT.md](specs/NAMESPACE_OBJECT.md)
 **Purpose**: Namespace as cryptographic asset
 
 **Defines**:
@@ -63,7 +63,7 @@
 
 ---
 
-### 5. [SOVEREIGNTY_CLASSES.md](SOVEREIGNTY_CLASSES.md)
+### 5. [SOVEREIGNTY_CLASSES.md](specs/SOVEREIGNTY_CLASSES.md)
 **Purpose**: Control and transfer models
 
 **Defines**:
@@ -77,7 +77,7 @@
 
 ---
 
-### 6. [VAULT_MODEL.md](VAULT_MODEL.md)
+### 6. [VAULT_MODEL.md](specs/VAULT_MODEL.md)
 **Purpose**: Value containment and authorization
 
 **Defines**:
@@ -91,7 +91,7 @@
 
 ---
 
-### 7. [STATELESS_VERIFIER.md](STATELESS_VERIFIER.md)
+### 7. [STATELESS_VERIFIER.md](specs/STATELESS_VERIFIER.md)
 **Purpose**: Eternal verification algorithm
 
 **Defines**:
