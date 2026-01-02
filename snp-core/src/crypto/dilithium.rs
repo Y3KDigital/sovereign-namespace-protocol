@@ -13,8 +13,9 @@ pub struct DilithiumPublicKey {
 }
 
 /// Dilithium5 secret key wrapper
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DilithiumSecretKey {
+    #[serde(with = "hex_vec")]
     bytes: Vec<u8>,
 }
 
