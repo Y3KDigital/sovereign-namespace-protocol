@@ -43,6 +43,7 @@ pub mod errors;
 pub mod genesis;
 pub mod crypto;
 pub mod sovereignty;
+pub mod transitions;
 pub mod namespace;
 pub mod identity;
 pub mod vault;
@@ -60,6 +61,7 @@ pub mod prelude {
         SignatureScheme,
     };
     pub use crate::sovereignty::SovereigntyClass;
+    pub use crate::transitions::{SovereigntyTransition, TransitionType, TransitionProof};
     pub use crate::namespace::Namespace;
     pub use crate::identity::Identity;
     pub use crate::vault::VaultDescriptor;

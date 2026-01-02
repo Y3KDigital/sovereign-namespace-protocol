@@ -4,7 +4,7 @@ use colored::Colorize;
 mod commands;
 mod utils;
 
-use commands::{namespace, identity, certificate, vault, keygen};
+use commands::{namespace, identity, certificate, vault, keygen, transition};
 
 #[derive(Parser)]
 #[command(name = "snp")]
@@ -36,6 +36,10 @@ enum Commands {
     /// Key generation and management
     #[command(subcommand)]
     Keygen(KeygenCommands),
+    
+    /// Sovereignty transitions (transfer, delegate, inherit, seal)
+    #[command(subcommand)]
+    Transition(TransitionCommands),
 }
 
 #[derive(Subcommand)]
@@ -204,6 +208,120 @@ enum KeygenCommands {
     },
 }
 
+#[derive(Subcommand)]
+enum TransitionCommands {
+    /// Transfer ownership (Transferable only)
+    Transfer {
+        /// Namespace file
+        #[arg(short, long)]
+        namespace: String,
+        
+        /// New owner hash (hex)
+        #[arg(short = 'o', long)]
+        new_owner: String,
+        
+        /// Secret key file (current owner)
+        #[arg(short, long)]
+        seckey: String,
+        
+        /// Output file for transition proof
+        #[arg(short = 'O', long)]
+        output: String,
+        
+        /// Nonce for replay protection
+        #[arg(long, default_value = "1")]
+        nonce: u64,
+    },
+    
+    /// Delegate authority (Delegable only)
+    Delegate {
+        /// Namespace file
+        #[arg(short, long)]
+        namespace: String,
+        
+        /// Delegate hashes (hex, comma-separated)
+        #[arg(short, long, value_delimiter = ',')]
+        delegates: Vec<String>,
+        
+        /// Threshold (M-of-N)
+        #[arg(short, long)]
+        threshold: u32,
+        
+        /// Secret key file (current owner)
+        #[arg(short, long)]
+        seckey: String,
+        
+        /// Output file for transition proof
+        #[arg(short = 'O', long)]
+        output: String,
+        
+        /// Nonce for replay protection
+        #[arg(long, default_value = "1")]
+        nonce: u64,
+    },
+    
+    /// Execute succession (Heritable only)
+    Inherit {
+        /// Namespace file
+        #[arg(short, long)]
+        namespace: String,
+        
+        /// Heir hash (hex)
+        #[arg(long)]
+        heir: String,
+        
+        /// Condition proof hash (hex)
+        #[arg(short, long)]
+        condition: String,
+        
+        /// Secret key file (executor)
+        #[arg(short, long)]
+        seckey: String,
+        
+        /// Output file for transition proof
+        #[arg(short = 'O', long)]
+        output: String,
+        
+        /// Nonce for replay protection
+        #[arg(long, default_value = "1")]
+        nonce: u64,
+    },
+    
+    /// Seal namespace permanently
+    Seal {
+        /// Namespace file
+        #[arg(short, long)]
+        namespace: String,
+        
+        /// Secret key file (owner)
+        #[arg(short, long)]
+        seckey: String,
+        
+        /// Output file for transition proof
+        #[arg(short = 'O', long)]
+        output: String,
+        
+        /// Nonce for replay protection
+        #[arg(long, default_value = "1")]
+        nonce: u64,
+        
+        /// Confirm irreversible action
+        #[arg(long)]
+        confirm: bool,
+    },
+    
+    /// Verify a transition
+    Verify {
+        /// Transition file to verify
+        #[arg(short, long)]
+        file: String,
+        
+        /// Public key file (authority)
+        #[arg(short, long)]
+        pubkey: String,
+    },
+}
+
 fn main() {
     let cli = Cli::parse();
     
@@ -243,6 +361,23 @@ fn main() {
         Commands::Keygen(cmd) => match cmd {
             KeygenCommands::Generate { seed, pubkey, seckey } => {
                 keygen::generate(&seed, &pubkey, &seckey)
+            }
+        },
+        Commands::Transition(cmd) => match cmd {
+            TransitionCommands::Transfer { namespace, new_owner, seckey, output, nonce } => {
+                transition::transfer(&namespace, &new_owner, &seckey, &output, nonce)
+            }
+            TransitionCommands::Delegate { namespace, delegates, threshold, seckey, output, nonce } => {
+                transition::delegate(&namespace, delegates, threshold, &seckey, &output, nonce)
+            }
+            TransitionCommands::Inherit { namespace, heir, condition, seckey, output, nonce } => {
+                transition::inherit(&namespace, &heir, &condition, &seckey, &output, nonce)
+            }
+            TransitionCommands::Seal { namespace, seckey, output, nonce, confirm } => {
+                transition::seal(&namespace, &seckey, &output, nonce, confirm)
+            }
+            TransitionCommands::Verify { file, pubkey } => {
+                transition::verify(&file, &pubkey)
             }
         },
     };
