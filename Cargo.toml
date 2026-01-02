@@ -8,6 +8,7 @@ members = [
     "api-server",
     "snp-verifier",
     "snp-genesis-cli",
+    "snp-core",
 ]
 resolver = "2"
 
