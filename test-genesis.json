@@ -1,0 +1,66 @@
+{
+  "version": "1.0.0",
+  "ceremony_date": "2026-01-15T00:00:00Z",
+  "entropy_sources": {
+    "bitcoin_block": {
+      "height": 875000,
+      "hash": "0x000000000000000000010000000000000000000100000000000000000001",
+      "timestamp": 1767358779
+    },
+    "ethereum_block": {
+      "height": 21000000,
+      "hash": "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "timestamp": 1767358779
+    },
+    "nist_beacon": {
+      "pulse_index": "1767358779",
+      "output": "0xfedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
+      "timestamp": 1767358779
+    },
+    "cosmic_source": {
+      "observatory": "Arecibo Observatory",
+      "measurement_id": "genesis-001",
+      "value": "0x1111222233334444111122223333444411112222333344441111222233334444"
+    },
+    "mpc_ceremony": {
+      "participants": [
+        "participant1",
+        "participant2",
+        "participant3",
+        "participant4",
+        "participant5",
+        "participant6",
+        "participant7"
+      ],
+      "commitments": [
+        "0x0000000000000000000000000000000000000000000000000000000000000001",
+        "0x0000000000000000000000000000000000000000000000000000000000000002",
+        "0x0000000000000000000000000000000000000000000000000000000000000003",
+        "0x0000000000000000000000000000000000000000000000000000000000000004",
+        "0x0000000000000000000000000000000000000000000000000000000000000005",
+        "0x0000000000000000000000000000000000000000000000000000000000000006",
+        "0x0000000000000000000000000000000000000000000000000000000000000007"
+      ],
+      "final_output": "0x9999888877776666999988887777666699998888777766669999888877776666"
+    }
+  },
+  "parameters": {
+    "signature_scheme": "CRYSTALS-Dilithium5",
+    "hash_function": "SHA3-256",
+    "merkle_hash": "BLAKE3",
+    "max_root_namespaces": 10000,
+    "max_depth": 10,
+    "max_total_namespaces": 1000000,
+    "rarity_algorithm": "v1",
+    "tier_boundaries": [
+      100,
+      250,
+      500,
+      750,
+      900
+    ]
+  },
+  "genesis_hash": "0x6787f9320ad087315948d2b60c210c674dc1844f451436a9f25156f9d54096fc",
+  "key_destruction_proof": "mock_proof_0x123...",
+  "ipfs_cid": null
+}

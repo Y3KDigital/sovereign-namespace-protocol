@@ -7,6 +7,7 @@ members = [
     "smart-contract",
     "api-server",
     "snp-verifier",
+    "snp-genesis-cli",
 ]
 resolver = "2"
 
