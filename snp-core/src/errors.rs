@@ -13,10 +13,7 @@ pub enum SnpError {
     InvalidSignature,
 
     #[error("Namespace mismatch: expected {expected}, got {actual}")]
-    NamespaceMismatch {
-        expected: String,
-        actual: String,
-    },
+    NamespaceMismatch { expected: String, actual: String },
 
     #[error("Determinism violation: {0}")]
     DeterminismViolation(String),

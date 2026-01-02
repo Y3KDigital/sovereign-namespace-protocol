@@ -1,6 +1,6 @@
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
-use snp_genesis_cli::{GenesisCeremony, GenesisParameters, GenesisTranscript, EntropySources};
+use snp_genesis_cli::{EntropySources, GenesisCeremony, GenesisParameters, GenesisTranscript};
 use std::fs;
 
 #[derive(Parser)]
@@ -140,8 +140,7 @@ fn run_mock_ceremony(ceremony_date: &str, output_file: &str) -> Result<()> {
     };
 
     let transcript_json = serde_json::to_string_pretty(&transcript)?;
-    fs::write(output_file, &transcript_json)
-        .context("Failed to write transcript")?;
+    fs::write(output_file, &transcript_json).context("Failed to write transcript")?;
 
     println!("✅ Transcript saved: {}", output_file);
     println!("\n=== Genesis Ceremony Complete ===\n");
@@ -158,14 +157,17 @@ fn run_mock_ceremony(ceremony_date: &str, output_file: &str) -> Result<()> {
 fn verify_transcript(transcript_path: &str) -> Result<()> {
     println!("🔍 Verifying Genesis Transcript\n");
 
-    let transcript_json = fs::read_to_string(transcript_path)
-        .context("Failed to read transcript file")?;
+    let transcript_json =
+        fs::read_to_string(transcript_path).context("Failed to read transcript file")?;
 
-    let transcript: GenesisTranscript = serde_json::from_str(&transcript_json)
-        .context("Failed to parse transcript JSON")?;
+    let transcript: GenesisTranscript =
+        serde_json::from_str(&transcript_json).context("Failed to parse transcript JSON")?;
 
     println!("📅 Ceremony Date: {}", transcript.ceremony_date);
-    println!("🔐 Genesis Hash: 0x{}\n", hex::encode(transcript.genesis_hash));
+    println!(
+        "🔐 Genesis Hash: 0x{}\n",
+        hex::encode(transcript.genesis_hash)
+    );
 
     println!("🧮 Recomputing genesis hash...");
     let is_valid = GenesisCeremony::verify_transcript(&transcript)?;
@@ -173,11 +175,26 @@ fn verify_transcript(transcript_path: &str) -> Result<()> {
     if is_valid {
         println!("✅ VALID - Genesis hash verified\n");
         println!("Entropy sources:");
-        println!("  ⛏️  Bitcoin block: {}", transcript.entropy_sources.bitcoin_block.height);
-        println!("  🔷 Ethereum block: {}", transcript.entropy_sources.ethereum_block.height);
-        println!("  🏛️  NIST beacon: {}", transcript.entropy_sources.nist_beacon.pulse_index);
-        println!("  🌌 Cosmic source: {}", transcript.entropy_sources.cosmic_source.observatory);
-        println!("  🤝 MPC participants: {}", transcript.entropy_sources.mpc_ceremony.participants.len());
+        println!(
+            "  ⛏️  Bitcoin block: {}",
+            transcript.entropy_sources.bitcoin_block.height
+        );
+        println!(
+            "  🔷 Ethereum block: {}",
+            transcript.entropy_sources.ethereum_block.height
+        );
+        println!(
+            "  🏛️  NIST beacon: {}",
+            transcript.entropy_sources.nist_beacon.pulse_index
+        );
+        println!(
+            "  🌌 Cosmic source: {}",
+            transcript.entropy_sources.cosmic_source.observatory
+        );
+        println!(
+            "  🤝 MPC participants: {}",
+            transcript.entropy_sources.mpc_ceremony.participants.len()
+        );
         Ok(())
     } else {
         anyhow::bail!("❌ INVALID - Genesis hash mismatch");
@@ -186,7 +203,7 @@ fn verify_transcript(transcript_path: &str) -> Result<()> {
 
 fn show_phases() {
     println!("=== Genesis Ceremony Phases (from GENESIS_SPEC.md) ===\n");
-    
+
     println!("Phase 1: Commitment (T-72 hours)");
     println!("  - Announce ceremony date publicly");
     println!("  - Specify future blockchain block heights");

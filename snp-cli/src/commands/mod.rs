@@ -1,6 +1,6 @@
-pub mod namespace;
-pub mod identity;
 pub mod certificate;
-pub mod vault;
+pub mod identity;
 pub mod keygen;
+pub mod namespace;
 pub mod transition;
+pub mod vault;

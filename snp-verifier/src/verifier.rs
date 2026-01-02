@@ -6,11 +6,11 @@ pub struct NamespaceVerifier;
 
 impl NamespaceVerifier {
     /// Verify a namespace certificate completely
-    /// 
+    ///
     /// Requires only:
     /// - certificate: The namespace certificate
     /// - genesis_hash: The genesis ceremony hash (32 bytes, public)
-    /// 
+    ///
     /// Returns VerificationResult with 6 verification checks:
     /// 1. Genesis binding
     /// 2. Identity derivation
@@ -165,15 +165,19 @@ impl NamespaceVerifier {
     // Helper: Verify Dilithium5 signature
     fn verify_dilithium5(public_key_hex: &str, message: &[u8], signature_hex: &str) -> bool {
         use pqcrypto_dilithium::dilithium5;
-        use pqcrypto_traits::sign::{PublicKey as PQPublicKey, DetachedSignature as PQDetachedSignature};
-
-        // Decode hex strings
-        let pk_bytes = match hex::decode(public_key_hex.strip_prefix("0x").unwrap_or(public_key_hex)) {
-            Ok(bytes) => bytes,
-            Err(_) => return false,
+        use pqcrypto_traits::sign::{
+            DetachedSignature as PQDetachedSignature, PublicKey as PQPublicKey,
         };
 
-        let sig_bytes = match hex::decode(signature_hex.strip_prefix("0x").unwrap_or(signature_hex)) {
+        // Decode hex strings
+        let pk_bytes =
+            match hex::decode(public_key_hex.strip_prefix("0x").unwrap_or(public_key_hex)) {
+                Ok(bytes) => bytes,
+                Err(_) => return false,
+            };
+
+        let sig_bytes = match hex::decode(signature_hex.strip_prefix("0x").unwrap_or(signature_hex))
+        {
             Ok(bytes) => bytes,
             Err(_) => return false,
         };
@@ -191,7 +195,7 @@ impl NamespaceVerifier {
             Ok(pk) => pk,
             Err(_) => return false,
         };
-        
+
         let signature = match dilithium5::DetachedSignature::from_bytes(&sig_bytes) {
             Ok(sig) => sig,
             Err(_) => return false,
@@ -204,15 +208,19 @@ impl NamespaceVerifier {
     // Helper: Verify SPHINCS+ signature
     fn verify_sphincs_plus(public_key_hex: &str, message: &[u8], signature_hex: &str) -> bool {
         use pqcrypto_sphincsplus::sphincssha2256fsimple;
-        use pqcrypto_traits::sign::{PublicKey as PQPublicKey, DetachedSignature as PQDetachedSignature};
-
-        // Decode hex strings
-        let pk_bytes = match hex::decode(public_key_hex.strip_prefix("0x").unwrap_or(public_key_hex)) {
-            Ok(bytes) => bytes,
-            Err(_) => return false,
+        use pqcrypto_traits::sign::{
+            DetachedSignature as PQDetachedSignature, PublicKey as PQPublicKey,
         };
 
-        let sig_bytes = match hex::decode(signature_hex.strip_prefix("0x").unwrap_or(signature_hex)) {
+        // Decode hex strings
+        let pk_bytes =
+            match hex::decode(public_key_hex.strip_prefix("0x").unwrap_or(public_key_hex)) {
+                Ok(bytes) => bytes,
+                Err(_) => return false,
+            };
+
+        let sig_bytes = match hex::decode(signature_hex.strip_prefix("0x").unwrap_or(signature_hex))
+        {
             Ok(bytes) => bytes,
             Err(_) => return false,
         };
@@ -230,7 +238,7 @@ impl NamespaceVerifier {
             Ok(pk) => pk,
             Err(_) => return false,
         };
-        
+
         let signature = match sphincssha2256fsimple::DetachedSignature::from_bytes(&sig_bytes) {
             Ok(sig) => sig,
             Err(_) => return false,
@@ -259,10 +267,16 @@ mod tests {
         let mut cert = create_test_certificate();
         cert.identity.genesis_hash = genesis_hash;
 
-        assert!(NamespaceVerifier::verify_genesis_binding(&cert, &genesis_hash));
-        
+        assert!(NamespaceVerifier::verify_genesis_binding(
+            &cert,
+            &genesis_hash
+        ));
+
         let wrong_hash = [0u8; 32];
-        assert!(!NamespaceVerifier::verify_genesis_binding(&cert, &wrong_hash));
+        assert!(!NamespaceVerifier::verify_genesis_binding(
+            &cert,
+            &wrong_hash
+        ));
     }
 
     fn create_test_certificate() -> Certificate {
