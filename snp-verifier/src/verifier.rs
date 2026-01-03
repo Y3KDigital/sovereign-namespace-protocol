@@ -6,11 +6,11 @@ pub struct NamespaceVerifier;
 
 impl NamespaceVerifier {
     /// Verify a namespace certificate completely
-    /// 
+    ///
     /// Requires only:
     /// - certificate: The namespace certificate
     /// - genesis_hash: The genesis ceremony hash (32 bytes, public)
-    /// 
+    ///
     /// Returns VerificationResult with 6 verification checks:
     /// 1. Genesis binding
     /// 2. Identity derivation
@@ -22,16 +22,12 @@ impl NamespaceVerifier {
         certificate: &Certificate,
         genesis_hash: &[u8; 32],
     ) -> VerificationResult {
-        let mut result = VerificationResult::default();
-
-        // Step 1: Verify genesis binding
-        result.genesis_binding = Self::verify_genesis_binding(certificate, genesis_hash);
-
-        // Step 2: Verify identity derivation
-        result.identity = Self::verify_identity(certificate);
-
-        // Step 3: Verify lineage proof
-        result.lineage = Self::verify_lineage(certificate);
+        let mut result = VerificationResult {
+            genesis_binding: Self::verify_genesis_binding(certificate, genesis_hash),
+            identity: Self::verify_identity(certificate),
+            lineage: Self::verify_lineage(certificate),
+            ..Default::default()
+        };
 
         // Step 4: Verify rarity calculation
         result.rarity = Self::verify_rarity(certificate);
@@ -58,19 +54,19 @@ impl NamespaceVerifier {
         hasher.update(b"web3-rarity-namespace-v1");
 
         // Genesis binding (ensures uniqueness to this genesis)
-        hasher.update(&cert.identity.genesis_hash);
+        hasher.update(cert.identity.genesis_hash);
 
         // Parent binding (ensures lineage)
-        hasher.update(&cert.lineage.parent_hash);
+        hasher.update(cert.lineage.parent_hash);
 
         // ID binding
         hasher.update(cert.identity.namespace_id.as_bytes());
 
         // Block binding (temporal uniqueness)
-        hasher.update(&cert.creation.block_number.to_le_bytes());
+        hasher.update(cert.creation.block_number.to_le_bytes());
 
         // Entropy (prevents prediction)
-        hasher.update(&cert.creation.entropy);
+        hasher.update(cert.creation.entropy);
 
         let computed_hash: [u8; 32] = hasher.finalize().into();
 
@@ -162,22 +158,26 @@ impl NamespaceVerifier {
         message.extend_from_slice(&cert.lineage.parent_hash);
         message.extend_from_slice(&cert.creation.block_number.to_le_bytes());
         message.extend_from_slice(&cert.creation.timestamp.to_le_bytes());
-        message.extend_from_slice(&cert.sovereignty.owner_public_key.as_bytes());
+        message.extend_from_slice(cert.sovereignty.owner_public_key.as_bytes());
         message
     }
 
     // Helper: Verify Dilithium5 signature
     fn verify_dilithium5(public_key_hex: &str, message: &[u8], signature_hex: &str) -> bool {
         use pqcrypto_dilithium::dilithium5;
-        use pqcrypto_traits::sign::{PublicKey as PQPublicKey, DetachedSignature as PQDetachedSignature};
-
-        // Decode hex strings
-        let pk_bytes = match hex::decode(public_key_hex.strip_prefix("0x").unwrap_or(public_key_hex)) {
-            Ok(bytes) => bytes,
-            Err(_) => return false,
+        use pqcrypto_traits::sign::{
+            DetachedSignature as PQDetachedSignature, PublicKey as PQPublicKey,
         };
 
-        let sig_bytes = match hex::decode(signature_hex.strip_prefix("0x").unwrap_or(signature_hex)) {
+        // Decode hex strings
+        let pk_bytes =
+            match hex::decode(public_key_hex.strip_prefix("0x").unwrap_or(public_key_hex)) {
+                Ok(bytes) => bytes,
+                Err(_) => return false,
+            };
+
+        let sig_bytes = match hex::decode(signature_hex.strip_prefix("0x").unwrap_or(signature_hex))
+        {
             Ok(bytes) => bytes,
             Err(_) => return false,
         };
@@ -195,7 +195,7 @@ impl NamespaceVerifier {
             Ok(pk) => pk,
             Err(_) => return false,
         };
-        
+
         let signature = match dilithium5::DetachedSignature::from_bytes(&sig_bytes) {
             Ok(sig) => sig,
             Err(_) => return false,
@@ -208,15 +208,19 @@ impl NamespaceVerifier {
     // Helper: Verify SPHINCS+ signature
     fn verify_sphincs_plus(public_key_hex: &str, message: &[u8], signature_hex: &str) -> bool {
         use pqcrypto_sphincsplus::sphincssha2256fsimple;
-        use pqcrypto_traits::sign::{PublicKey as PQPublicKey, DetachedSignature as PQDetachedSignature};
-
-        // Decode hex strings
-        let pk_bytes = match hex::decode(public_key_hex.strip_prefix("0x").unwrap_or(public_key_hex)) {
-            Ok(bytes) => bytes,
-            Err(_) => return false,
+        use pqcrypto_traits::sign::{
+            DetachedSignature as PQDetachedSignature, PublicKey as PQPublicKey,
         };
 
-        let sig_bytes = match hex::decode(signature_hex.strip_prefix("0x").unwrap_or(signature_hex)) {
+        // Decode hex strings
+        let pk_bytes =
+            match hex::decode(public_key_hex.strip_prefix("0x").unwrap_or(public_key_hex)) {
+                Ok(bytes) => bytes,
+                Err(_) => return false,
+            };
+
+        let sig_bytes = match hex::decode(signature_hex.strip_prefix("0x").unwrap_or(signature_hex))
+        {
             Ok(bytes) => bytes,
             Err(_) => return false,
         };
@@ -234,7 +238,7 @@ impl NamespaceVerifier {
             Ok(pk) => pk,
             Err(_) => return false,
         };
-        
+
         let signature = match sphincssha2256fsimple::DetachedSignature::from_bytes(&sig_bytes) {
             Ok(sig) => sig,
             Err(_) => return false,
@@ -263,10 +267,16 @@ mod tests {
         let mut cert = create_test_certificate();
         cert.identity.genesis_hash = genesis_hash;
 
-        assert!(NamespaceVerifier::verify_genesis_binding(&cert, &genesis_hash));
-        
+        assert!(NamespaceVerifier::verify_genesis_binding(
+            &cert,
+            &genesis_hash
+        ));
+
         let wrong_hash = [0u8; 32];
-        assert!(!NamespaceVerifier::verify_genesis_binding(&cert, &wrong_hash));
+        assert!(!NamespaceVerifier::verify_genesis_binding(
+            &cert,
+            &wrong_hash
+        ));
     }
 
     fn create_test_certificate() -> Certificate {

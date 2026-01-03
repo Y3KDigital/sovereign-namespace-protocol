@@ -1,13 +1,13 @@
-use serde::{Deserialize, Serialize};
-use crate::identity::Identity;
-use crate::namespace::Namespace;
-use crate::crypto::dilithium::{DilithiumSecretKey, DilithiumSignature, Dilithium5};
+use crate::crypto::dilithium::{Dilithium5, DilithiumSecretKey, DilithiumSignature};
 use crate::crypto::hash::{sha3_256_domain, DOMAIN_CERTIFICATE};
 use crate::crypto::traits::SignatureScheme;
 use crate::errors::Result;
+use crate::identity::Identity;
+use crate::namespace::Namespace;
+use serde::{Deserialize, Serialize};
 
 /// A certificate is a signed attestation binding identity to namespace
-/// 
+///
 /// Certificates are verifiable artifacts that prove:
 /// - Identity ownership
 /// - Namespace authority
@@ -18,21 +18,21 @@ pub struct Certificate {
     /// Subject identity ID
     #[serde(with = "hex_bytes")]
     pub subject: [u8; 32],
-    
+
     /// Namespace ID
     #[serde(with = "hex_bytes")]
     pub namespace: [u8; 32],
-    
+
     /// Claims root (hash of certificate claims)
     #[serde(with = "hex_bytes")]
     pub claims_root: [u8; 32],
-    
+
     /// Issuance timestamp (Unix epoch seconds)
     pub issued_at: u64,
-    
+
     /// Expiration timestamp (Unix epoch seconds, 0 = never expires)
     pub expires_at: u64,
-    
+
     /// Dilithium5 signature over certificate contents
     pub signature: DilithiumSignature,
 }
@@ -56,17 +56,14 @@ impl Certificate {
             expires_at,
             signature: DilithiumSignature::from_bytes(&vec![0u8; 4595]).unwrap(), // Placeholder
         };
-        
+
         // Compute signing message
         let signing_message = cert.signing_message();
-        
+
         // Sign with Dilithium5
         let signature = Dilithium5::sign(secret_key, &signing_message)?;
-        
-        Ok(Self {
-            signature,
-            ..cert
-        })
+
+        Ok(Self { signature, ..cert })
     }
 
     /// Compute the message to be signed (deterministic)
@@ -84,7 +81,7 @@ impl Certificate {
     /// Verify the certificate signature
     pub fn verify(&self, identity: &Identity) -> Result<bool> {
         use crate::errors::SnpError;
-        
+
         // Check identity binding
         if self.subject != identity.id {
             return Err(SnpError::NamespaceMismatch {
@@ -92,13 +89,13 @@ impl Certificate {
                 actual: format!("0x{}", hex::encode(self.subject)),
             });
         }
-        
+
         // Compute signing message
         let signing_message = self.signing_message();
-        
+
         // Verify signature
         let valid = Dilithium5::verify(&identity.public_key, &signing_message, &self.signature);
-        
+
         Ok(valid)
     }
 
@@ -108,12 +105,12 @@ impl Certificate {
         if self.issued_at > current_time {
             return false;
         }
-        
+
         // If expires_at is 0, never expires
         if self.expires_at == 0 {
             return true;
         }
-        
+
         // Must not be expired
         current_time < self.expires_at
     }
@@ -143,7 +140,7 @@ mod hex_bytes {
         let s = String::deserialize(deserializer)?;
         let s = s.strip_prefix("0x").unwrap_or(&s);
         let bytes = hex::decode(s).map_err(serde::de::Error::custom)?;
-        
+
         if bytes.len() != 32 {
             return Err(serde::de::Error::custom("Expected 32 bytes"));
         }
@@ -163,13 +160,15 @@ mod tests {
     #[test]
     fn test_certificate_generation() {
         let genesis = GenesisContext::new([42u8; 32]);
-        let namespace = Namespace::derive(&genesis, "test.ns", SovereigntyClass::Immutable).unwrap();
+        let namespace =
+            Namespace::derive(&genesis, "test.ns", SovereigntyClass::Immutable).unwrap();
         let (pk, sk) = Dilithium5::keypair(b"test seed").unwrap();
         let identity = Identity::derive(&namespace, "user", pk).unwrap();
-        
+
         let claims_root = [1u8; 32];
-        let cert = Certificate::generate(&identity, &namespace, claims_root, 1000, 2000, &sk).unwrap();
-        
+        let cert =
+            Certificate::generate(&identity, &namespace, claims_root, 1000, 2000, &sk).unwrap();
+
         assert_eq!(cert.subject, identity.id);
         assert_eq!(cert.namespace, namespace.id);
         assert_eq!(cert.claims_root, claims_root);
@@ -178,38 +177,43 @@ mod tests {
     #[test]
     fn test_certificate_verification() {
         let genesis = GenesisContext::new([42u8; 32]);
-        let namespace = Namespace::derive(&genesis, "test.ns", SovereigntyClass::Immutable).unwrap();
+        let namespace =
+            Namespace::derive(&genesis, "test.ns", SovereigntyClass::Immutable).unwrap();
         let (pk, sk) = Dilithium5::keypair(b"test seed").unwrap();
         let identity = Identity::derive(&namespace, "user", pk).unwrap();
-        
-        let cert = Certificate::generate(&identity, &namespace, [1u8; 32], 1000, 2000, &sk).unwrap();
-        
+
+        let cert =
+            Certificate::generate(&identity, &namespace, [1u8; 32], 1000, 2000, &sk).unwrap();
+
         assert!(cert.verify(&identity).unwrap());
     }
 
     #[test]
     fn test_certificate_validity() {
         let genesis = GenesisContext::new([42u8; 32]);
-        let namespace = Namespace::derive(&genesis, "test.ns", SovereigntyClass::Immutable).unwrap();
+        let namespace =
+            Namespace::derive(&genesis, "test.ns", SovereigntyClass::Immutable).unwrap();
         let (pk, sk) = Dilithium5::keypair(b"test seed").unwrap();
         let identity = Identity::derive(&namespace, "user", pk).unwrap();
-        
-        let cert = Certificate::generate(&identity, &namespace, [1u8; 32], 1000, 2000, &sk).unwrap();
-        
-        assert!(!cert.is_valid_at(500));   // Before issuance
-        assert!(cert.is_valid_at(1500));   // Within validity period
-        assert!(!cert.is_valid_at(2500));  // After expiration
+
+        let cert =
+            Certificate::generate(&identity, &namespace, [1u8; 32], 1000, 2000, &sk).unwrap();
+
+        assert!(!cert.is_valid_at(500)); // Before issuance
+        assert!(cert.is_valid_at(1500)); // Within validity period
+        assert!(!cert.is_valid_at(2500)); // After expiration
     }
 
     #[test]
     fn test_certificate_never_expires() {
         let genesis = GenesisContext::new([42u8; 32]);
-        let namespace = Namespace::derive(&genesis, "test.ns", SovereigntyClass::Immutable).unwrap();
+        let namespace =
+            Namespace::derive(&genesis, "test.ns", SovereigntyClass::Immutable).unwrap();
         let (pk, sk) = Dilithium5::keypair(b"test seed").unwrap();
         let identity = Identity::derive(&namespace, "user", pk).unwrap();
-        
+
         let cert = Certificate::generate(&identity, &namespace, [1u8; 32], 1000, 0, &sk).unwrap();
-        
+
         assert!(cert.is_valid_at(1000));
         assert!(cert.is_valid_at(u64::MAX)); // Never expires
     }

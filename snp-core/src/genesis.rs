@@ -1,8 +1,8 @@
-use serde::{Deserialize, Serialize};
 use crate::errors::{Result, SnpError};
+use serde::{Deserialize, Serialize};
 
 /// Genesis context - the immutable root of all protocol authority
-/// 
+///
 /// Everything in SNP is bound to exactly one genesis hash.
 /// This is the SHA3-256 output from the genesis ceremony.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -21,9 +21,8 @@ impl GenesisContext {
     /// Create from a hex string (with or without 0x prefix)
     pub fn from_hex(hex_str: &str) -> Result<Self> {
         let hex_str = hex_str.strip_prefix("0x").unwrap_or(hex_str);
-        let bytes = hex::decode(hex_str)
-            .map_err(|_| SnpError::InvalidGenesis)?;
-        
+        let bytes = hex::decode(hex_str).map_err(|_| SnpError::InvalidGenesis)?;
+
         if bytes.len() != 32 {
             return Err(SnpError::InvalidGenesis);
         }
@@ -43,7 +42,7 @@ impl GenesisContext {
     pub fn validate(&self) -> Result<()> {
         if self.genesis_hash.iter().all(|&b| b == 0) {
             return Err(SnpError::DeterminismViolation(
-                "Genesis hash cannot be all zeros".to_string()
+                "Genesis hash cannot be all zeros".to_string(),
             ));
         }
         Ok(())
@@ -68,7 +67,7 @@ mod hex_bytes {
         let s = String::deserialize(deserializer)?;
         let s = s.strip_prefix("0x").unwrap_or(&s);
         let bytes = hex::decode(s).map_err(serde::de::Error::custom)?;
-        
+
         if bytes.len() != 32 {
             return Err(serde::de::Error::custom("Expected 32 bytes"));
         }

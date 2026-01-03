@@ -59,11 +59,10 @@ fn verify_certificate(cert_path: &str, genesis_hex: &str, verbose: bool) -> Resu
         println!("Loading certificate: {}", cert_path);
     }
 
-    let cert_json = fs::read_to_string(cert_path)
-        .context("Failed to read certificate file")?;
+    let cert_json = fs::read_to_string(cert_path).context("Failed to read certificate file")?;
 
-    let certificate: Certificate = serde_json::from_str(&cert_json)
-        .context("Failed to parse certificate JSON")?;
+    let certificate: Certificate =
+        serde_json::from_str(&cert_json).context("Failed to parse certificate JSON")?;
 
     if verbose {
         println!("Certificate loaded: {}", certificate.identity.namespace_id);
@@ -71,8 +70,7 @@ fn verify_certificate(cert_path: &str, genesis_hex: &str, verbose: bool) -> Resu
 
     // Parse genesis hash
     let genesis_hex = genesis_hex.strip_prefix("0x").unwrap_or(genesis_hex);
-    let genesis_bytes = hex::decode(genesis_hex)
-        .context("Invalid genesis hash format")?;
+    let genesis_bytes = hex::decode(genesis_hex).context("Invalid genesis hash format")?;
 
     if genesis_bytes.len() != 32 {
         anyhow::bail!("Genesis hash must be exactly 32 bytes");
@@ -104,8 +102,14 @@ fn verify_certificate(cert_path: &str, genesis_hex: &str, verbose: bool) -> Resu
     if result.is_valid() {
         println!("\n✅ VALID - Certificate passes all checks");
         println!("\nNamespace: {}", certificate.identity.namespace_id);
-        println!("Hash: 0x{}", hex::encode(certificate.identity.namespace_hash));
-        println!("Rarity: {} ({})", certificate.rarity.tier, certificate.rarity.score);
+        println!(
+            "Hash: 0x{}",
+            hex::encode(certificate.identity.namespace_hash)
+        );
+        println!(
+            "Rarity: {} ({})",
+            certificate.rarity.tier, certificate.rarity.score
+        );
         println!("Class: {}", certificate.sovereignty.class);
         Ok(())
     } else {

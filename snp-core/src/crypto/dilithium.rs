@@ -1,9 +1,11 @@
-use pqcrypto_dilithium::dilithium5;
-use pqcrypto_traits::sign::{PublicKey as PQPublicKey, SecretKey as PQSecretKey, DetachedSignature as PQDetachedSignature};
-use serde::{Deserialize, Serialize};
-use crate::errors::{Result, SnpError};
-use crate::crypto::traits::SignatureScheme;
 use crate::crypto::hash::sha3_256;
+use crate::crypto::traits::SignatureScheme;
+use crate::errors::{Result, SnpError};
+use pqcrypto_dilithium::dilithium5;
+use pqcrypto_traits::sign::{
+    DetachedSignature as PQDetachedSignature, PublicKey as PQPublicKey, SecretKey as PQSecretKey,
+};
+use serde::{Deserialize, Serialize};
 
 /// Dilithium5 public key wrapper
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -29,9 +31,10 @@ pub struct DilithiumSignature {
 impl DilithiumPublicKey {
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         // Validate size
-        dilithium5::PublicKey::from_bytes(bytes)
-            .map_err(|_| SnpError::InvalidPublicKey)?;
-        Ok(Self { bytes: bytes.to_vec() })
+        dilithium5::PublicKey::from_bytes(bytes).map_err(|_| SnpError::InvalidPublicKey)?;
+        Ok(Self {
+            bytes: bytes.to_vec(),
+        })
     }
 
     pub fn as_bytes(&self) -> &[u8] {
@@ -46,9 +49,10 @@ impl DilithiumPublicKey {
 impl DilithiumSecretKey {
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         // Validate size
-        dilithium5::SecretKey::from_bytes(bytes)
-            .map_err(|_| SnpError::InvalidSecretKey)?;
-        Ok(Self { bytes: bytes.to_vec() })
+        dilithium5::SecretKey::from_bytes(bytes).map_err(|_| SnpError::InvalidSecretKey)?;
+        Ok(Self {
+            bytes: bytes.to_vec(),
+        })
     }
 
     pub fn as_bytes(&self) -> &[u8] {
@@ -59,9 +63,10 @@ impl DilithiumSecretKey {
 impl DilithiumSignature {
     pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         // Validate size
-        dilithium5::DetachedSignature::from_bytes(bytes)
-            .map_err(|_| SnpError::InvalidSignature)?;
-        Ok(Self { bytes: bytes.to_vec() })
+        dilithium5::DetachedSignature::from_bytes(bytes).map_err(|_| SnpError::InvalidSignature)?;
+        Ok(Self {
+            bytes: bytes.to_vec(),
+        })
     }
 
     pub fn as_bytes(&self) -> &[u8] {
@@ -82,32 +87,36 @@ impl SignatureScheme for Dilithium5 {
     type Signature = DilithiumSignature;
 
     /// Generate a keypair from a seed
-    /// 
+    ///
     /// The seed is hashed with SHA3-256 to ensure uniform distribution,
     /// then used to seed the Dilithium5 key generation.
     fn keypair(seed: &[u8]) -> Result<(Self::PublicKey, Self::SecretKey)> {
         // Hash the seed to ensure uniform distribution
         let _uniform_seed = sha3_256(&[seed]);
-        
+
         // Use the first 32 bytes as seed for Dilithium5
         // Note: Dilithium5 uses its own internal key generation
         // For true deterministic generation, we'd need a seeded version
         // For now, we generate a keypair and derive it deterministically
         let (pk, sk) = dilithium5::keypair();
-        
+
         Ok((
-            DilithiumPublicKey { bytes: pk.as_bytes().to_vec() },
-            DilithiumSecretKey { bytes: sk.as_bytes().to_vec() },
+            DilithiumPublicKey {
+                bytes: pk.as_bytes().to_vec(),
+            },
+            DilithiumSecretKey {
+                bytes: sk.as_bytes().to_vec(),
+            },
         ))
     }
 
     /// Sign a message with Dilithium5
     fn sign(sk: &Self::SecretKey, msg: &[u8]) -> Result<Self::Signature> {
-        let secret_key = dilithium5::SecretKey::from_bytes(&sk.bytes)
-            .map_err(|_| SnpError::InvalidSecretKey)?;
-        
+        let secret_key =
+            dilithium5::SecretKey::from_bytes(&sk.bytes).map_err(|_| SnpError::InvalidSecretKey)?;
+
         let sig = dilithium5::detached_sign(msg, &secret_key);
-        
+
         Ok(DilithiumSignature {
             bytes: sig.as_bytes().to_vec(),
         })
@@ -119,12 +128,12 @@ impl SignatureScheme for Dilithium5 {
             Ok(pk) => pk,
             Err(_) => return false,
         };
-        
+
         let signature = match dilithium5::DetachedSignature::from_bytes(&sig.bytes) {
             Ok(sig) => sig,
             Err(_) => return false,
         };
-        
+
         dilithium5::verify_detached_signature(&signature, msg, &public_key).is_ok()
     }
 }
@@ -157,7 +166,7 @@ mod tests {
     fn test_keypair_generation() {
         let seed = b"test seed for deterministic generation";
         let (pk, sk) = Dilithium5::keypair(seed).unwrap();
-        
+
         assert!(!pk.as_bytes().is_empty());
         assert!(!sk.as_bytes().is_empty());
     }
@@ -166,10 +175,10 @@ mod tests {
     fn test_sign_and_verify() {
         let seed = b"test seed";
         let (pk, sk) = Dilithium5::keypair(seed).unwrap();
-        
+
         let message = b"test message";
         let sig = Dilithium5::sign(&sk, message).unwrap();
-        
+
         assert!(Dilithium5::verify(&pk, message, &sig));
         assert!(!Dilithium5::verify(&pk, b"wrong message", &sig));
     }

@@ -7,7 +7,7 @@ pub struct GenesisCeremony;
 
 impl GenesisCeremony {
     /// Compute genesis hash from entropy sources and parameters
-    /// 
+    ///
     /// Formula (from GENESIS_SPEC.md):
     /// GENESIS_HASH = SHA3-256(
     ///     PROTOCOL_VERSION ||
@@ -31,28 +31,58 @@ impl GenesisCeremony {
         hasher.update(b"SNP/v1.0");
 
         // Bitcoin block hash
-        let btc_hash = hex::decode(entropy.bitcoin_block.hash.strip_prefix("0x").unwrap_or(&entropy.bitcoin_block.hash))
-            .context("Invalid Bitcoin block hash")?;
+        let btc_hash = hex::decode(
+            entropy
+                .bitcoin_block
+                .hash
+                .strip_prefix("0x")
+                .unwrap_or(&entropy.bitcoin_block.hash),
+        )
+        .context("Invalid Bitcoin block hash")?;
         hasher.update(&btc_hash);
 
         // Ethereum block hash
-        let eth_hash = hex::decode(entropy.ethereum_block.hash.strip_prefix("0x").unwrap_or(&entropy.ethereum_block.hash))
-            .context("Invalid Ethereum block hash")?;
+        let eth_hash = hex::decode(
+            entropy
+                .ethereum_block
+                .hash
+                .strip_prefix("0x")
+                .unwrap_or(&entropy.ethereum_block.hash),
+        )
+        .context("Invalid Ethereum block hash")?;
         hasher.update(&eth_hash);
 
         // NIST beacon output
-        let nist_output = hex::decode(entropy.nist_beacon.output.strip_prefix("0x").unwrap_or(&entropy.nist_beacon.output))
-            .context("Invalid NIST beacon output")?;
+        let nist_output = hex::decode(
+            entropy
+                .nist_beacon
+                .output
+                .strip_prefix("0x")
+                .unwrap_or(&entropy.nist_beacon.output),
+        )
+        .context("Invalid NIST beacon output")?;
         hasher.update(&nist_output);
 
         // Cosmic measurement
-        let cosmic_value = hex::decode(entropy.cosmic_source.value.strip_prefix("0x").unwrap_or(&entropy.cosmic_source.value))
-            .context("Invalid cosmic measurement")?;
+        let cosmic_value = hex::decode(
+            entropy
+                .cosmic_source
+                .value
+                .strip_prefix("0x")
+                .unwrap_or(&entropy.cosmic_source.value),
+        )
+        .context("Invalid cosmic measurement")?;
         hasher.update(&cosmic_value);
 
         // MPC ceremony output
-        let mpc_output = hex::decode(entropy.mpc_ceremony.final_output.strip_prefix("0x").unwrap_or(&entropy.mpc_ceremony.final_output))
-            .context("Invalid MPC output")?;
+        let mpc_output = hex::decode(
+            entropy
+                .mpc_ceremony
+                .final_output
+                .strip_prefix("0x")
+                .unwrap_or(&entropy.mpc_ceremony.final_output),
+        )
+        .context("Invalid MPC output")?;
         hasher.update(&mpc_output);
 
         // Parameters commitment (hash of parameters)
@@ -158,41 +188,51 @@ mod tests {
         let entropy = EntropySources {
             bitcoin_block: BitcoinBlock {
                 height: 875000,
-                hash: "0x0000000000000000000000000000000000000000000000000000000000000001".to_string(),
+                hash: "0x0000000000000000000000000000000000000000000000000000000000000001"
+                    .to_string(),
                 timestamp: 1737072000,
             },
             ethereum_block: EthereumBlock {
                 height: 21000000,
-                hash: "0x0000000000000000000000000000000000000000000000000000000000000002".to_string(),
+                hash: "0x0000000000000000000000000000000000000000000000000000000000000002"
+                    .to_string(),
                 timestamp: 1737072000,
             },
             nist_beacon: NistBeacon {
                 pulse_index: "1234567890".to_string(),
-                output: "0x0000000000000000000000000000000000000000000000000000000000000003".to_string(),
+                output: "0x0000000000000000000000000000000000000000000000000000000000000003"
+                    .to_string(),
                 timestamp: 1737072000,
             },
             cosmic_source: CosmicSource {
                 observatory: "Test Observatory".to_string(),
                 measurement_id: "test-001".to_string(),
-                value: "0x0000000000000000000000000000000000000000000000000000000000000004".to_string(),
+                value: "0x0000000000000000000000000000000000000000000000000000000000000004"
+                    .to_string(),
             },
             mpc_ceremony: MpcCeremony {
                 participants: vec!["participant1".to_string()],
-                commitments: vec!["0x0000000000000000000000000000000000000000000000000000000000000005".to_string()],
-                final_output: "0x0000000000000000000000000000000000000000000000000000000000000006".to_string(),
+                commitments: vec![
+                    "0x0000000000000000000000000000000000000000000000000000000000000005"
+                        .to_string(),
+                ],
+                final_output: "0x0000000000000000000000000000000000000000000000000000000000000006"
+                    .to_string(),
             },
         };
 
         let parameters = GenesisParameters::default();
         let ceremony_date = "2026-01-15T00:00:00Z";
 
-        let genesis_hash = GenesisCeremony::compute_genesis_hash(&entropy, &parameters, ceremony_date).unwrap();
+        let genesis_hash =
+            GenesisCeremony::compute_genesis_hash(&entropy, &parameters, ceremony_date).unwrap();
 
         // Hash should be deterministic
         assert_eq!(genesis_hash.len(), 32);
 
         // Second computation should match
-        let genesis_hash2 = GenesisCeremony::compute_genesis_hash(&entropy, &parameters, ceremony_date).unwrap();
+        let genesis_hash2 =
+            GenesisCeremony::compute_genesis_hash(&entropy, &parameters, ceremony_date).unwrap();
         assert_eq!(genesis_hash, genesis_hash2);
     }
 }

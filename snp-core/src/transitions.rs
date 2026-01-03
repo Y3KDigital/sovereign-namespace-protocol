@@ -1,16 +1,18 @@
-use serde::{Deserialize, Serialize};
-use crate::namespace::Namespace;
-use crate::crypto::dilithium::{DilithiumPublicKey, DilithiumSecretKey, DilithiumSignature, Dilithium5};
+use crate::crypto::dilithium::{
+    Dilithium5, DilithiumPublicKey, DilithiumSecretKey, DilithiumSignature,
+};
 use crate::crypto::hash::sha3_256_domain;
 use crate::crypto::traits::SignatureScheme;
-use crate::sovereignty::SovereigntyClass;
 use crate::errors::{Result, SnpError};
+use crate::namespace::Namespace;
+use crate::sovereignty::SovereigntyClass;
+use serde::{Deserialize, Serialize};
 
 /// Domain separation tag for transition proofs
 pub const DOMAIN_TRANSITION: &[u8] = b"SNP::TRANSITION";
 
 /// A sovereignty transition represents a change in namespace ownership or authority
-/// 
+///
 /// Transitions are constrained by sovereignty class:
 /// - Immutable: No transitions allowed
 /// - Transferable: One-way ownership transfer
@@ -22,16 +24,16 @@ pub struct SovereigntyTransition {
     /// Namespace being transitioned
     #[serde(with = "hex_bytes")]
     pub namespace_id: [u8; 32],
-    
+
     /// Type of transition
     pub transition_type: TransitionType,
-    
+
     /// Transition proof
     pub proof: TransitionProof,
-    
+
     /// Timestamp of transition
     pub timestamp: u64,
-    
+
     /// Signature by current authority
     pub signature: DilithiumSignature,
 }
@@ -44,14 +46,14 @@ pub enum TransitionType {
         #[serde(with = "hex_bytes")]
         new_owner: [u8; 32],
     },
-    
+
     /// Delegate authority (Delegable only)
     Delegate {
         #[serde(with = "hex_vec")]
         delegates: Vec<[u8; 32]>,
         threshold: u32,
     },
-    
+
     /// Execute succession (Heritable only)
     Succession {
         #[serde(with = "hex_bytes")]
@@ -59,7 +61,7 @@ pub enum TransitionType {
         #[serde(with = "hex_bytes")]
         condition_proof: [u8; 32],
     },
-    
+
     /// Seal namespace permanently (any class → Sealed)
     Seal,
 }
@@ -70,10 +72,10 @@ pub struct TransitionProof {
     /// Hash of transition data
     #[serde(with = "hex_bytes")]
     pub data_hash: [u8; 32],
-    
+
     /// Additional signatures (for delegation)
     pub co_signatures: Vec<DilithiumSignature>,
-    
+
     /// Nonce to prevent replay attacks
     pub nonce: u64,
 }
@@ -89,37 +91,29 @@ impl SovereigntyTransition {
     ) -> Result<Self> {
         // Validate sovereignty class allows transfer
         if !namespace.sovereignty.allows_transfer() {
-            return Err(SnpError::InvalidSovereigntyTransition(
-                format!("{:?} class does not allow transfers", namespace.sovereignty)
-            ));
+            return Err(SnpError::InvalidSovereigntyTransition(format!(
+                "{:?} class does not allow transfers",
+                namespace.sovereignty
+            )));
         }
-        
+
         let transition_type = TransitionType::Transfer { new_owner };
-        
+
         // Create proof
-        let data_hash = Self::compute_data_hash(
-            &namespace.id,
-            &transition_type,
-            timestamp,
-            nonce,
-        );
-        
+        let data_hash = Self::compute_data_hash(&namespace.id, &transition_type, timestamp, nonce);
+
         let proof = TransitionProof {
             data_hash,
             co_signatures: vec![],
             nonce,
         };
-        
+
         // Sign transition
-        let signing_message = Self::create_signing_message(
-            &namespace.id,
-            &transition_type,
-            &proof,
-            timestamp,
-        );
-        
+        let signing_message =
+            Self::create_signing_message(&namespace.id, &transition_type, &proof, timestamp);
+
         let signature = Dilithium5::sign(current_owner_key, &signing_message)?;
-        
+
         Ok(Self {
             namespace_id: namespace.id,
             transition_type,
@@ -128,7 +122,7 @@ impl SovereigntyTransition {
             signature,
         })
     }
-    
+
     /// Create a new delegation transition
     pub fn create_delegation(
         namespace: &Namespace,
@@ -140,44 +134,41 @@ impl SovereigntyTransition {
     ) -> Result<Self> {
         // Validate sovereignty class allows delegation
         if !namespace.sovereignty.allows_delegation() {
-            return Err(SnpError::InvalidSovereigntyTransition(
-                format!("{:?} class does not allow delegation", namespace.sovereignty)
-            ));
+            return Err(SnpError::InvalidSovereigntyTransition(format!(
+                "{:?} class does not allow delegation",
+                namespace.sovereignty
+            )));
         }
-        
+
         // Validate threshold
         if threshold == 0 || threshold as usize > delegates.len() {
-            return Err(SnpError::InvalidSovereigntyTransition(
-                format!("Invalid threshold: {} delegates, {} required", delegates.len(), threshold)
-            ));
+            return Err(SnpError::InvalidSovereigntyTransition(format!(
+                "Invalid threshold: {} delegates, {} required",
+                delegates.len(),
+                threshold
+            )));
         }
-        
-        let transition_type = TransitionType::Delegate { delegates, threshold };
-        
+
+        let transition_type = TransitionType::Delegate {
+            delegates,
+            threshold,
+        };
+
         // Create proof
-        let data_hash = Self::compute_data_hash(
-            &namespace.id,
-            &transition_type,
-            timestamp,
-            nonce,
-        );
-        
+        let data_hash = Self::compute_data_hash(&namespace.id, &transition_type, timestamp, nonce);
+
         let proof = TransitionProof {
             data_hash,
             co_signatures: vec![],
             nonce,
         };
-        
+
         // Sign transition
-        let signing_message = Self::create_signing_message(
-            &namespace.id,
-            &transition_type,
-            &proof,
-            timestamp,
-        );
-        
+        let signing_message =
+            Self::create_signing_message(&namespace.id, &transition_type, &proof, timestamp);
+
         let signature = Dilithium5::sign(current_owner_key, &signing_message)?;
-        
+
         Ok(Self {
             namespace_id: namespace.id,
             transition_type,
@@ -186,7 +177,7 @@ impl SovereigntyTransition {
             signature,
         })
     }
-    
+
     /// Create a new succession transition
     pub fn create_succession(
         namespace: &Namespace,
@@ -198,37 +189,32 @@ impl SovereigntyTransition {
     ) -> Result<Self> {
         // Validate sovereignty class allows inheritance
         if !namespace.sovereignty.allows_inheritance() {
-            return Err(SnpError::InvalidSovereigntyTransition(
-                format!("{:?} class does not allow inheritance", namespace.sovereignty)
-            ));
+            return Err(SnpError::InvalidSovereigntyTransition(format!(
+                "{:?} class does not allow inheritance",
+                namespace.sovereignty
+            )));
         }
-        
-        let transition_type = TransitionType::Succession { heir, condition_proof };
-        
+
+        let transition_type = TransitionType::Succession {
+            heir,
+            condition_proof,
+        };
+
         // Create proof
-        let data_hash = Self::compute_data_hash(
-            &namespace.id,
-            &transition_type,
-            timestamp,
-            nonce,
-        );
-        
+        let data_hash = Self::compute_data_hash(&namespace.id, &transition_type, timestamp, nonce);
+
         let proof = TransitionProof {
             data_hash,
             co_signatures: vec![],
             nonce,
         };
-        
+
         // Sign transition
-        let signing_message = Self::create_signing_message(
-            &namespace.id,
-            &transition_type,
-            &proof,
-            timestamp,
-        );
-        
+        let signing_message =
+            Self::create_signing_message(&namespace.id, &transition_type, &proof, timestamp);
+
         let signature = Dilithium5::sign(executor_key, &signing_message)?;
-        
+
         Ok(Self {
             namespace_id: namespace.id,
             transition_type,
@@ -237,7 +223,7 @@ impl SovereigntyTransition {
             signature,
         })
     }
-    
+
     /// Create a seal transition (permanent freeze)
     pub fn create_seal(
         namespace: &Namespace,
@@ -248,36 +234,27 @@ impl SovereigntyTransition {
         // Sealed namespaces cannot transition
         if namespace.sovereignty == SovereigntyClass::Sealed {
             return Err(SnpError::InvalidSovereigntyTransition(
-                "Namespace is already sealed".to_string()
+                "Namespace is already sealed".to_string(),
             ));
         }
-        
+
         let transition_type = TransitionType::Seal;
-        
+
         // Create proof
-        let data_hash = Self::compute_data_hash(
-            &namespace.id,
-            &transition_type,
-            timestamp,
-            nonce,
-        );
-        
+        let data_hash = Self::compute_data_hash(&namespace.id, &transition_type, timestamp, nonce);
+
         let proof = TransitionProof {
             data_hash,
             co_signatures: vec![],
             nonce,
         };
-        
+
         // Sign transition
-        let signing_message = Self::create_signing_message(
-            &namespace.id,
-            &transition_type,
-            &proof,
-            timestamp,
-        );
-        
+        let signing_message =
+            Self::create_signing_message(&namespace.id, &transition_type, &proof, timestamp);
+
         let signature = Dilithium5::sign(owner_key, &signing_message)?;
-        
+
         Ok(Self {
             namespace_id: namespace.id,
             transition_type,
@@ -286,7 +263,7 @@ impl SovereigntyTransition {
             signature,
         })
     }
-    
+
     /// Verify transition signature
     pub fn verify(&self, public_key: &DilithiumPublicKey) -> Result<bool> {
         // Recompute signing message
@@ -296,39 +273,46 @@ impl SovereigntyTransition {
             &self.proof,
             self.timestamp,
         );
-        
+
         // Verify signature
-        Ok(Dilithium5::verify(public_key, &signing_message, &self.signature))
+        Ok(Dilithium5::verify(
+            public_key,
+            &signing_message,
+            &self.signature,
+        ))
     }
-    
+
     /// Add co-signature for delegated transitions
     pub fn add_co_signature(&mut self, signature: DilithiumSignature) {
         self.proof.co_signatures.push(signature);
     }
-    
+
     /// Verify all co-signatures for delegation
     pub fn verify_delegation(&self, _delegate_keys: &[[u8; 32]], threshold: u32) -> Result<bool> {
         match &self.transition_type {
-            TransitionType::Delegate { delegates: _, threshold: required_threshold } => {
+            TransitionType::Delegate {
+                delegates: _,
+                threshold: required_threshold,
+            } => {
                 if threshold != *required_threshold {
                     return Ok(false);
                 }
-                
+
                 // Need at least threshold valid signatures
                 if self.proof.co_signatures.len() < *required_threshold as usize {
                     return Ok(false);
                 }
-                
+
                 // Verify each co-signature is from a valid delegate
                 // (In production, this would check against actual delegate public keys)
                 Ok(self.proof.co_signatures.len() >= *required_threshold as usize)
             }
             _ => Err(SnpError::InvalidSovereigntyTransition(
-                "Not a delegation transition".to_string()
-            ))
+                "Not a delegation transition".to_string(),
+            )),
         }
     }
-    
+
     /// Compute data hash for transition
     fn compute_data_hash(
         namespace_id: &[u8; 32],
@@ -347,11 +331,11 @@ impl SovereigntyTransition {
             ],
         )
     }
-    
+
     /// Create signing message
     fn create_signing_message(
         namespace_id: &[u8; 32],
-        transition_type: &TransitionType,
+        _transition_type: &TransitionType,
         proof: &TransitionProof,
         timestamp: u64,
     ) -> Vec<u8> {
@@ -383,7 +367,7 @@ mod hex_bytes {
         let s = String::deserialize(deserializer)?;
         let s = s.strip_prefix("0x").unwrap_or(&s);
         let bytes = hex::decode(s).map_err(serde::de::Error::custom)?;
-        
+
         if bytes.len() != 32 {
             return Err(serde::de::Error::custom("Expected 32 bytes"));
         }
@@ -397,11 +381,12 @@ mod hex_bytes {
 mod hex_vec {
     use serde::{Deserialize, Deserializer, Serializer};
 
-    pub fn serialize<S>(items: &Vec<[u8; 32]>, serializer: S) -> Result<S::Ok, S::Error>
+    pub fn serialize<S>(items: &[[u8; 32]], serializer: S) -> Result<S::Ok, S::Error>
     where
         S: Serializer,
     {
-        let hex_strs: Vec<String> = items.iter()
+        let hex_strs: Vec<String> = items
+            .iter()
             .map(|bytes| format!("0x{}", hex::encode(bytes)))
             .collect();
         serializer.collect_seq(hex_strs)
@@ -412,19 +397,22 @@ mod hex_vec {
         D: Deserializer<'de>,
     {
         let strings: Vec<String> = Vec::deserialize(deserializer)?;
-        
-        strings.into_iter().map(|s| {
-            let s = s.strip_prefix("0x").unwrap_or(&s);
-            let bytes = hex::decode(s).map_err(serde::de::Error::custom)?;
-            
-            if bytes.len() != 32 {
-                return Err(serde::de::Error::custom("Expected 32 bytes"));
-            }
 
-            let mut array = [0u8; 32];
-            array.copy_from_slice(&bytes);
-            Ok(array)
-        }).collect()
+        strings
+            .into_iter()
+            .map(|s| {
+                let s = s.strip_prefix("0x").unwrap_or(&s);
+                let bytes = hex::decode(s).map_err(serde::de::Error::custom)?;
+
+                if bytes.len() != 32 {
+                    return Err(serde::de::Error::custom("Expected 32 bytes"));
+                }
+
+                let mut array = [0u8; 32];
+                array.copy_from_slice(&bytes);
+                Ok(array)
+            })
+            .collect()
     }
 }
 
@@ -436,70 +424,53 @@ mod tests {
     #[test]
     fn test_transfer_transition() {
         let genesis = GenesisContext::new([42u8; 32]);
-        let namespace = Namespace::derive(&genesis, "test.ns", SovereigntyClass::Transferable).unwrap();
+        let namespace =
+            Namespace::derive(&genesis, "test.ns", SovereigntyClass::Transferable).unwrap();
         let (pk, sk) = Dilithium5::keypair(b"owner").unwrap();
         let new_owner = [1u8; 32];
-        
-        let transition = SovereigntyTransition::create_transfer(
-            &namespace,
-            new_owner,
-            &sk,
-            1000,
-            1,
-        ).unwrap();
-        
+
+        let transition =
+            SovereigntyTransition::create_transfer(&namespace, new_owner, &sk, 1000, 1).unwrap();
+
         assert!(transition.verify(&pk).unwrap());
     }
 
     #[test]
     fn test_immutable_cannot_transfer() {
         let genesis = GenesisContext::new([42u8; 32]);
-        let namespace = Namespace::derive(&genesis, "test.ns", SovereigntyClass::Immutable).unwrap();
+        let namespace =
+            Namespace::derive(&genesis, "test.ns", SovereigntyClass::Immutable).unwrap();
         let (_pk, sk) = Dilithium5::keypair(b"owner").unwrap();
-        
-        let result = SovereigntyTransition::create_transfer(
-            &namespace,
-            [1u8; 32],
-            &sk,
-            1000,
-            1,
-        );
-        
+
+        let result = SovereigntyTransition::create_transfer(&namespace, [1u8; 32], &sk, 1000, 1);
+
         assert!(result.is_err());
     }
 
     #[test]
     fn test_delegation_transition() {
         let genesis = GenesisContext::new([42u8; 32]);
-        let namespace = Namespace::derive(&genesis, "test.ns", SovereigntyClass::Delegable).unwrap();
+        let namespace =
+            Namespace::derive(&genesis, "test.ns", SovereigntyClass::Delegable).unwrap();
         let (pk, sk) = Dilithium5::keypair(b"owner").unwrap();
-        
+
         let delegates = vec![[1u8; 32], [2u8; 32], [3u8; 32]];
-        let transition = SovereigntyTransition::create_delegation(
-            &namespace,
-            delegates,
-            2,
-            &sk,
-            1000,
-            1,
-        ).unwrap();
-        
+        let transition =
+            SovereigntyTransition::create_delegation(&namespace, delegates, 2, &sk, 1000, 1)
+                .unwrap();
+
         assert!(transition.verify(&pk).unwrap());
     }
 
     #[test]
     fn test_seal_transition() {
         let genesis = GenesisContext::new([42u8; 32]);
-        let namespace = Namespace::derive(&genesis, "test.ns", SovereigntyClass::Transferable).unwrap();
+        let namespace =
+            Namespace::derive(&genesis, "test.ns", SovereigntyClass::Transferable).unwrap();
         let (pk, sk) = Dilithium5::keypair(b"owner").unwrap();
-        
-        let transition = SovereigntyTransition::create_seal(
-            &namespace,
-            &sk,
-            1000,
-            1,
-        ).unwrap();
-        
+
+        let transition = SovereigntyTransition::create_seal(&namespace, &sk, 1000, 1).unwrap();
+
         assert!(transition.verify(&pk).unwrap());
     }
 
@@ -508,14 +479,9 @@ mod tests {
         let genesis = GenesisContext::new([42u8; 32]);
         let namespace = Namespace::derive(&genesis, "test.ns", SovereigntyClass::Sealed).unwrap();
         let (_pk, sk) = Dilithium5::keypair(b"owner").unwrap();
-        
-        let result = SovereigntyTransition::create_seal(
-            &namespace,
-            &sk,
-            1000,
-            1,
-        );
-        
+
+        let result = SovereigntyTransition::create_seal(&namespace, &sk, 1000, 1);
+
         assert!(result.is_err());
     }
 }

@@ -1,23 +1,23 @@
-use serde::{Deserialize, Serialize};
 use crate::errors::{Result, SnpError};
+use serde::{Deserialize, Serialize};
 
 /// Sovereignty class defines the ownership and transfer semantics of a namespace
-/// 
+///
 /// These are protocol-level state machines that constrain allowed operations.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 pub enum SovereigntyClass {
     /// Immutable - Never changes, never transfers, frozen forever
     Immutable,
-    
+
     /// Transferable - Ownership can be transferred to another party
     Transferable,
-    
+
     /// Delegable - Authority can be delegated (M-of-N multisig)
     Delegable,
-    
+
     /// Heritable - Succession rules can be defined
     Heritable,
-    
+
     /// Sealed - Cryptographically frozen, receive-only vault
     Sealed,
 }
@@ -44,7 +44,7 @@ impl SovereigntyClass {
     }
 
     /// Validate a transition from one sovereignty class to another
-    /// 
+    ///
     /// In general, sovereignty classes are set at creation and cannot be changed.
     /// This function exists to enforce that invariant.
     pub fn validate_transition(&self, new_class: Self) -> Result<()> {
@@ -53,9 +53,10 @@ impl SovereigntyClass {
         }
 
         // Sovereignty classes cannot be changed after creation
-        Err(SnpError::InvalidSovereigntyTransition(
-            format!("Cannot transition from {:?} to {:?}", self, new_class)
-        ))
+        Err(SnpError::InvalidSovereigntyTransition(format!(
+            "Cannot transition from {:?} to {:?}",
+            self, new_class
+        )))
     }
 
     /// Get the string representation for hashing
@@ -94,12 +95,18 @@ mod tests {
     #[test]
     fn test_sovereignty_transitions() {
         let class = SovereigntyClass::Immutable;
-        
+
         // Same class is always valid
-        assert!(class.validate_transition(SovereigntyClass::Immutable).is_ok());
-        
+        assert!(class
+            .validate_transition(SovereigntyClass::Immutable)
+            .is_ok());
+
         // Any other transition is invalid
-        assert!(class.validate_transition(SovereigntyClass::Transferable).is_err());
-        assert!(class.validate_transition(SovereigntyClass::Delegable).is_err());
+        assert!(class
+            .validate_transition(SovereigntyClass::Transferable)
+            .is_err());
+        assert!(class
+            .validate_transition(SovereigntyClass::Delegable)
+            .is_err());
     }
 }

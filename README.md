@@ -29,13 +29,13 @@ This is a **permanent trust primitive** and **digital scarcity substrate**.
 
 1. **[SPEC_INDEX.md](SPEC_INDEX.md)** — Navigation and conformance requirements
 2. **[VERSION.md](VERSION.md)** — Finality statement and immutability declaration
-3. **[CONSTITUTION.md](CONSTITUTION.md)** — Irreversible axioms and prohibited features
-4. **[GENESIS_SPEC.md](GENESIS_SPEC.md)** — One-time genesis ceremony protocol
-5. **[CRYPTO_PROFILE.md](CRYPTO_PROFILE.md)** — Post-quantum cryptographic primitives
-6. **[NAMESPACE_OBJECT.md](NAMESPACE_OBJECT.md)** — Namespace as cryptographic asset
-7. **[SOVEREIGNTY_CLASSES.md](SOVEREIGNTY_CLASSES.md)** — Control and transfer models
-8. **[VAULT_MODEL.md](VAULT_MODEL.md)** — Value containment and authorization
-9. **[STATELESS_VERIFIER.md](STATELESS_VERIFIER.md)** — Eternal verification algorithm
+3. **[CONSTITUTION.md](specs/CONSTITUTION.md)** — Irreversible axioms and prohibited features
+4. **[GENESIS_SPEC.md](specs/GENESIS_SPEC.md)** — One-time genesis ceremony protocol
+5. **[CRYPTO_PROFILE.md](specs/CRYPTO_PROFILE.md)** — Post-quantum cryptographic primitives
+6. **[NAMESPACE_OBJECT.md](specs/NAMESPACE_OBJECT.md)** — Namespace as cryptographic asset
+7. **[SOVEREIGNTY_CLASSES.md](specs/SOVEREIGNTY_CLASSES.md)** — Control and transfer models
+8. **[VAULT_MODEL.md](specs/VAULT_MODEL.md)** — Value containment and authorization
+9. **[STATELESS_VERIFIER.md](specs/STATELESS_VERIFIER.md)** — Eternal verification algorithm
 
 **These specifications are immutable.** No amendments, upgrades, or revisions are permitted.
 
@@ -150,7 +150,7 @@ curl http://localhost:8080/namespaces/1.x/rarity
 
 ### Cryptographic Guarantees (MUST)
 
-Per [CRYPTO_PROFILE.md](CRYPTO_PROFILE.md):
+Per [CRYPTO_PROFILE.md](specs/CRYPTO_PROFILE.md):
 - Post-quantum signatures: Dilithium5
 - Hash function: SHA3-256
 - Merkle trees: BLAKE3
@@ -158,7 +158,7 @@ Per [CRYPTO_PROFILE.md](CRYPTO_PROFILE.md):
 
 ### Identity Derivation (MUST)
 
-Per [NAMESPACE_OBJECT.md](NAMESPACE_OBJECT.md):
+Per [NAMESPACE_OBJECT.md](specs/NAMESPACE_OBJECT.md):
 ```
 NAMESPACE_HASH = SHA3-256(
   domain_separator ||
@@ -172,7 +172,7 @@ NAMESPACE_HASH = SHA3-256(
 
 ### Genesis Binding (MUST)
 
-Per [GENESIS_SPEC.md](GENESIS_SPEC.md):
+Per [GENESIS_SPEC.md](specs/GENESIS_SPEC.md):
 - Single genesis ceremony
 - Multi-party entropy
 - Key destruction proofs
@@ -226,9 +226,9 @@ From **constraints that cannot be reversed**:
 
 ---
 
-## Rarity Example (Specification)
+### Rarity Example (Specification)
 
-Per [NAMESPACE_OBJECT.md](NAMESPACE_OBJECT.md), rarity is deterministic:
+Per [NAMESPACE_OBJECT.md](specs/NAMESPACE_OBJECT.md), rarity is deterministic:
 
 ```
 Rarity Score = 
@@ -262,13 +262,10 @@ specs/                    # IMMUTABLE SPECIFICATIONS
   VAULT_MODEL.md
   STATELESS_VERIFIER.md
 
-crates/                   # Reference implementation (pre-spec)
-  namespace-core/
-  rarity-engine/
-  ipfs-integration/
-  certificate-gen/
-  smart-contract/
-  api-server/
+snp-verifier/            # Stateless verifier (spec-conformant)
+snp-genesis-cli/         # Genesis ceremony CLI
+snp-core/                # Core library (spec-conformant)
+snp-cli/                 # Command-line interface
 ```
 
 ### Testing (Current Implementation)
@@ -285,7 +282,7 @@ cargo doc --no-deps --open
 
 ## Prohibited "Features"
 
-Per [CONSTITUTION.md](CONSTITUTION.md), the following MUST NOT exist:
+Per [CONSTITUTION.md](specs/CONSTITUTION.md), the following MUST NOT exist:
 
 ❌ **Governance** — No DAOs, voting, proposals, or parameter changes  
 ❌ **Administration** — No admin keys, multisigs, or emergency controls  
@@ -328,16 +325,3 @@ Reference code: MIT License
 ---
 
 **SNP v1.0 — Sovereign by Mathematics, Not by Policy**
-- **Permanent Ownership**: Blockchain-backed NFTs
-- **Value Preservation**: Rarity increases over time
-- **Anti-Fraud**: Cryptographic guarantees
-
-## 🎯 Vision
-
-Build a Web3 ecosystem where value is intrinsic, not artificial. Where rarity is mathematical, not marketing. Where ownership is permanent, not leased.
-
-This is the foundation for a new paradigm of digital value.
-
----
-
-**Built with Rust 🦀 | Secured by Crypto 🔐 | Stored on IPFS 📦 | Minted on Blockchain ⛓️**
