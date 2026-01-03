@@ -1,0 +1,101 @@
+{
+  "ceremony": {
+    "protocol": "Y3K Sovereign Namespace Protocol",
+    "version": "1.0.0",
+    "ceremony_type": "canonical_genesis",
+    "pre_commit_date": "2026-01-03T00:00:00Z",
+    "execution_date": "2026-01-15T00:00:00Z"
+  },
+  "entropy_commitment": {
+    "timestamp": {
+      "value": "2026-01-15T00:00:00Z",
+      "timezone": "UTC",
+      "immutable": true,
+      "description": "Canonical genesis moment - pre-committed before any entropy values known"
+    },
+    "bitcoin_anchor": {
+      "rule": "first_block_after_timestamp",
+      "description": "First Bitcoin block mined at or after 2026-01-15T00:00:00Z",
+      "chain": "Bitcoin (mainnet)",
+      "query_method": "public_block_explorer",
+      "note": "Block hash UNKNOWN at pre-commit time - will be determined by Bitcoin network",
+      "pre_committed_height": null,
+      "pre_committed_hash": null
+    },
+    "nist_beacon": {
+      "rule": "first_pulse_after_timestamp",
+      "description": "First NIST Randomness Beacon pulse at or after 2026-01-15T00:00:00Z",
+      "service": "NIST Randomness Beacon 2.0",
+      "query_method": "https://beacon.nist.gov/beacon/2.0/chain/1/pulse/time/{unix_timestamp}",
+      "note": "Pulse output UNKNOWN at pre-commit time - will be determined by NIST service",
+      "pre_committed_pulse": null,
+      "pre_committed_output": null
+    },
+    "operator_commitment": {
+      "algorithm": "SHA3-256",
+      "commitment_hash": "a6c6b9af954728a8d250385839766f89792eceb7f8ea5353ae912a97e6c6e3fd",
+      "description": "SHA3-256 hash of 256-bit cryptographically secure operator seed",
+      "seed_location": "genesis/SECRETS/operator-commitment-seed.txt",
+      "entropy_source": "Windows RNGCryptoServiceProvider (FIPS 140-2 compliant CSPRNG)",
+      "note": "Seed generated BEFORE Bitcoin block or NIST pulse values known - proves no manipulation",
+      "commitment_verified": "SHA3-256 computed using Rust sha3 crate v0.10 (FIPS 202 compliant)",
+      "reveal_at": "2026-01-15T00:00:00Z"
+    }
+  },
+  "procedural_guarantees": {
+    "no_discretion": "All entropy sources determined by external systems (Bitcoin network, NIST) or pre-committed values (operator seed)",
+    "no_cherry_picking": "Operator seed committed before block/pulse values exist",
+    "no_retries": "Genesis executes exactly once with materialized entropy",
+    "offline_verifiable": "Anyone can verify: (1) commitment hash matches revealed seed, (2) Bitcoin block matches rule, (3) NIST pulse matches rule, (4) genesis hash derived correctly",
+    "immutable_timeline": "Timestamp locked at pre-commit - cannot be changed to seek favorable entropy"
+  },
+  "authority_keys": {
+    "ed25519": {
+      "key_id": "y3k-ed25519-genesis-01",
+      "fingerprint_sha3_256": "9d54cc2c9eef93a039b4b16eecb2689f19cfe1e982fa4627ff6ceac22a6841d7",
+      "generated": "2026-01-03T13:37:03Z",
+      "description": "Canonical signing key for genesis attestation"
+    },
+    "post_quantum": {
+      "key_id": "y3k-dilithium5-genesis-01",
+      "algorithm": "CRYSTALS-Dilithium5",
+      "fingerprint_sha3_256": "c26800051471a582d077c2c06d8f9016c3fa6b23782e5d0a8e7fbb61b44a0b1f",
+      "generated": "2026-01-03T13:37:03Z",
+      "description": "Post-quantum attestation key"
+    }
+  },
+  "publication": {
+    "publish_this_file": true,
+    "publish_method": "IPFS + GitHub + y3k.digital",
+    "publish_before": "2026-01-15T00:00:00Z",
+    "purpose": "Public commitment to entropy rules and operator seed hash - proves no post-hoc manipulation",
+    "cid": null
+  },
+  "verification": {
+    "at_ceremony": [
+      "Fetch Bitcoin block hash for first block ≥ timestamp",
+      "Fetch NIST pulse output for first pulse ≥ timestamp",
+      "Reveal operator seed from genesis/SECRETS/operator-commitment-seed.txt",
+      "Verify SHA3-256(seed) matches commitment_hash",
+      "Construct entropy_bundle.json with all values",
+      "Execute genesis with finalized entropy",
+      "Sign attestation with Ed25519 key",
+      "Publish: attestation, manifest, registry, certificates, entropy_bundle"
+    ],
+    "by_anyone": [
+      "Read this pre-commit file",
+      "Verify commitment_hash matches SHA3-256(revealed_seed)",
+      "Verify Bitcoin block satisfies rule (first block ≥ timestamp)",
+      "Verify NIST pulse satisfies rule (first pulse ≥ timestamp)",
+      "Recompute genesis hash from published entropy_bundle",
+      "Verify genesis hash matches attestation",
+      "Verify attestation signature with published Ed25519 public key"
+    ]
+  },
+  "attestation": {
+    "statement": "This pre-commitment record locks the Y3K canonical genesis ceremony to 2026-01-15T00:00:00Z with entropy derived from Bitcoin block, NIST Beacon pulse, and pre-committed operator seed. No discretion remains after this publication. Genesis can be verified by anyone, replicated by no one.",
+    "operator": "Y3K Genesis Authority",
+    "signature": null,
+    "signed_at": null
+  }
+}
