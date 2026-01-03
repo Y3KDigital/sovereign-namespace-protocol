@@ -1,0 +1,77 @@
+# Genesis Execution - Security Notice
+
+## ⚠️ NEVER COMMIT THESE FILES ⚠️
+
+# Private keys
+*.key
+*.pem
+*.secret
+*.sk
+*.seed
+*.p8
+*.p12
+*.keystore
+*_private_key*
+ed25519_key*
+dilithium5_key*
+
+# Secrets directory (contains all generated keys)
+SECRETS/
+**/SECRETS/
+
+# Revealed entropy seeds
+reveal_seed.txt
+operator_entropy.txt
+
+# Intermediate artifacts (before finalization)
+genesis/ARTIFACTS/*.partial
+genesis/ARTIFACTS/temp_*
+
+# Execution logs with sensitive data
+genesis_execution.log
+*.sensitive.log
+
+## SAFE TO COMMIT
+
+# Configuration templates
+GENESIS_CONFIG.json (with PLACEHOLDER values)
+entropy_bundle.json (before reveal)
+
+# Final published artifacts
+genesis/ARTIFACTS/manifest.json (after verification)
+genesis/ARTIFACTS/genesis_attestation.json (after signing)
+genesis/ARTIFACTS/genesis_registry.json (after finalization)
+
+# Publication hashes
+genesis/HASHES/*.sha3-256.txt
+genesis/HASHES/*.sha256.txt
+
+## KEY MANAGEMENT RULES
+
+1. Generate keys offline in air-gapped environment
+2. Store keys in secure vault, NOT in repository
+3. Use key paths outside repository during execution
+4. After genesis: archive keys securely, remove from active systems
+5. Public keys are safe to commit, private keys NEVER
+
+## ENTROPY SECURITY
+
+- Commit entropy_bundle.json with commit_hash BEFORE reveal
+- Update with reveal_seed ONLY at genesis execution time
+- DO NOT commit reveal_seed ahead of time
+- After genesis: revealed entropy is public (safe to publish)
+
+## ARTIFACT PUBLICATION
+
+Only publish after independent verification:
+- ✅ genesis_attestation.json (signed)
+- ✅ manifest.json (verified integrity)
+- ✅ genesis_registry.json (spot-checked scores)
+- ✅ Sample certificate bundles
+- ✅ Publication hashes
+
+DO NOT publish:
+- ❌ Private keys
+- ❌ Partial/unverified artifacts
+- ❌ Execution logs
+- ❌ Backup/temp files
