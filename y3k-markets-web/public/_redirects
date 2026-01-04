@@ -1,0 +1,15 @@
+# Cloudflare Pages redirects
+# Keep these minimal and explicit; static export cannot generate arbitrary server-side redirects.
+
+# Common "human guessed" docs routes
+/security /docs/canonical/security/ 308
+
+# Canonical docs common filename casing
+/docs/canonical/README /docs/canonical/readme/ 308
+/docs/canonical/README/ /docs/canonical/readme/ 308
+
+/docs/canonical/SECURITY /docs/canonical/security/ 308
+/docs/canonical/SECURITY/ /docs/canonical/security/ 308
+
+/docs/canonical/SPEC_INDEX /docs/canonical/spec-index/ 308
+/docs/canonical/SPEC_INDEX/ /docs/canonical/spec-index/ 308
