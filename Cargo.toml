@@ -10,6 +10,9 @@ members = [
     "snp-genesis-cli",
     "snp-core",
     "snp-cli",
+    "snp-policy",
+    "snp-keygen",
+    "payments-api",
 ]
 resolver = "2"
 

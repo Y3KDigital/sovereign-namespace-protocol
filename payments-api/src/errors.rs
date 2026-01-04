@@ -66,6 +66,18 @@ pub enum PaymentError {
     #[error("Invalid input: {0}")]
     InvalidInput(String),
 
+    #[error("Unauthorized")]
+    Unauthorized,
+
+    #[error("Affiliate not found")]
+    AffiliateNotFound,
+
+    #[error("Affiliate is inactive")]
+    AffiliateInactive,
+
+    #[error("Lead already exists")]
+    LeadAlreadyExists,
+
     #[error("Internal error: {0}")]
     InternalError(String),
 }
@@ -95,6 +107,30 @@ impl actix_web::ResponseError for PaymentError {
             PaymentError::InvalidWebhookSignature => {
                 actix_web::HttpResponse::Unauthorized().json(serde_json::json!({
                     "error": "invalid_signature",
+                    "message": self.to_string()
+                }))
+            }
+            PaymentError::Unauthorized => {
+                actix_web::HttpResponse::Unauthorized().json(serde_json::json!({
+                    "error": "unauthorized",
+                    "message": self.to_string()
+                }))
+            }
+            PaymentError::AffiliateNotFound => {
+                actix_web::HttpResponse::NotFound().json(serde_json::json!({
+                    "error": "affiliate_not_found",
+                    "message": self.to_string()
+                }))
+            }
+            PaymentError::AffiliateInactive => {
+                actix_web::HttpResponse::build(StatusCode::FORBIDDEN).json(serde_json::json!({
+                    "error": "affiliate_inactive",
+                    "message": self.to_string()
+                }))
+            }
+            PaymentError::LeadAlreadyExists => {
+                actix_web::HttpResponse::Conflict().json(serde_json::json!({
+                    "error": "lead_already_exists",
                     "message": self.to_string()
                 }))
             }

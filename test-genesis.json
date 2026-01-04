@@ -1,21 +1,21 @@
 {
   "version": "1.0.0",
-  "ceremony_date": "2026-01-15T00:00:00Z",
+  "ceremony_date": "2026-01-03T00:00:00Z",
   "entropy_sources": {
     "bitcoin_block": {
       "height": 875000,
       "hash": "0x000000000000000000010000000000000000000100000000000000000001",
-      "timestamp": 1767358779
+      "timestamp": 1767447837
     },
     "ethereum_block": {
       "height": 21000000,
       "hash": "0x0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
-      "timestamp": 1767358779
+      "timestamp": 1767447837
     },
     "nist_beacon": {
-      "pulse_index": "1767358779",
+      "pulse_index": "1767447837",
       "output": "0xfedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210",
-      "timestamp": 1767358779
+      "timestamp": 1767447837
     },
     "cosmic_source": {
       "observatory": "Arecibo Observatory",
@@ -60,7 +60,7 @@
       900
     ]
   },
-  "genesis_hash": "0x6787f9320ad087315948d2b60c210c674dc1844f451436a9f25156f9d54096fc",
+  "genesis_hash": "0xd32e80a31c4856983141b245ed767c7474be9a921c11fc74df87e72320e5df5f",
   "key_destruction_proof": "mock_proof_0x123...",
   "ipfs_cid": null
 }

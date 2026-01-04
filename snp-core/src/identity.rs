@@ -4,6 +4,9 @@ use crate::crypto::dilithium::DilithiumPublicKey;
 use crate::crypto::hash::{sha3_256_domain, DOMAIN_IDENTITY};
 use crate::errors::{Result, SnpError};
 
+/// Type alias for identity identifiers
+pub type IdentityId = [u8; 32];
+
 /// An identity is a subject bound to a namespace with a post-quantum public key
 /// 
 /// Identities are derived deterministically from:

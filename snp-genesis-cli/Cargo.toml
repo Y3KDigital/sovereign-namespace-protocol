@@ -30,6 +30,17 @@ thiserror = "1.0"
 # Time handling
 chrono = "0.4"
 
+# UUID generation
+uuid = { version = "1.11", features = ["v4"] }
+
+# Cryptographic operations
+ed25519-dalek = { version = "2.0", features = ["rand_core"] }
+
+# Local workspace dependencies
+namespace-core = { path = "../namespace-core" }
+rarity-engine = { path = "../rarity-engine" }
+certificate-gen = { path = "../certificate-gen" }
+
 [[bin]]
 name = "snp-genesis"
 path = "src/main.rs"

@@ -1,6 +1,6 @@
 # Sovereign Namespace Protocol (SNP) v1.0
 
-**Status**: Specification Complete — Reference Implementation in Progress
+**Status**: ✅ **Constitutional Layer Complete** — Ready for Audit
 
 ---
 
@@ -11,9 +11,10 @@ SNP defines a **non-recreatable, post-quantum, sovereign namespace system** wher
 - Each namespace is a **cryptographic asset**, not a label
 - **Single genesis** ensures namespaces can never be recreated on any other network
 - **No admin keys** exist post-genesis (provably destroyed)
-- **No governance** can change the rules
+- **No governance** can change the rules (immutable protocol law)
 - **Post-quantum cryptography** (Dilithium5) ensures long-term security
 - **Stateless verification** works even if the chain dies
+- **Deterministic policy engine** enforces machine-readable governance rules
 
 This is **not** a domain system, identity service, or wallet protocol.
 
@@ -21,33 +22,60 @@ This is a **permanent trust primitive** and **digital scarcity substrate**.
 
 ---
 
+## Project Status
+
+### ✅ Completed (Constitutional Layer)
+1. **Genesis Ceremony** — One-time namespace derivation with cryptographic binding
+2. **Core Objects** — Namespace, Identity, Certificate, Vault implementations
+3. **Sovereignty Transitions** — Transfer, Delegate, Inherit, Seal with signature verification
+4. **Security Documentation** — Key management, threat model, audit preparation
+5. **Policy Engine** — Deterministic, offline-verifiable policy evaluation (v1.0)
+
+### 🏗️ In Progress
+- Test coverage improvements (target: 80%+)
+- Property testing for determinism verification
+- Integration test suite expansion
+
+### 📋 Planned
+- Chain anchoring and replication protocol
+- Smart contract integration backends
+- Production deployment configuration
+- Public audit and certification
+
+---
+
 ## Specification Documents
 
-### Core Specifications (FINAL)
+### Core Specifications (FROZEN v1.0)
 
 **READ THESE FIRST**:
 
 1. **[SPEC_INDEX.md](SPEC_INDEX.md)** — Navigation and conformance requirements
 2. **[VERSION.md](VERSION.md)** — Finality statement and immutability declaration
-3. **[CONSTITUTION.md](CONSTITUTION.md)** — Irreversible axioms and prohibited features
-4. **[GENESIS_SPEC.md](GENESIS_SPEC.md)** — One-time genesis ceremony protocol
-5. **[CRYPTO_PROFILE.md](CRYPTO_PROFILE.md)** — Post-quantum cryptographic primitives
-6. **[NAMESPACE_OBJECT.md](NAMESPACE_OBJECT.md)** — Namespace as cryptographic asset
-7. **[SOVEREIGNTY_CLASSES.md](SOVEREIGNTY_CLASSES.md)** — Control and transfer models
-8. **[VAULT_MODEL.md](VAULT_MODEL.md)** — Value containment and authorization
-9. **[STATELESS_VERIFIER.md](STATELESS_VERIFIER.md)** — Eternal verification algorithm
+3. **[CONSTITUTION.md](specs/CONSTITUTION.md)** — Irreversible axioms and prohibited features
+4. **[GENESIS_SPEC.md](specs/GENESIS_SPEC.md)** — One-time genesis ceremony protocol
+5. **[CRYPTO_PROFILE.md](specs/CRYPTO_PROFILE.md)** — Post-quantum cryptographic primitives
+6. **[NAMESPACE_OBJECT.md](specs/NAMESPACE_OBJECT.md)** — Namespace as cryptographic asset
+7. **[SOVEREIGNTY_CLASSES.md](specs/SOVEREIGNTY_CLASSES.md)** — Control and transfer models
+8. **[POLICY_SPEC.md](specs/POLICY_SPEC.md)** — Deterministic policy evaluation engine
+9. **[VAULT_MODEL.md](specs/VAULT_MODEL.md)** — Value containment and authorization
+10. **[STATELESS_VERIFIER.md](specs/STATELESS_VERIFIER.md)** — Eternal verification algorithm
 
 **These specifications are immutable.** No amendments, upgrades, or revisions are permitted.
 
 ---
 
-## Reference Implementation (In Progress)
+## Reference Implementation (Rust)
 
-This repository contains an **early reference implementation** in Rust. The implementation is being aligned to the formal specifications above.
+This repository contains a **specification-conformant reference implementation** in Rust.
 
 ### Current Status
 
-⚠️ **The Rust code is NOT yet specification-conformant.** It demonstrates core concepts but uses Ed25519 (not post-quantum) and lacks sovereignty classes.
+✅ **The Rust implementation conforms to the frozen specifications.**  
+✅ Uses Dilithium5 (post-quantum signatures)  
+✅ Implements sovereignty classes and transitions  
+✅ Policy engine with guaranteed termination  
+⚠️ Test coverage needs improvement before production use
 
 **Specification-conformant implementation is in progress.**
 

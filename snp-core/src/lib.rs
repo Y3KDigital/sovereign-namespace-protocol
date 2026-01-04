@@ -62,8 +62,8 @@ pub mod prelude {
     };
     pub use crate::sovereignty::SovereigntyClass;
     pub use crate::transitions::{SovereigntyTransition, TransitionType, TransitionProof};
-    pub use crate::namespace::Namespace;
-    pub use crate::identity::Identity;
-    pub use crate::vault::VaultDescriptor;
+    pub use crate::namespace::{Namespace, NamespaceId};
+    pub use crate::identity::{Identity, IdentityId};
+    pub use crate::vault::{VaultDescriptor, VaultId};
     pub use crate::certificate::Certificate;
 }

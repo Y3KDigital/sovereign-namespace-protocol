@@ -45,6 +45,23 @@ genesis/SECRETS/
 *.sqlite
 *.sqlite3
 
+# SQLite transient and backup artifacts (avoid committing WAL/SHM and backups)
+*.db-wal
+*.db-shm
+*.db-journal
+*.db.*
+
+# Generic editor/backup artifacts
+*.bak
+
+# Ignore generated affiliate/broker link exports (contain portal tokens)
+payments-api/affiliates.created.csv
+payments-api/affiliates.created.*.csv
+payments-api/outreach/
+
+# Ignore broker roster inputs (can contain PII)
+payments-api/affiliates.brokers*.csv
+
 # Ignore log files
 *.log
 

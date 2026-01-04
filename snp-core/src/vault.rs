@@ -3,6 +3,9 @@ use crate::namespace::Namespace;
 use crate::crypto::hash::{sha3_256_domain, DOMAIN_VAULT};
 use crate::errors::Result;
 
+/// Type alias for vault identifiers
+pub type VaultId = [u8; 32];
+
 /// Vault descriptor - a deterministically derived address for asset custody
 /// 
 /// Vaults are derived from:

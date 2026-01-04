@@ -4,7 +4,7 @@ use colored::Colorize;
 mod commands;
 mod utils;
 
-use commands::{namespace, identity, certificate, vault, keygen, transition};
+use commands::{namespace, identity, certificate, vault, keygen, transition, policy};
 
 #[derive(Parser)]
 #[command(name = "snp")]
@@ -40,6 +40,10 @@ enum Commands {
     /// Sovereignty transitions (transfer, delegate, inherit, seal)
     #[command(subcommand)]
     Transition(TransitionCommands),
+    
+    /// Policy engine (create, evaluate, verify, bind)
+    #[command(subcommand)]
+    Policy(PolicyCommands),
 }
 
 #[derive(Subcommand)]
@@ -322,6 +326,80 @@ enum TransitionCommands {
     },
 }
 
+#[derive(Subcommand)]
+enum PolicyCommands {
+    /// Create a new policy
+    Create {
+        /// Policy name
+        #[arg(short, long)]
+        name: String,
+        
+        /// Policy version
+        #[arg(short, long, default_value = "1")]
+        version: u32,
+        
+        /// Rules file (JSON)
+        #[arg(short, long)]
+        rules: String,
+        
+        /// Secret key file (policy creator)
+        #[arg(short, long)]
+        seckey: String,
+        
+        /// Output file for policy
+        #[arg(short, long)]
+        output: String,
+    },
+    
+    /// Evaluate policy against context
+    Evaluate {
+        /// Policy file
+        #[arg(short, long)]
+        policy: String,
+        
+        /// Evaluation context file (JSON)
+        #[arg(short, long)]
+        context: String,
+    },
+    
+    /// Verify policy signature
+    Verify {
+        /// Policy file
+        #[arg(short, long)]
+        policy: String,
+        
+        /// Creator's public key file
+        #[arg(long)]
+        pubkey: String,
+    },
+    
+    /// Bind policy to namespace
+    Bind {
+        /// Policy file
+        #[arg(short, long)]
+        policy: String,
+        
+        /// Namespace file
+        #[arg(short, long)]
+        namespace: String,
+        
+        /// Secret key file (binder authority)
+        #[arg(short, long)]
+        seckey: String,
+        
+        /// Output file for binding
+        #[arg(short, long)]
+        output: String,
+    },
+    
+    /// List policies
+    List {
+        /// Optional namespace file
+        #[arg(short, long)]
+        namespace: Option<String>,
+    },
+}
+
 fn main() {
     let cli = Cli::parse();
     
@@ -378,6 +456,23 @@ fn main() {
             }
             TransitionCommands::Verify { file, pubkey } => {
                 transition::verify(&file, &pubkey)
+            }
+        },
+        Commands::Policy(cmd) => match cmd {
+            PolicyCommands::Create { name, version, rules, seckey, output } => {
+                policy::create(&name, version, &rules, &seckey, &output)
+            }
+            PolicyCommands::Evaluate { policy: policy_file, context } => {
+                policy::evaluate(&policy_file, &context)
+            }
+            PolicyCommands::Verify { policy: policy_file, pubkey } => {
+                policy::verify(&policy_file, &pubkey)
+            }
+            PolicyCommands::Bind { policy: policy_file, namespace, seckey, output } => {
+                policy::bind(&policy_file, &namespace, &seckey, &output)
+            }
+            PolicyCommands::List { namespace } => {
+                policy::list(namespace.as_deref())
             }
         },
     };

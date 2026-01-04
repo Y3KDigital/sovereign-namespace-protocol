@@ -4,6 +4,9 @@ use crate::sovereignty::SovereigntyClass;
 use crate::crypto::hash::{sha3_256_domain, DOMAIN_NAMESPACE};
 use crate::errors::{Result, SnpError};
 
+/// Type alias for namespace identifiers
+pub type NamespaceId = [u8; 32];
+
 /// A namespace is a unique, deterministic identifier derived from:
 /// - Genesis hash (protocol binding)
 /// - Label (human-readable name)

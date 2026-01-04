@@ -1,7 +1,10 @@
 use anyhow::{Context, Result};
 use clap::{Parser, Subcommand};
-use snp_genesis_cli::{GenesisCeremony, GenesisParameters, GenesisTranscript, EntropySources};
+use snp_genesis_cli::{GenesisCeremony, GenesisParameters, GenesisTranscript, EntropySources, GenesisRunner};
 use std::fs;
+
+mod genesis_cmd;
+use genesis_cmd::run_genesis;
 
 #[derive(Parser)]
 #[command(name = "snp-genesis")]
@@ -13,6 +16,21 @@ struct Cli {
 
 #[derive(Subcommand)]
 enum Commands {
+    /// Run production genesis ceremony
+    Run {
+        /// Path to GENESIS_CONFIG.json
+        #[arg(short, long)]
+        config: String,
+
+        /// Private key file for signing (ed25519)
+        #[arg(short, long)]
+        key: Option<String>,
+
+        /// Offline mode (no network operations)
+        #[arg(long, default_value = "false")]
+        offline: bool,
+    },
+
     /// Run genesis ceremony (mock mode for testing)
     RunMock {
         /// Ceremony date (ISO 8601 format)
@@ -42,6 +60,9 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
+        Commands::Run { config, key, offline } => {
+            run_genesis(&config, key.as_deref(), offline)?;
+        }
         Commands::RunMock { date, output } => {
             run_mock_ceremony(&date, &output)?;
         }

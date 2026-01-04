@@ -4,3 +4,4 @@ pub mod certificate;
 pub mod vault;
 pub mod keygen;
 pub mod transition;
+pub mod policy;

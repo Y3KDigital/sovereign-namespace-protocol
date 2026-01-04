@@ -152,6 +152,12 @@ async fn main() -> std::io::Result<()> {
                     .route("/health", web::get().to(handlers::health_check))
                     .route("/payments/create-intent", web::post().to(handlers::create_payment_intent))
                     .route("/payments/webhook", web::post().to(handlers::stripe_webhook))
+                    .route("/affiliates", web::post().to(handlers::create_affiliate_admin))
+                    .route(
+                        "/affiliates/portal/{portal_token}",
+                        web::get().to(handlers::affiliate_portal),
+                    )
+                    .route("/affiliates/leads", web::post().to(handlers::create_affiliate_lead))
                     .route("/orders/{order_id}", web::get().to(handlers::get_order))
                     .route("/downloads/{token}", web::get().to(handlers::download_certificate))
                     .route("/inventory/status", web::get().to(handlers::get_inventory_status))
