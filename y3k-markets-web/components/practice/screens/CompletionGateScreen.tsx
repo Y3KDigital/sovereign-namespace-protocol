@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { getPublicApiBase } from '@/lib/publicApiBase';
 
 interface CompletionGateScreenProps {
   sessionToken: string;
@@ -43,8 +44,10 @@ export default function CompletionGateScreen({ sessionToken, session }: Completi
     try {
       setIsSubmitting(true);
 
+      const apiBase = getPublicApiBase();
+
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/practice/complete`,
+        `${apiBase}/api/practice/complete`,
         {
           method: 'POST',
           headers: {

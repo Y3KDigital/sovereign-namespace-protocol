@@ -155,8 +155,17 @@ function rewriteDocHref(originalHref: string): string {
   const rel = href.replace(/^\.\//, "");
   if (rel.endsWith(".md")) {
     const normalized = rel.replace(/^\.\.\//g, "").replace(/\\/g, "/");
-    const mapped = CANONICAL_BY_SOURCE_PATH[normalized];
-    if (mapped) return mapped;
+
+    // 1) Direct mapping (e.g. "specs/GENESIS_SPEC.md")
+    const direct = CANONICAL_BY_SOURCE_PATH[normalized];
+    if (direct) return direct;
+
+    // 2) SPEC_INDEX.md commonly links to filenames without the "specs/" prefix
+    // (e.g. "CONSTITUTION.md"). Rewrite those to the canonical specs routes.
+    const basename = normalized.split("/").pop() ?? normalized;
+    const inferredSpecsPath = `specs/${basename}`;
+    const inferred = CANONICAL_BY_SOURCE_PATH[inferredSpecsPath];
+    if (inferred) return inferred;
   }
 
   return href;

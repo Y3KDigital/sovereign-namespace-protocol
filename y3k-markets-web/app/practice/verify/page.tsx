@@ -7,6 +7,7 @@
 import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import PracticeBanner from '@/components/practice/PracticeBanner';
+import { getPublicApiBase } from '@/lib/publicApiBase';
 
 function VerifyContent() {
   const router = useRouter();
@@ -29,8 +30,9 @@ function VerifyContent() {
 
   const verifyEmail = async (token: string) => {
     try {
+      const apiBase = getPublicApiBase();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/practice/verify-email?token=${token}`
+        `${apiBase}/api/practice/verify-email?token=${token}`
       );
 
       const data = await response.json();

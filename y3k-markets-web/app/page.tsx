@@ -60,8 +60,9 @@ export default function Home() {
               <div className="text-5xl mb-4">🔐</div>
               <h3 className="text-2xl font-bold mb-3">Cryptographic Uniqueness</h3>
               <p className="text-gray-400">
-                Every namespace is generated using post-quantum cryptography (Dilithium5). 
-                Once created, it's mathematically impossible to duplicate.
+                Every namespace is generated and bound under SNP's cryptographic profile (post-quantum signatures via
+                NIST-standard ML-DSA/Dilithium and modern hashing). Once created, duplicates are cryptographically
+                infeasible—and verification can be performed offline.
               </p>
             </div>
             <div className="p-8 rounded-xl bg-white/5 border border-white/10 hover:border-purple-500/50 transition">
@@ -97,7 +98,7 @@ export default function Home() {
                 <h3 className="text-xl font-bold mb-2">True Scarcity</h3>
                 <p className="text-gray-400">
                   Traditional NFTs rely on creator promises. Y3K namespaces are cryptographically unique—
-                  it's physically impossible to create duplicates.
+                  duplication is cryptographically infeasible.
                 </p>
               </div>
             </div>
@@ -107,7 +108,8 @@ export default function Home() {
                 <h3 className="text-xl font-bold mb-2">Post-Quantum Ready</h3>
                 <p className="text-gray-400">
                   Most blockchains use ECDSA signatures vulnerable to quantum computers. 
-                  Y3K uses NIST-standard Dilithium5, future-proofing your assets.
+                  SNP is designed around NIST-standard post-quantum signatures (ML-DSA/Dilithium) to support long-term
+                  verification as cryptography evolves.
                 </p>
               </div>
             </div>

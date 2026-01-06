@@ -15,6 +15,7 @@ import VerificationScreen from '@/components/practice/screens/VerificationScreen
 import FinalityScreen from '@/components/practice/screens/FinalityScreen';
 import QuizScreen from '@/components/practice/screens/QuizScreen';
 import CompletionGateScreen from '@/components/practice/screens/CompletionGateScreen';
+import { getPublicApiBase } from '@/lib/publicApiBase';
 
 interface PracticeSession {
   id: string;
@@ -53,8 +54,9 @@ function SessionContent() {
     }
 
     try {
+      const apiBase = getPublicApiBase();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/practice/session/${sessionToken}`
+        `${apiBase}/api/practice/session/${sessionToken}`
       );
 
       if (!response.ok) {

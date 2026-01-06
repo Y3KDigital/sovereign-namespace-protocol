@@ -6,8 +6,8 @@ const rarityTiers = [
     color: "from-pink-600 to-red-600",
     textColor: "text-pink-500",
     borderColor: "border-pink-500/50",
-    probability: "< 0.01%",
-    score: "9,500+",
+    probability: "Tier 6",
+    score: "901–1000",
     example: "1.x",
     description: "Legendary one-of-a-kind namespaces with perfect cryptographic properties",
   },
@@ -16,8 +16,8 @@ const rarityTiers = [
     color: "from-yellow-500 to-orange-500",
     textColor: "text-yellow-500",
     borderColor: "border-yellow-500/50",
-    probability: "< 0.1%",
-    score: "9,000 - 9,499",
+    probability: "Tier 5",
+    score: "751–900",
     example: "42.x",
     description: "Extraordinarily rare with exceptional hash patterns",
   },
@@ -26,8 +26,8 @@ const rarityTiers = [
     color: "from-purple-600 to-indigo-600",
     textColor: "text-purple-500",
     borderColor: "border-purple-500/50",
-    probability: "< 1%",
-    score: "8,000 - 8,999",
+    probability: "Tier 4",
+    score: "501–750",
     example: "777.x",
     description: "Highly valuable with remarkable structural uniqueness",
   },
@@ -36,8 +36,8 @@ const rarityTiers = [
     color: "from-blue-500 to-cyan-500",
     textColor: "text-blue-500",
     borderColor: "border-blue-500/50",
-    probability: "< 5%",
-    score: "7,000 - 7,999",
+    probability: "Tier 3",
+    score: "251–500",
     example: "1337.x",
     description: "Uncommon namespaces with strong cryptographic traits",
   },
@@ -46,8 +46,8 @@ const rarityTiers = [
     color: "from-green-500 to-emerald-500",
     textColor: "text-green-500",
     borderColor: "border-green-500/50",
-    probability: "< 15%",
-    score: "6,000 - 6,999",
+    probability: "Tier 2",
+    score: "101–250",
     example: "8888.x",
     description: "Above-average uniqueness with notable properties",
   },
@@ -56,8 +56,8 @@ const rarityTiers = [
     color: "from-gray-500 to-gray-600",
     textColor: "text-gray-500",
     borderColor: "border-gray-500/50",
-    probability: "> 15%",
-    score: "< 6,000",
+    probability: "Tier 1",
+    score: "0–100",
     example: "123456.x",
     description: "Standard namespaces with baseline cryptographic security",
   },
@@ -71,8 +71,12 @@ export function RarityShowcase() {
           Rarity Tiers
         </h2>
         <p className="text-center text-gray-400 mb-16 max-w-2xl mx-auto">
-          Every namespace is assigned a rarity score based on cryptographic properties: 
+          Every namespace is assigned a deterministic rarity score (0-1000) based on cryptographic properties:
           hash entropy, byte distribution, and structural complexity.
+        </p>
+
+        <p className="text-center text-gray-500 mb-10 max-w-3xl mx-auto text-sm">
+          Examples are illustrative only; rarity is computed solely from cryptographic properties, not numeric meaning.
         </p>
         
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">

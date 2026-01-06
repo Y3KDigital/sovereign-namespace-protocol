@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from "next/link";
+import { getPublicApiBase } from "@/lib/publicApiBase";
 
 interface Namespace {
   namespace: string;
@@ -36,7 +37,7 @@ export default function ExplorePage() {
     setLoading(true);
 
     try {
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:8081';
+      const apiUrl = getPublicApiBase();
       const url = selectedTier 
         ? `${apiUrl}/api/namespaces?tier=${selectedTier}&limit=100`
         : `${apiUrl}/api/namespaces?limit=100`;

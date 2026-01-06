@@ -2,6 +2,10 @@
 
 $ErrorActionPreference = "Stop"
 
+# Pin Wrangler to a known-good version to avoid intermittent Pages deploy failures.
+# (Newer Wrangler releases have occasionally returned: "Failed to publish your Function. Got error: Unknown internal error occurred.")
+$WranglerVersion = "3.22.1"
+
 Write-Host "Deploying Y3K Markets to Cloudflare Pages..." -ForegroundColor Cyan
 
 # Check if node_modules exists
@@ -21,13 +25,14 @@ if ($LASTEXITCODE -ne 0) {
 
 # Deploy to Cloudflare Pages
 Write-Host "Deploying to Cloudflare Pages..." -ForegroundColor Yellow
-npx wrangler pages deploy out --project-name=y3kmarkets --branch=main --commit-dirty=true
+npx -y "wrangler@$WranglerVersion" pages deploy out --project-name=y3kmarkets --branch=main --commit-dirty=true
 
 if ($LASTEXITCODE -eq 0) {
     Write-Host "Deployment successful." -ForegroundColor Green
     Write-Host ""
     Write-Host "Your site will be available at:" -ForegroundColor Cyan
-    Write-Host "  https://y3k-markets.pages.dev" -ForegroundColor White
+    Write-Host "  https://y3kmarkets.pages.dev" -ForegroundColor White
+    Write-Host "  https://x.y3kmarkets.com" -ForegroundColor White
     Write-Host "  https://y3kmarkets.com" -ForegroundColor White
 } else {
     Write-Host "Deployment failed." -ForegroundColor Red

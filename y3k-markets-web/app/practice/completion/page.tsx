@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import PracticeBanner from '@/components/practice/PracticeBanner';
+import { getPublicApiBase } from '@/lib/publicApiBase';
 
 interface CompletionData {
   completion_token: string;
@@ -33,8 +34,9 @@ function CompletionContent() {
     }
 
     try {
+      const apiBase = getPublicApiBase();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/practice/completion/${completionToken}`
+        `${apiBase}/api/practice/completion/${completionToken}`
       );
 
       if (!response.ok) {

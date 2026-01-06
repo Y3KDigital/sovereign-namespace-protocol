@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { getPublicApiBase } from "@/lib/publicApiBase";
 
 type Affiliate = {
   id: string;
@@ -55,8 +56,7 @@ export default function PartnerClient() {
   const token = (searchParams.get("t") || "").trim();
 
   const apiBase = useMemo(() => {
-    const v = process.env.NEXT_PUBLIC_API_URL;
-    return (v && v.trim()) || "https://api.y3kmarkets.com";
+    return getPublicApiBase();
   }, []);
 
   const [data, setData] = useState<AffiliatePortalResponse | null>(null);

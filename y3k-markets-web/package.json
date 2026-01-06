@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "pages:deploy": "npm run build && npx wrangler pages deploy out --project-name=y3kmarkets --branch=main"
+    "pages:deploy": "npm run build && npx wrangler pages deploy out --project-name=y3kmarkets --branch=main",
+    "verify:deploy": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\verify-deploy.ps1"
   },
   "dependencies": {
     "next": "^14.1.0",

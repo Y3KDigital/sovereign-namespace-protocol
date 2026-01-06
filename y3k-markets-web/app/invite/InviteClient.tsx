@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
+import { getPublicApiBase } from "@/lib/publicApiBase";
 
 async function fetchWithTimeout(input: RequestInfo, init: RequestInit, timeoutMs: number) {
   const controller = new AbortController();
@@ -19,8 +20,7 @@ export default function InviteClient() {
   const referralCode = (searchParams.get("r") || "").trim();
 
   const apiBase = useMemo(() => {
-    const v = process.env.NEXT_PUBLIC_API_URL;
-    return (v && v.trim()) || "https://api.y3kmarkets.com";
+    return getPublicApiBase();
   }, []);
 
   const [email, setEmail] = useState("");

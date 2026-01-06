@@ -4,6 +4,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { getPublicApiBase } from '@/lib/publicApiBase';
 
 interface CertificateScreenProps {
   sessionToken: string;
@@ -47,8 +48,9 @@ export default function CertificateScreen({ sessionToken, session, onNext }: Cer
     setError(null);
 
     try {
+      const apiBase = getPublicApiBase();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/practice/generate-certificate`,
+        `${apiBase}/api/practice/generate-certificate`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

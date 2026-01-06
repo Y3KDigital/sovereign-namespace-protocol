@@ -7,6 +7,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import PracticeBanner from '@/components/practice/PracticeBanner';
+import { getPublicApiBase } from '@/lib/publicApiBase';
 
 export default function PracticeEntryPage() {
   const router = useRouter();
@@ -27,7 +28,8 @@ export default function PracticeEntryPage() {
     setIsLoading(true);
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/practice/start`, {
+      const apiBase = getPublicApiBase();
+      const response = await fetch(`${apiBase}/api/practice/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, acknowledgement }),

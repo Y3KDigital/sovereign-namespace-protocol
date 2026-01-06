@@ -4,6 +4,7 @@
 'use client';
 
 import { useState } from 'react';
+import { getPublicApiBase } from '@/lib/publicApiBase';
 
 interface IdentifierScreenProps {
   sessionToken: string;
@@ -44,8 +45,9 @@ export default function IdentifierScreen({ sessionToken, session, onNext }: Iden
     setIsChecking(true);
 
     try {
+      const apiBase = getPublicApiBase();
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/practice/identifier`,
+        `${apiBase}/api/practice/identifier`,
         {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

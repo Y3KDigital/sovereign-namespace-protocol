@@ -14,6 +14,15 @@
 /docs/canonical/SPEC_INDEX /docs/canonical/spec-index/ 308
 /docs/canonical/SPEC_INDEX/ /docs/canonical/spec-index/ 308
 
+# Legacy spec-index links (SPEC_INDEX.md contains these filenames as relative links)
+/docs/canonical/spec-index/CONSTITUTION.md /docs/canonical/specs/constitution/ 308
+/docs/canonical/spec-index/GENESIS_SPEC.md /docs/canonical/specs/genesis-spec/ 308
+/docs/canonical/spec-index/CRYPTO_PROFILE.md /docs/canonical/specs/crypto-profile/ 308
+/docs/canonical/spec-index/NAMESPACE_OBJECT.md /docs/canonical/specs/namespace-object/ 308
+/docs/canonical/spec-index/SOVEREIGNTY_CLASSES.md /docs/canonical/specs/sovereignty-classes/ 308
+/docs/canonical/spec-index/VAULT_MODEL.md /docs/canonical/specs/vault-model/ 308
+/docs/canonical/spec-index/STATELESS_VERIFIER.md /docs/canonical/specs/stateless-verifier/ 308
+
 # Trust / status convenience
 /trust-center /trust/ 308
 /trust-center/ /trust/ 308

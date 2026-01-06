@@ -35,16 +35,21 @@ Or set a local environment variable (recommended for CI) such as `CLOUDFLARE_API
 ### Step 2: Configure Custom Domain
 
 1. Go to [https://dash.cloudflare.com](https://dash.cloudflare.com)
-2. Navigate to Pages → y3k-markets
+2. Navigate to Pages → y3kmarkets
 3. Click "Custom domains"
 4. Add `y3kmarkets.com` and `www.y3kmarkets.com`
 5. DNS will be configured automatically
 
 ### Step 3: Verify Deployment
 
+For a verification-first, audit-friendly checklist (headers + raw HTML proof), see:
+
+- `DEPLOYMENT_VERIFICATION_PLAYBOOK.md`
+
 Visit your site:
 
-- **Cloudflare URL**: [https://y3k-markets.pages.dev](https://y3k-markets.pages.dev)
+- **Cloudflare URL**: [https://y3kmarkets.pages.dev](https://y3kmarkets.pages.dev)
+- **x subdomain**: [https://x.y3kmarkets.com](https://x.y3kmarkets.com)
 - **Custom domain**: [https://y3kmarkets.com](https://y3kmarkets.com)
 
 ## What's Included
@@ -84,11 +89,10 @@ Visit your site:
 
 Currently using mock data. To connect to your SNP Rust API:
 
-1. **Update API base URL** in components:
+1. **Set `NEXT_PUBLIC_API_URL`**:
 
-   ```typescript
-   const API_URL = "https://api.y3kmarkets.com";
-   ```
+   - For local dev: copy `.env.example` → `.env.local` and set your local API base.
+   - For Cloudflare Pages: set the same variable in Pages → Settings → Environment variables.
 
 2. **Create API service** (`lib/api.ts`):
 
@@ -165,7 +169,7 @@ Set these in Cloudflare Pages → Settings → Environment variables:
 ```dotenv
 NEXT_PUBLIC_API_URL=https://api.y3kmarkets.com
 NEXT_PUBLIC_IPFS_GATEWAY=https://ipfs.io/ipfs/
-NEXT_PUBLIC_CHAIN_ID=1 (or your blockchain network)
+# NEXT_PUBLIC_CHAIN_ID=1
 ```
 
 ## Performance Optimizations
@@ -174,7 +178,6 @@ Already included:
 
 - ✅ Static site generation (SSG)
 - ✅ Image optimization
-- ✅ Code splitting
 - ✅ Cloudflare CDN
 - ✅ Gzip compression
 
@@ -227,7 +230,7 @@ npx wrangler login
 ## Support
 
 - **Documentation**: This file + README.md
-- **Canonical protocol docs**: https://y3kmarkets.com/docs/canonical/readme/
+- **Canonical protocol docs**: <https://y3kmarkets.com/docs/canonical/readme/>
 - **Email**: [support@y3kdigital.com](mailto:support@y3kdigital.com)
 
 ---

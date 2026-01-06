@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { getPublicApiBase } from "@/lib/publicApiBase";
 
 type HealthOk = {
   status: string;
@@ -68,10 +69,7 @@ function Pill({
 
 export default function StatusPage() {
   const apiBase = useMemo(() => {
-    return (
-      process.env.NEXT_PUBLIC_API_URL ||
-      (typeof window !== "undefined" ? "https://api.y3kmarkets.com" : "https://api.y3kmarkets.com")
-    );
+    return getPublicApiBase();
   }, []);
 
   const [health, setHealth] = useState<FetchState<HealthOk>>({ state: "idle" });

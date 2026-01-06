@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { getPublicApiBase } from '@/lib/publicApiBase';
 
 interface QuizQuestion {
   id: number;
@@ -36,9 +37,11 @@ export default function QuizScreen({ sessionToken, onNext }: QuizScreenProps) {
     try {
       setIsLoading(true);
       setError(null);
+
+      const apiBase = getPublicApiBase();
       
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/practice/quiz/questions`,
+        `${apiBase}/api/practice/quiz/questions`,
         {
           headers: {
             'Content-Type': 'application/json',
@@ -80,8 +83,10 @@ export default function QuizScreen({ sessionToken, onNext }: QuizScreenProps) {
       setIsSubmitting(true);
       setError(null);
 
+      const apiBase = getPublicApiBase();
+
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/practice/quiz/submit`,
+        `${apiBase}/api/practice/quiz/submit`,
         {
           method: 'POST',
           headers: {

@@ -52,11 +52,27 @@ npx wrangler pages deploy out --project-name=y3kmarkets --branch=main
    - **Root directory**: `y3k-markets-web`
 5. Click "Save and Deploy"
 
+## Deployment verification (audit-friendly)
+
+If you need to prove what is *actually* being served (headers + raw HTML, resistant to stale extractors), use:
+
+- `DEPLOYMENT_VERIFICATION_PLAYBOOK.md`
+
+### CI evidence capture (Deployment Truth Control)
+
+This repo includes a GitHub Actions workflow that runs the same verification and uploads the terminal output as an artifact:
+
+- `.github/workflows/deployment-truth-control.yml`
+
+Use **Actions → Deployment Truth Control → Run workflow** (optionally override the base URLs).
+
 ## Environment Variables
 
-For production deployment, set these in Cloudflare Pages:
+For production deployment, set these in Cloudflare Pages.
 
-```
+For local development, copy `.env.example` to `.env.local` and adjust as needed.
+
+```dotenv
 NEXT_PUBLIC_API_URL=https://api.y3kmarkets.com
 NEXT_PUBLIC_IPFS_GATEWAY=https://ipfs.io/ipfs/
 ```
@@ -69,7 +85,7 @@ NEXT_PUBLIC_IPFS_GATEWAY=https://ipfs.io/ipfs/
 
 ## Project Structure
 
-```
+```text
 y3k-markets-web/
 ├── app/
 │   ├── page.tsx          # Home page
@@ -114,6 +130,6 @@ See ../LICENSE
 
 ## Support
 
-- Documentation: https://y3kmarkets.com/docs
-- Canonical protocol docs: https://y3kmarkets.com/docs/canonical/readme/
-- Email: support@y3kdigital.com
+- Documentation: <https://y3kmarkets.com/docs>
+- Canonical protocol docs: <https://y3kmarkets.com/docs/canonical/readme/>
+- Email: [support@y3kdigital.com](mailto:support@y3kdigital.com)
