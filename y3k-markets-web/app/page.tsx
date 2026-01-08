@@ -26,6 +26,9 @@ export default function Home() {
               <Link href="/trust" className="text-gray-300 hover:text-white transition">
                 Trust
               </Link>
+              <Link href="/docs/game-time" className="text-gray-300 hover:text-white transition">
+                Game Time
+              </Link>
               <Link href="/status" className="text-gray-300 hover:text-white transition">
                 Status
               </Link>

@@ -129,6 +129,9 @@ export default function StatusPage() {
               <Link href="/trust" className="hover:text-purple-400 transition">
                 Trust
               </Link>
+              <Link href="/docs/game-time" className="hover:text-purple-400 transition">
+                Game Time
+              </Link>
               <Link href="/status" className="text-purple-400">
                 Status
               </Link>

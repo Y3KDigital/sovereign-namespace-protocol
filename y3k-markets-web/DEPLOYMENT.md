@@ -85,34 +85,39 @@ Visit your site:
 
 ## Next Steps
 
-### 1. Connect to Rust API
+### 1. Connect to the Payments API (game-time critical)
 
-Currently using mock data. To connect to your SNP Rust API:
+The bowl-week pages and `/mint` call the **payments API** from the browser.
+
+Key endpoints used by the web app:
+
+- `POST /api/payments/create-intent`
+- `GET /api/orders/{order_id}`
+- `GET /api/downloads/{token}`
 
 1. **Set `NEXT_PUBLIC_API_URL`**:
 
    - For local dev: copy `.env.example` → `.env.local` and set your local API base.
-   - For Cloudflare Pages: set the same variable in Pages → Settings → Environment variables.
+   - For Cloudflare Pages (Git integration): set the variable in Pages → Settings → Environment variables (it is baked at build time).
+   - For local-build + `wrangler pages deploy` (this repo's default): ensure your local `.env.local` is correct **before** running `npm run build`.
 
-2. **Create API service** (`lib/api.ts`):
+2. **Set `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`**:
 
-   ```typescript
-   export async function generateNamespace(seed: string) {
-     const response = await fetch(`${API_URL}/namespaces`, {
-       method: 'POST',
-       headers: { 'Content-Type': 'application/json' },
-       body: JSON.stringify({ seed })
-     });
-     return response.json();
-   }
-   ```
+   - Required to render Stripe Elements checkout on `/mint`.
+   - This is public-safe (publishable key), but still treat it as a config value (don’t hardcode it).
 
-3. **Deploy Rust API** to production:
+3. **Ensure API CORS allows the site origin**:
 
-   ```powershell
-   cd ../api-server
-   # Deploy to cloud provider (AWS/Azure/DO)
-   ```
+   The payments API supports `CORS_ALLOWED_ORIGINS` and defaults to allowing:
+   `https://y3kmarkets.com`, `https://x.y3kmarkets.com`, `https://y3kmarkets.pages.dev`, and `http://localhost:3000`.
+   If you deploy additional subdomains, either:
+   - add them to `CORS_ALLOWED_ORIGINS`, or
+   - rely on the built-in `https://*.y3kmarkets.com` allowance.
+4. **Deploy payments API** to production:
+
+   - Deploy `../payments-api` to your API host.
+   - Ensure `STRIPE_API_KEY` + `STRIPE_WEBHOOK_SECRET` are set (and valid) for real purchases.
+   - Consider setting `REQUIRE_STRIPE=true` in production to prevent booting without Stripe.
 
 ### 2. Add Analytics
 
@@ -133,11 +138,15 @@ Optional integrations:
 
 ### 4. Enable Payments
 
-For marketplace functionality:
+Stripe checkout is now integrated on `/mint` (via Stripe Elements + PaymentIntents).
 
-- Integrate Stripe or similar payment processor
-- Add wallet connection (MetaMask, WalletConnect)
-- Implement escrow smart contracts
+For the backend execution protocol and webhook forwarding, see:
+
+- `../payments-api/STRIPE_TEST_EXECUTION.md`
+
+For “we are walking into the stadium” readiness, see:
+
+- `GAME_TIME_CHECKLIST.md`
 
 ## Development Workflow
 
@@ -169,6 +178,8 @@ Set these in Cloudflare Pages → Settings → Environment variables:
 ```dotenv
 NEXT_PUBLIC_API_URL=https://api.y3kmarkets.com
 NEXT_PUBLIC_IPFS_GATEWAY=https://ipfs.io/ipfs/
+# Stripe publishable key for client-side checkout (/mint)
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 # NEXT_PUBLIC_CHAIN_ID=1
 ```
 
@@ -193,12 +204,15 @@ Already configured:
 
 ## Security
 
-Already implemented:
+Deployment-time controls:
 
 - ✅ HTTPS only (via Cloudflare)
-- ✅ Content Security Policy headers
-- ✅ XSS protection
-- ✅ No sensitive data in client code
+- ✅ No sensitive data in client code (publishable Stripe key only)
+- ⚠️ Security headers (CSP, etc.) should be enforced via Cloudflare Pages headers/config
+
+If you need proof-oriented verification (headers + raw HTML), use:
+
+- `DEPLOYMENT_VERIFICATION_PLAYBOOK.md`
 
 ## Troubleshooting
 

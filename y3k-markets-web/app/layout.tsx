@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 
+import { getBrandGradientVars } from "@/lib/gameDay";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://y3kmarkets.com"),
   title: "Y3K Markets - True Web3 Rarity",
@@ -20,7 +22,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html
+      lang="en"
+      // Set brand colors (game-day mode) at build-time via NEXT_PUBLIC_GAME_TEAM.
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      style={getBrandGradientVars()}
+    >
       <body className="antialiased">
         {children}
       </body>

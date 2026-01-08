@@ -168,6 +168,22 @@ export default function DocsPage() {
             </div>
           </section>
 
+          {/* Operations */}
+          <section className="bg-white/5 border border-white/10 rounded-lg p-8">
+            <h2 className="text-3xl font-bold mb-6">Operations</h2>
+            <p className="text-gray-400 text-sm mb-6">
+              Fast, phone-friendly runbooks for launch windows.
+            </p>
+            <div className="grid md:grid-cols-2 gap-4">
+              <SpecCard
+                title="Game Time Checklist"
+                description="Bowl-week ops checklist for the mint funnel (web + payments-api + Stripe webhooks)."
+                status="live"
+                href="/docs/game-time"
+              />
+            </div>
+          </section>
+
           {/* Implementation Status */}
           <section className="bg-white/5 border border-white/10 rounded-lg p-8">
             <h2 className="text-3xl font-bold mb-6">Implementation Status</h2>

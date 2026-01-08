@@ -15,7 +15,7 @@ The official marketplace website for Y3K Markets - True Web3 Rarity.
 - **Frontend**: Next.js 14, React, TypeScript
 - **Styling**: Tailwind CSS
 - **Deployment**: Cloudflare Pages
-- **Backend**: Rust API (../api-server)
+- **Backend (payments + issuance)**: Rust payments API (`../payments-api`)
 
 ## Local Development
 
@@ -75,6 +75,7 @@ For local development, copy `.env.example` to `.env.local` and adjust as needed.
 ```dotenv
 NEXT_PUBLIC_API_URL=https://api.y3kmarkets.com
 NEXT_PUBLIC_IPFS_GATEWAY=https://ipfs.io/ipfs/
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=
 ```
 
 ## Custom Domain
@@ -104,15 +105,18 @@ y3k-markets-web/
 └── wrangler.toml        # Cloudflare config
 ```
 
-## Integration with SNP
+## Integration with payments-api (mint flow)
 
-This website connects to the Sovereign Namespace Protocol (SNP) Rust API:
+The `/mint` page and bowl-week landings create a Stripe PaymentIntent and then poll order status:
 
-- **Namespace generation**: `POST /namespaces`
-- **Rarity calculation**: `GET /namespaces/:id/rarity`
-- **Certificate verification**: `GET /certificates/:hash`
+- **Create payment intent**: `POST /api/payments/create-intent`
+- **Get order status**: `GET /api/orders/{order_id}`
+- **Download certificate**: `GET /api/downloads/{token}`
 
-See `../api-server/` for API implementation.
+See:
+
+- `../payments-api/README.md`
+- `../payments-api/STRIPE_TEST_EXECUTION.md`
 
 ## Production Checklist
 
