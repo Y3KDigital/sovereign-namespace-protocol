@@ -4,7 +4,8 @@ use colored::Colorize;
 mod commands;
 mod utils;
 
-use commands::{namespace, identity, certificate, vault, keygen, transition, policy};
+use commands::{namespace, identity, certificate, vault, keygen, transition};
+// use commands::policy; // TODO: Implement policy module
 
 #[derive(Parser)]
 #[command(name = "snp")]
@@ -41,9 +42,9 @@ enum Commands {
     #[command(subcommand)]
     Transition(TransitionCommands),
     
-    /// Policy engine (create, evaluate, verify, bind)
-    #[command(subcommand)]
-    Policy(PolicyCommands),
+    // /// Policy engine (create, evaluate, verify, bind)
+    // #[command(subcommand)]
+    // Policy(PolicyCommands),
 }
 
 #[derive(Subcommand)]
@@ -326,6 +327,7 @@ enum TransitionCommands {
     },
 }
 
+/*
 #[derive(Subcommand)]
 enum PolicyCommands {
     /// Create a new policy
@@ -399,6 +401,7 @@ enum PolicyCommands {
         namespace: Option<String>,
     },
 }
+*/
 
 fn main() {
     let cli = Cli::parse();
@@ -458,23 +461,23 @@ fn main() {
                 transition::verify(&file, &pubkey)
             }
         },
-        Commands::Policy(cmd) => match cmd {
-            PolicyCommands::Create { name, version, rules, seckey, output } => {
-                policy::create(&name, version, &rules, &seckey, &output)
-            }
-            PolicyCommands::Evaluate { policy: policy_file, context } => {
-                policy::evaluate(&policy_file, &context)
-            }
-            PolicyCommands::Verify { policy: policy_file, pubkey } => {
-                policy::verify(&policy_file, &pubkey)
-            }
-            PolicyCommands::Bind { policy: policy_file, namespace, seckey, output } => {
-                policy::bind(&policy_file, &namespace, &seckey, &output)
-            }
-            PolicyCommands::List { namespace } => {
-                policy::list(namespace.as_deref())
-            }
-        },
+        // Commands::Policy(cmd) => match cmd {
+        //     PolicyCommands::Create { name, version, rules, seckey, output } => {
+        //         policy::create(&name, version, &rules, &seckey, &output)
+        //     }
+        //     PolicyCommands::Evaluate { policy: policy_file, context } => {
+        //         policy::evaluate(&policy_file, &context)
+        //     }
+        //     PolicyCommands::Verify { policy: policy_file, pubkey } => {
+        //         policy::verify(&policy_file, &pubkey)
+        //     }
+        //     PolicyCommands::Bind { policy: policy_file, namespace, seckey, output } => {
+        //         policy::bind(&policy_file, &namespace, &seckey, &output)
+        //     }
+        //     PolicyCommands::List { namespace } => {
+        //         policy::list(namespace.as_deref())
+        //     }
+        // },
     };
     
     if let Err(e) = result {

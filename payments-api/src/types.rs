@@ -60,12 +60,23 @@ pub struct PaymentIntent {
     pub currency: String,
     pub customer_email: String,
     pub namespace_reserved: Option<String>,
+    /// Optional NIL label (CityNIL / MascotNIL) attached at purchase time.
+    pub nil_name: Option<String>,
+    pub nil_role: Option<NilRole>,
+    pub nil_pair_key: Option<String>,
     pub rarity_tier: String,
     pub status: PaymentStatus,
     pub created_at: DateTime<Utc>,
     pub settled_at: Option<DateTime<Utc>>,
     pub partner_id: Option<String>,
     pub affiliate_id: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[serde(rename_all = "snake_case")]
+pub enum NilRole {
+    City,
+    Mascot,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -88,6 +99,9 @@ pub struct IssuanceRecord {
     pub payment_intent_id: Uuid,
     pub namespace: String,
     pub tier: String,
+    pub nil_name: Option<String>,
+    pub nil_role: Option<NilRole>,
+    pub nil_pair_key: Option<String>,
     pub certificate_ipfs_cid: String,
     pub certificate_hash_sha3: String,
     pub customer_email: String,
@@ -121,6 +135,16 @@ pub struct StripeWebhookEvent {
 #[derive(Debug, Deserialize)]
 pub struct CreatePaymentRequest {
     pub customer_email: String,
+    /// Optional user-chosen namespace to reserve before payment settles.
+    /// If omitted, the system will generate one at issuance time.
+    pub namespace: Option<String>,
+    /// Optional NIL label to attach to this mint, e.g. "GlendaleNIL" or "HurricaneNIL".
+    pub nil_name: Option<String>,
+    /// Required if `nil_name` is provided.
+    pub nil_role: Option<NilRole>,
+    /// Optional stable key to group CityNIL + MascotNIL as one market.
+    /// If omitted (and `nil_name` present), the server will derive it.
+    pub nil_pair_key: Option<String>,
     pub rarity_tier: String,
     pub partner_id: Option<String>,
     pub affiliate_id: Option<String>,
@@ -129,11 +153,18 @@ pub struct CreatePaymentRequest {
 /// API response: Payment intent created
 #[derive(Debug, Serialize)]
 pub struct CreatePaymentResponse {
+    /// Local order identifier (UUID) used by GET /api/orders/{order_id}.
+    ///
+    /// NOTE: This is NOT the Stripe payment intent id.
+    pub order_id: String,
     pub payment_intent_id: String,
     pub client_secret: String,
     pub amount_cents: u64,
     pub currency: String,
     pub namespace_reserved: Option<String>,
+    pub nil_name: Option<String>,
+    pub nil_role: Option<NilRole>,
+    pub nil_pair_key: Option<String>,
 }
 
 /// API response: Order details
@@ -142,10 +173,112 @@ pub struct OrderResponse {
     pub order_id: String,
     pub status: PaymentStatus,
     pub namespace: Option<String>,
+    pub nil_name: Option<String>,
+    pub nil_role: Option<NilRole>,
+    pub nil_pair_key: Option<String>,
     pub certificate_ipfs_cid: Option<String>,
     pub download_url: Option<String>,
     pub amount_paid_cents: u64,
     pub created_at: DateTime<Utc>,
+}
+
+/// Signed "funding truth" receipt for an order.
+///
+/// Notes:
+/// - This is a *receipt* and audit artifact, not a blockchain settlement.
+/// - Signature covers `payload_json` bytes (canonical JSON derived from this struct).
+#[derive(Debug, Serialize)]
+pub struct FundingProofResponse {
+    pub order_id: String,
+    pub stripe_payment_intent_id: String,
+    pub currency: String,
+    pub amount_cents: u64,
+
+    pub affiliate_earned_cents: u64,
+    pub treasury_cents: u64,
+
+    pub created_at: DateTime<Utc>,
+    pub settled_at: Option<DateTime<Utc>>,
+
+    pub partner_id: Option<String>,
+    pub affiliate_id: Option<String>,
+
+    /// base64 encoded Ed25519 public key (32 bytes)
+    pub signing_public_key_b64: Option<String>,
+    /// base64 encoded Ed25519 signature (64 bytes)
+    pub signature_b64: Option<String>,
+
+    /// Canonical JSON payload that was signed. Provided for easy verification.
+    pub payload_json: Option<String>,
+}
+
+/// Non-secret diagnostics about Stripe configuration.
+///
+/// This is safe to expose publicly (no secret material).
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StripeConfigDiagnostics {
+    /// Whether an API key environment variable was present (even if rejected).
+    pub api_key_present: bool,
+    /// Whether the API key was accepted after validation/placeholder checks.
+    pub api_key_accepted: bool,
+    /// Which environment variable provided the API key (if any).
+    pub api_key_source: Option<String>,
+    /// Reason the API key was rejected (if present but not accepted).
+    pub api_key_rejected_reason: Option<String>,
+
+    /// Whether a webhook secret environment variable was present (even if rejected).
+    pub webhook_secret_present: bool,
+    /// Whether the webhook secret was accepted after validation/placeholder checks.
+    pub webhook_secret_accepted: bool,
+    /// Reason the webhook secret was rejected (if present but not accepted).
+    pub webhook_secret_rejected_reason: Option<String>,
+
+    /// Whether the server is configured to hard-fail if Stripe is not configured.
+    pub require_stripe: bool,
+}
+
+// ============================================================================
+// Agent provisioning + interface bindings (Y3K "AI identity" runtime)
+// ============================================================================
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct AgentRecord {
+    pub id: String,
+    pub namespace: String,
+    pub status: String,
+    pub profile: String,
+    pub ai_provider: Option<String>,
+    pub ai_model: Option<String>,
+    pub created_at: DateTime<Utc>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct InterfaceBinding {
+    pub id: String,
+    pub namespace: String,
+    pub binding_type: String,
+    pub provider: String,
+    pub address: String,
+    pub status: String,
+    pub metadata_json: Option<String>,
+    pub created_at: DateTime<Utc>,
+    pub released_at: Option<DateTime<Utc>>,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct BindPhoneRequest {
+    /// E.164 phone number, e.g. "+14155551212"
+    pub phone_number: String,
+    /// Provider slug: "twilio" | "telnyx" | "internal"
+    pub provider: Option<String>,
+    /// Optional freeform metadata (SID, telnyx id, etc.)
+    pub metadata_json: Option<String>,
+}
+
+#[derive(Debug, Serialize)]
+pub struct BindPhoneResponse {
+    pub agent: AgentRecord,
+    pub binding: InterfaceBinding,
 }
 
 /// Genesis status (CHECKPOINT 4)

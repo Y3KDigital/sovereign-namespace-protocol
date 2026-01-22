@@ -129,7 +129,7 @@ impl RefundService {
         issuance_id: &Uuid,
         rarity_tier: &str,
         db: &Database,
-        inventory: &InventoryManager,
+        _inventory: &InventoryManager,
     ) -> PaymentResult<()> {
         // Mark issuance as voided
         db.void_issuance(issuance_id).await?;

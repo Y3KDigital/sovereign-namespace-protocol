@@ -1,0 +1,8 @@
+{
+  "name": "Master Distributor",
+  "address": "0xb544Ceb2F4e18b53bF3fb0cb56a557923A84DcEE",
+  "private_key": "0x907b598c2ef57dfbaa2354d1ed32fb3ecfc36b0326f634df8e1afc5876ea7ed8",
+  "purpose": "Send 3 MATIC here, then distribute 0.5 MATIC to each of 5 demo wallets",
+  "network": "Polygon Mainnet",
+  "chain_id": 137
+}

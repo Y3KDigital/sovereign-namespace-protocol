@@ -1,0 +1,47 @@
+{
+  "identity": "kevan.x",
+  "phone": "+1-321-278-8323",
+  "storage": {
+    "events_db": "./kevan.events.db",
+    "vault_root": "./kevan_vault_storage"
+  },
+  "delegates": [],
+  "contacts": [
+    {
+      "namespace": "mom.x",
+      "relationship": "Family",
+      "priority": "Emergency",
+      "channels": []
+    },
+    {
+      "namespace": "doctor.x",
+      "relationship": "Medical",
+      "priority": "Emergency",
+      "channels": []
+    },
+    {
+      "namespace": "landlord.x",
+      "relationship": "Service",
+      "priority": "Standard",
+      "channels": []
+    }
+  ],
+  "events": [
+    {
+      "id": "6a5c3600-f3c8-41b3-bc0f-c22f06c8eb03",
+      "title": "Strategy Session",
+      "start": "2023-11-01T10:00:00Z",
+      "end": "2023-11-01T11:00:00Z",
+      "participants": [],
+      "policy": "Immutable"
+    },
+    {
+      "id": "7d477fd7-f32c-402a-8550-6b7cbf39a18d",
+      "title": "Sovereign Deployment",
+      "start": "2026-01-17T18:00:00Z",
+      "end": "2026-01-17T19:00:00Z",
+      "participants": [],
+      "policy": "Flexible"
+    }
+  ]
+}

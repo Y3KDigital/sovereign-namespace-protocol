@@ -1,0 +1,55 @@
+{
+  "description": "5 Polygon wallets for UD vs Y3K comparison demo",
+  "network": "Polygon Mainnet",
+  "chain_id": 137,
+  "rpc_url": "https://polygon-rpc.com",
+  "explorer": "https://polygonscan.com",
+  "wallets": [
+    {
+      "id": 1,
+      "name": "Demo Wallet 1",
+      "address": "0x6Da9bFE383dE453c43AB55b3196C67f33a6D62a2",
+      "private_key": "0x35710487b43ecbb4297cceed4f36e1a7797d7c5c022131f4ddaa8dc4400263ce",
+      "balance_matic": 0,
+      "purpose": "UD .x high-end domain (crypto.x, money.x equivalent)"
+    },
+    {
+      "id": 2,
+      "name": "Demo Wallet 2",
+      "address": "0x9493c2E088239cd21Add9b56B760e36659F5bbdF",
+      "private_key": "0xed573b5a1ac4c60e9303d843c2c194caa7f4b1b51cb2e4000ab87e8e40a965f6",
+      "balance_matic": 0,
+      "purpose": "UD .x premium domain (master.x, player.x equivalent)"
+    },
+    {
+      "id": 3,
+      "name": "Demo Wallet 3",
+      "address": "0x881f50634b232cDAc2c365e00c40c68aaEA700Ab",
+      "private_key": "0x057be55eec74e8ec803b3f40aaddf264b9a6fc981d85654d66609ed62425e497",
+      "balance_matic": 0,
+      "purpose": "UD .crypto domain #1 (elite.crypto, vault.crypto)"
+    },
+    {
+      "id": 4,
+      "name": "Demo Wallet 4",
+      "address": "0x40c980e012Ea5e2397e880aC6389197DDE21D5C5",
+      "private_key": "0x09a35b3dabcf3e70b25d183f83d06ba834813ae1ce01c7649749855b1ded2619",
+      "balance_matic": 0,
+      "purpose": "UD .crypto domain #2 (finance.crypto, pay.crypto)"
+    },
+    {
+      "id": 5,
+      "name": "Demo Wallet 5",
+      "address": "0xC17E4d527b53b53B6a18E7E879B7acFf0FF2B497",
+      "private_key": "0x30ddeb4130ee3a027134463fe04fbd6436f2f85c03df8ef0cb40126978886542",
+      "balance_matic": 0,
+      "purpose": "Y3K comparison wallet (demonstrate value difference)"
+    }
+  ],
+  "next_steps": [
+    "1. Fund each wallet with ~0.1 MATIC (for gas fees)",
+    "2. Run mint-ud-domains.py to mint .x and .crypto domains",
+    "3. Compare costs: UD charges $5k-$51k, Y3K charges $35-$7.5k",
+    "4. Demonstrate soulbound (non-transferable) feature"
+  ]
+}

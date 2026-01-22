@@ -1,0 +1,62 @@
+{
+  "contracts": {
+    "TRUTH": "0x_TRUTH_TOKEN_ADDRESS_HERE",
+    "Y3KNamespace": "0x_NAMESPACE_NFT_ADDRESS_HERE",
+    "Y3KAccount": "0x_ACCOUNT_IMPL_ADDRESS_HERE",
+    "Y3KRegistry": "0x_REGISTRY_ADDRESS_HERE"
+  },
+  "demo_wallets": [
+    {
+      "id": 1,
+      "address": "0x6Da9bFE383dE453c43AB55b3196C67f33a6D62a2",
+      "namespace": "crypto.x",
+      "truth_amount": "51546000",
+      "subdomains": [
+        "auth.crypto.x",
+        "pay.crypto.x",
+        "vault.crypto.x"
+      ]
+    },
+    {
+      "id": 2,
+      "address": "0x9493c2E088239cd21Add9b56B760e36659F5bbdF",
+      "namespace": "money.x",
+      "truth_amount": "25000000",
+      "subdomains": [
+        "bank.money.x",
+        "swap.money.x",
+        "defi.money.x"
+      ]
+    },
+    {
+      "id": 3,
+      "address": "0x881f50634b232cDAc2c365e00c40c68aaEA700Ab",
+      "namespace": "elite.crypto",
+      "truth_amount": "5000000",
+      "subdomains": [
+        "vault.elite.crypto",
+        "premium.elite.crypto"
+      ]
+    },
+    {
+      "id": 4,
+      "address": "0x40c980e012Ea5e2397e880aC6389197DDE21D5C5",
+      "namespace": "vault.crypto",
+      "truth_amount": "3500000",
+      "subdomains": [
+        "secure.vault.crypto",
+        "cold.vault.crypto"
+      ]
+    },
+    {
+      "id": 5,
+      "address": "0xC17E4d527b53b53B6a18E7E879B7acFf0FF2B497",
+      "namespace": "master.x",
+      "truth_amount": "5000000",
+      "subdomains": [
+        "gov.master.x",
+        "admin.master.x"
+      ]
+    }
+  ]
+}

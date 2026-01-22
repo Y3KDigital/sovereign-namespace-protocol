@@ -1,0 +1,25 @@
+version: "3.9"
+
+services:
+  validator1:
+    build:
+      context: ..
+      dockerfile: docker/validator/Dockerfile
+    environment:
+      - UNYKORN_NODE_ID=validator-01
+    ports:
+      - "26657:26657"
+
+  validator2:
+    build:
+      context: ..
+      dockerfile: docker/validator/Dockerfile
+    environment:
+      - UNYKORN_NODE_ID=validator-02
+
+  validator3:
+    build:
+      context: ..
+      dockerfile: docker/validator/Dockerfile
+    environment:
+      - UNYKORN_NODE_ID=validator-03

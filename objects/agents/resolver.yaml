@@ -1,0 +1,79 @@
+# Object Type: Agent
+# ID: agent.resolver
+# Status: Production Service
+
+object_type: agent
+canonical_id: "agent.resolver"
+display_name: "Namespace Resolver"
+description: "AI AGENT • Namespace Resolution"
+
+authority:
+  entity: "Y3K Agent Registry"
+  context: "Autonomous Resolution Service"
+  verification: verified
+  verification_method: "registry"
+
+qr:
+  protocol: "y3k"
+  payload: "y3k://agent/resolver"
+  fallback_url: "https://agent.y3k.xyz/resolver"
+  encoding: protocol-native
+  size: medium
+
+actions:
+  - id: query_agent
+    label: "Query Resolver"
+    enabled: true
+    endpoint: "/api/agent/resolver/query"
+    
+  - id: view_tasks
+    label: "View Active Tasks"
+    enabled: true
+    endpoint: "/api/agent/resolver/tasks"
+    
+  - id: check_status
+    label: "Health Check"
+    enabled: true
+    endpoint: "/api/agent/resolver/status"
+
+state:
+  - label: "Uptime"
+    value: 99.98
+    unit: "%"
+    format: percentage
+    
+  - label: "Total Queries"
+    value: 1200000
+    unit: ""
+    format: number
+    
+  - label: "Avg Response"
+    value: 120
+    unit: "ms"
+    format: number
+    
+  - label: "Success Rate"
+    value: 99.94
+    unit: "%"
+    format: percentage
+    
+  - label: "Active Tasks"
+    value: 3
+    unit: "tasks"
+    format: number
+
+metadata:
+  service_type: "resolver"
+  version: "2.1.0"
+  runtime: "autonomous"
+  model: "claude-sonnet-4.5"
+  capabilities:
+    - "namespace_resolution"
+    - "dns_translation"
+    - "ipfs_gateway"
+    - "chain_verification"
+
+theme:
+  primary_color: "#00D9FF"
+  accent_color: "#000000"
+  badge_icon: "🤖"

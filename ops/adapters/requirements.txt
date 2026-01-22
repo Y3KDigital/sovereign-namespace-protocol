@@ -1,0 +1,4 @@
+# Python dependencies for XRPL/Stellar adapters
+xrpl-py==2.6.0
+stellar-sdk==9.1.0
+httpx==0.26.0

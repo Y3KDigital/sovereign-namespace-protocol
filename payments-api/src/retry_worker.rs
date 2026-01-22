@@ -4,7 +4,7 @@ use uuid::Uuid;
 
 use crate::database::Database;
 use crate::issuance::IssuanceService;
-use crate::errors::{PaymentError, PaymentResult};
+use crate::errors::PaymentError;
 
 /// Retry worker for failed certificate issuances
 pub struct RetryWorker {

@@ -2,54 +2,20 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 export const metadata: Metadata = {
-  title: "Trust Center | Y3K Markets",
+  title: "What You Actually Own | Y3K Markets",
   description:
-    "Security posture, protocol immutability guarantees, and canonical documents for independent verification.",
+    "Y3K does not sell tokens. It allocates cryptographic identity roots that let people own names, authority, and verification without platforms.",
   alternates: { canonical: "/trust/" },
   openGraph: {
-    title: "Trust Center | Y3K Markets",
+    title: "What You Actually Own | Y3K Markets",
     description:
-      "Security posture, protocol immutability guarantees, and canonical documents for independent verification.",
+      "Understanding True Web3: Identity, Authority, Control, and Scarcity beyond speculation.",
   },
 };
 
-function TrustCard({
-  title,
-  description,
-  href,
-  badge,
-}: {
-  title: string;
-  description: string;
-  href: string;
-  badge?: string;
-}) {
-  return (
-    <Link
-      href={href}
-      className="group block bg-white/5 border border-white/10 hover:border-purple-500/50 rounded-xl p-6 transition"
-    >
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-3">
-            <h3 className="text-xl font-bold">{title}</h3>
-            {badge ? (
-              <span className="text-xs px-2.5 py-1 rounded-full bg-purple-600/20 text-purple-200 border border-purple-500/20">
-                {badge}
-              </span>
-            ) : null}
-          </div>
-          <p className="text-gray-400 mt-2">{description}</p>
-        </div>
-        <div className="text-gray-500 group-hover:text-purple-300 transition">→</div>
-      </div>
-    </Link>
-  );
-}
-
 export default function TrustCenterPage() {
   return (
-    <main className="min-h-screen pt-16">
+    <main className="min-h-screen pt-16 bg-black text-gray-200">
       <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -63,90 +29,177 @@ export default function TrustCenterPage() {
               <Link href="/explore" className="hover:text-purple-400 transition">
                 Explore
               </Link>
-              <Link href="/docs" className="hover:text-purple-400 transition">
-                Docs
-              </Link>
-              <Link href="/trust" className="text-purple-400">
+              <Link href="/trust" className="text-purple-400 font-bold">
                 Trust
               </Link>
-              <Link href="/status" className="hover:text-purple-400 transition">
-                Status
+              <Link href="/docs/game-time" className="hover:text-purple-400 transition">
+                Game Time
+              </Link>
+              <Link 
+                href="/mint"
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-4 py-2 rounded-lg transition text-sm font-bold"
+              >
+                Claim Root
               </Link>
             </div>
           </div>
         </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-4 py-12">
-        <h1 className="text-5xl font-bold mb-4 gradient-text">Trust Center</h1>
-        <p className="text-gray-400 text-lg mb-10">
-          Everything here is designed for independent verification: frozen specs, audit-facing docs,
-          and live operational status.
-        </p>
-
-        <div className="grid md:grid-cols-2 gap-4 mb-10">
-          <TrustCard
-            title="Canonical Documents"
-            badge="Frozen"
-            description="Protocol docs mirrored on-site so verification never depends on external links."
-            href="/docs/canonical/readme"
-          />
-          <TrustCard
-            title="Security Overview"
-            badge="Public"
-            description="Threat model, security posture, and operating assumptions."
-            href="/docs/canonical/security"
-          />
-          <TrustCard
-            title="Specification Index"
-            badge="Index"
-            description="Find the exact frozen spec for any subsystem (genesis, rarity, vault, verifier, etc.)."
-            href="/docs/canonical/spec-index"
-          />
-          <TrustCard
-            title="Operational Status"
-            badge="Live"
-            description="View real-time API reachability and service signals."
-            href="/status"
-          />
+      {/* Hero Section */}
+      <section className="pt-24 pb-16 px-4">
+        <div className="max-w-5xl mx-auto text-center">
+            <h1 className="text-5xl md:text-7xl font-bold mb-8 text-white">
+                What You <span className="gradient-text">Actually Own</span>
+            </h1>
+            <div className="p-8 bg-blue-900/10 border border-blue-500/30 rounded-2xl max-w-4xl mx-auto">
+                <p className="text-2xl md:text-3xl text-blue-200 font-light leading-relaxed">
+                    "Y3K does not sell tokens. It allocates cryptographic identity roots that let you own names, authority, and verification <strong className="text-white font-bold">without platforms</strong>."
+                </p>
+            </div>
         </div>
+      </section>
 
-        <section className="bg-white/5 border border-white/10 rounded-xl p-8">
-          <h2 className="text-2xl font-bold mb-3">What “trust” means here</h2>
-          <div className="space-y-3 text-gray-300">
-            <p>
-              Y3K is built to be verified, not believed. The goal is to make the claims legible and
-              checkable by third parties.
+      {/* The Core Distinction - 4 Pillars */}
+      <section className="py-16 px-4">
+        <div className="max-w-7xl mx-auto grid md:grid-cols-2 lg:grid-cols-2 gap-8">
+            
+            {/* Identity */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-purple-500/50 transition duration-300">
+                <div className="text-4xl mb-4">🆔</div>
+                <h3 className="text-2xl font-bold text-white mb-2">Identity <span className="text-gray-500 text-lg font-normal">(Not Profiles)</span></h3>
+                <p className="text-gray-400 leading-relaxed mb-4">
+                    A cryptographic root is not a username on a server. It is a <strong>root of identity</strong> that you carry across systems. Passports expire. Platforms ban users. Your cryptographic root is verifiable anywhere, forever.
+                </p>
+                <div className="text-sm text-purple-300 font-mono bg-purple-900/10 p-2 rounded">
+                    Value: No one can delete you.
+                </div>
+            </div>
+
+            {/* Authority */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-purple-500/50 transition duration-300">
+                <div className="text-4xl mb-4">✍️</div>
+                <h3 className="text-2xl font-bold text-white mb-2">Authority <span className="text-gray-500 text-lg font-normal">(Not Badges)</span></h3>
+                <p className="text-gray-400 leading-relaxed mb-4">
+                    Ownership in True Web3 means <strong>signing power</strong>. You check-in, authorize, and approve actions without asking central permission. Our offline-first verification puts the stamp of authority in your hands, not ours.
+                </p>
+                <div className="text-sm text-purple-300 font-mono bg-purple-900/10 p-2 rounded">
+                    Value: Your authority outlives the platform.
+                </div>
+            </div>
+
+            {/* Control */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-purple-500/50 transition duration-300">
+                <div className="text-4xl mb-4">🔑</div>
+                <h3 className="text-2xl font-bold text-white mb-2">Control <span className="text-gray-500 text-lg font-normal">(Not Custody)</span></h3>
+                <p className="text-gray-400 leading-relaxed mb-4">
+                    Most "Web3" is just a login to a new website. Y3K delivers <strong>client-side keys</strong> and air-gapped security capability. If Y3K Markets disappears tomorrow, your namespace keys still work.
+                </p>
+                <div className="text-sm text-purple-300 font-mono bg-purple-900/10 p-2 rounded">
+                    Value: Survivability.
+                </div>
+            </div>
+
+            {/* Scarcity */}
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-8 hover:border-purple-500/50 transition duration-300">
+                <div className="text-4xl mb-4">💎</div>
+                <h3 className="text-2xl font-bold text-white mb-2">Scarcity <span className="text-gray-500 text-lg font-normal">(Not Artificial)</span></h3>
+                <p className="text-gray-400 leading-relaxed mb-4">
+                    We don't "promise" not to mint more. It is <strong>mathematically impossible</strong> to create more genesis roots. The set is closed. The keys are burned. The math is absolute.
+                </p>
+                <div className="text-sm text-purple-300 font-mono bg-purple-900/10 p-2 rounded">
+                    Value: Scarcity enforced by math, not reputation.
+                </div>
+            </div>
+
+        </div>
+      </section>
+
+      {/* Real Use Cases */}
+      <section className="py-20 px-4 bg-gray-900/50 border-y border-white/5">
+        <div className="max-w-6xl mx-auto">
+            <h2 className="text-4xl font-bold text-center mb-16">How Humans Use True Web3</h2>
+            
+            <div className="grid md:grid-cols-3 gap-8">
+                {/* Personal */}
+                <div className="bg-black p-8 rounded-xl border border-white/10">
+                    <h3 className="text-xl font-bold text-white mb-4">Your Sovereignty</h3>
+                    <ul className="space-y-4 text-sm text-gray-400">
+                        <li className="flex gap-3">
+                            <span className="text-red-500">❌ Web2:</span>
+                            Single-sign-on (Google/Apple) tracks you.
+                        </li>
+                        <li className="flex gap-3">
+                            <span className="text-green-400">✅ Web3:</span>
+                            Sign documents, authenticate apps, and prove action with your own key.
+                        </li>
+                    </ul>
+                </div>
+
+                {/* Family */}
+                <div className="bg-black p-8 rounded-xl border border-white/10">
+                    <h3 className="text-xl font-bold text-white mb-4">Family & Legacy</h3>
+                    <ul className="space-y-4 text-sm text-gray-400">
+                        <li className="flex gap-3">
+                            <span className="text-red-500">❌ Web2:</span>
+                            Digital assets die with the account owner.
+                        </li>
+                        <li className="flex gap-3">
+                            <span className="text-green-400">✅ Web3:</span>
+                            Pass namespaces to children, trusts, or estates via offline key transfer.
+                        </li>
+                    </ul>
+                </div>
+
+                {/* Business */}
+                <div className="bg-black p-8 rounded-xl border border-white/10">
+                    <h3 className="text-xl font-bold text-white mb-4">Business Trust</h3>
+                    <ul className="space-y-4 text-sm text-gray-400">
+                        <li className="flex gap-3">
+                            <span className="text-red-500">❌ Web2:</span>
+                            Email hacks and domain seizures.
+                        </li>
+                        <li className="flex gap-3">
+                            <span className="text-green-400">✅ Web3:</span>
+                            Invoice signing, contract anchoring, and continuity that outlives SaaS vendors.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+      </section>
+
+      {/* Immutable History */}
+      <section className="py-24 px-4 bg-black">
+        <div className="max-w-4xl mx-auto text-center border border-white/10 bg-white/5 rounded-2xl p-10">
+            <div className="inline-block px-3 py-1 bg-green-900/30 text-green-400 rounded-full text-xs font-bold mb-4 border border-green-500/30">
+                HISTORICAL RECORD · FROZEN
+            </div>
+            <h2 className="text-3xl font-bold mb-4 text-white">The Genesis Event</h2>
+            <p className="text-xl text-gray-300 mb-8 max-w-2xl mx-auto leading-relaxed">
+                On January 17, 2026 (UTC), 955 Genesis Roots were mathematically generated, hashed, and immutably committed. 
+                <br/><br/>
+                No additional Genesis Roots can ever be created. Subsequent activity consists solely of allocation and sovereign activation of these pre-existing roots.
             </p>
-            <ul className="space-y-2 ml-6">
-              <li>• Canonical documents are published and mirrored under this domain.</li>
-              <li>• Post-genesis rules are intended to be immutable (no hidden admin toggles).</li>
-              <li>• Certificates are designed to be verifiable offline (stateless verification).</li>
-            </ul>
-          </div>
+            <div className="flex justify-center gap-4">
+                <Link href="/genesis" className="text-sm font-bold text-purple-400 hover:text-white transition">
+                    View Verified Ceremony Artifacts →
+                </Link>
+            </div>
+        </div>
+      </section>
 
-          <div className="mt-6 flex flex-wrap gap-3">
-            <Link
-              href="/docs"
-              className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 hover:border-purple-500/50 transition"
-            >
-              Read the docs
-            </Link>
-            <Link
-              href="/practice"
-              className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 hover:border-purple-500/50 transition"
-            >
-              Try practice mode
-            </Link>
-            <Link
-              href="/contact"
-              className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 transition"
-            >
-              Request an audit pack
-            </Link>
-          </div>
-        </section>
-      </div>
+      {/* Footer */}
+      <footer className="py-12 border-t border-white/10 text-center">
+        <Link 
+            href="/mint" 
+            className="inline-flex items-center gap-2 bg-white text-black px-8 py-3 rounded-full font-bold hover:bg-gray-200 transition"
+        >
+            <span>Start Your Sovereignty Journey</span>
+            <span>→</span>
+        </Link>
+      </footer>
+
     </main>
   );
 }

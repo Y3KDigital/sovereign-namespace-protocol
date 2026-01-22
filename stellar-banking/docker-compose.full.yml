@@ -1,0 +1,281 @@
+version: '3.8'
+
+services:
+  # =====================================================
+  # VALIDATOR NODES (Layer 1 Blockchain)
+  # =====================================================
+  
+  validator-1:
+    build:
+      context: ./stellar-core
+      dockerfile: Dockerfile.validator
+    container_name: digitalgiant-validator-1
+    hostname: validator-1
+    ports:
+      - "11625:11625"  # Peer port
+      - "11626:11626"  # HTTP port
+    volumes:
+      - validator1-data:/data
+      - validator1-history:/history
+    environment:
+      - POSTGRES_HOST=postgres-core
+      - POSTGRES_DB=stellar-core-node1
+      - POSTGRES_USER=stellar
+      - POSTGRES_PASSWORD=stellar123
+      - NODE_SEED=SDJF6JC43QAY5JYCD2EML5SPGFV2IKTXVX5WEUKD3BGBOXJ62KI25LZU secret
+    depends_on:
+      - postgres-core
+    networks:
+      - stellar-network
+    restart: unless-stopped
+    command: >
+      bash -c "
+      until pg_isready -h postgres-core -U stellar; do
+        echo 'Waiting for database...';
+        sleep 2;
+      done;
+      stellar-core new-db 2>/dev/null || true;
+      exec stellar-core run --console --testnet;
+      "
+
+  validator-2:
+    build:
+      context: ./stellar-core
+      dockerfile: Dockerfile.validator
+    container_name: digitalgiant-validator-2
+    hostname: validator-2
+    ports:
+      - "12625:11625"
+      - "12626:11626"
+    volumes:
+      - validator2-data:/data
+      - validator2-history:/history
+    environment:
+      - POSTGRES_HOST=postgres-core
+      - POSTGRES_DB=stellar-core-node2
+      - POSTGRES_USER=stellar
+      - POSTGRES_PASSWORD=stellar123
+      - NODE_SEED=SB3DBGQ4Y3LIUDQOU3YG5WKH52E6I4F6YXJGRO42JWBUK53RZZQPPJ2I secret
+    depends_on:
+      - postgres-core
+      - validator-1
+    networks:
+      - stellar-network
+    restart: unless-stopped
+    command: >
+      bash -c "
+      until pg_isready -h postgres-core -U stellar; do
+        echo 'Waiting for database...';
+        sleep 2;
+      done;
+      sleep 10;
+      stellar-core new-db 2>/dev/null || true;
+      exec stellar-core run --console --testnet;
+      "
+
+  validator-3:
+    build:
+      context: ./stellar-core
+      dockerfile: Dockerfile.validator
+    container_name: digitalgiant-validator-3
+    hostname: validator-3
+    ports:
+      - "13625:11625"
+      - "13626:11626"
+    volumes:
+      - validator3-data:/data
+      - validator3-history:/history
+    environment:
+      - POSTGRES_HOST=postgres-core
+      - POSTGRES_DB=stellar-core-node3
+      - POSTGRES_USER=stellar
+      - POSTGRES_PASSWORD=stellar123
+      - NODE_SEED=SCQXUT64MHQLUITOHIIJQ34M5BP6EG7BUZSL7MOPJ6ZEGYQS2S25EYOG secret
+    depends_on:
+      - postgres-core
+      - validator-1
+      - validator-2
+    networks:
+      - stellar-network
+    restart: unless-stopped
+    command: >
+      bash -c "
+      until pg_isready -h postgres-core -U stellar; do
+        echo 'Waiting for database...';
+        sleep 2;
+      done;
+      sleep 15;
+      stellar-core new-db 2>/dev/null || true;
+      exec stellar-core run --console --testnet;
+      "
+
+  # =====================================================
+  # HORIZON API SERVER
+  # =====================================================
+  
+  horizon:
+    build:
+      context: ./horizon
+      dockerfile: Dockerfile.horizon
+    container_name: digitalgiant-horizon
+    ports:
+      - "18000:8000"   # Public API
+      - "18001:8001"   # Admin API
+    volumes:
+      - horizon-data:/data
+      - validator1-history:/history:ro
+      - ./stellar-core/stellar-core-validator1.cfg:/etc/stellar/stellar-core.cfg:ro
+    env_file:
+      - ./horizon/horizon.env
+    depends_on:
+      - postgres-horizon
+      - postgres-core
+      - validator-1
+    networks:
+      - stellar-network
+    restart: unless-stopped
+    entrypoint: ["/bin/bash", "-lc"]
+    command: ["until pg_isready -h postgres-horizon -U horizon; do echo 'Waiting for Horizon database...'; sleep 2; done; sleep 20; horizon db init; exec horizon serve"]
+
+  # =====================================================
+  # APPLICATION API (Node.js)
+  # =====================================================
+  
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: digitalgiant-api
+    ports:
+      - "13000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_HOST=postgres-app
+      - REDIS_HOST=redis
+      - STELLAR_HORIZON_URL=http://horizon:8000
+      - STELLAR_NETWORK=private
+      - STELLAR_PASSPHRASE=Digital Giant Private Network ; January 2026
+    env_file:
+      - .env
+    depends_on:
+      - postgres-app
+      - redis
+      - horizon
+    restart: unless-stopped
+    networks:
+      - stellar-network
+    volumes:
+      - ./logs:/app/logs
+
+  # =====================================================
+  # DATABASES
+  # =====================================================
+  
+  # Core Database for Stellar Validators
+  postgres-core:
+    image: postgres:15-alpine
+    container_name: digitalgiant-postgres-core
+    environment:
+      - POSTGRES_USER=stellar
+      - POSTGRES_PASSWORD=stellar123
+      - POSTGRES_MULTIPLE_DATABASES=stellar-core-node1,stellar-core-node2,stellar-core-node3
+    ports:
+      - "15433:5432"
+    volumes:
+      - postgres-core-data:/var/lib/postgresql/data
+      - ./scripts/init-multiple-dbs.sh:/docker-entrypoint-initdb.d/init-multiple-dbs.sh
+    restart: unless-stopped
+    networks:
+      - stellar-network
+
+  # Horizon Database
+  postgres-horizon:
+    image: postgres:15-alpine
+    container_name: digitalgiant-postgres-horizon
+    environment:
+      - POSTGRES_DB=horizon
+      - POSTGRES_USER=horizon
+      - POSTGRES_PASSWORD=horizon123
+    ports:
+      - "15434:5432"
+    volumes:
+      - postgres-horizon-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - stellar-network
+
+  # Application Database
+  postgres-app:
+    image: postgres:15-alpine
+    container_name: digitalgiant-postgres-app
+    environment:
+      - POSTGRES_DB=digital_giant_stellar
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    ports:
+      - "15432:5432"
+    volumes:
+      - postgres-app-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - stellar-network
+
+  # Redis Cache
+  redis:
+    image: redis:7-alpine
+    container_name: digitalgiant-redis
+    ports:
+      - "16379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redis-data:/data
+    restart: unless-stopped
+    networks:
+      - stellar-network
+
+  # =====================================================
+  # NGINX LOAD BALANCER
+  # =====================================================
+  
+  nginx:
+    image: nginx:alpine
+    container_name: digitalgiant-nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx-full.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - api
+      - horizon
+    restart: unless-stopped
+    networks:
+      - stellar-network
+
+# =====================================================
+# VOLUMES
+# =====================================================
+
+volumes:
+  validator1-data:
+  validator1-history:
+  validator2-data:
+  validator2-history:
+  validator3-data:
+  validator3-history:
+  horizon-data:
+  postgres-core-data:
+  postgres-horizon-data:
+  postgres-app-data:
+  redis-data:
+
+# =====================================================
+# NETWORKS
+# =====================================================
+
+networks:
+  stellar-network:
+    external: true
+    name: digital-giant-stellar_stellar-network

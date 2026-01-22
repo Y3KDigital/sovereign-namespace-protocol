@@ -3,9 +3,11 @@ use sqlx::sqlite::{SqliteConnectOptions, SqlitePoolOptions};
 use std::str::FromStr;
 use uuid::Uuid;
 use chrono::{DateTime, Utc};
+use sha3::{Digest, Sha3_256};
 use crate::types::{GenesisStatus, InventoryTierStatus};
-use crate::types::{PaymentIntent, PaymentStatus, IssuanceRecord, Order};
+use crate::types::{NilRole, PaymentIntent, PaymentStatus, IssuanceRecord, Order};
 use crate::types::{Affiliate, AffiliatePortalStats};
+use crate::types::{AgentRecord, InterfaceBinding};
 use crate::errors::{PaymentError, PaymentResult};
 
 #[derive(Clone)]
@@ -38,6 +40,193 @@ impl Database {
     /// Create Database from existing pool (for CLI tools)
     pub fn from_pool(pool: SqlitePool) -> Self {
         Self { pool }
+    }
+
+    // =====================================================================
+    // Agent provisioning + interface bindings
+    // =====================================================================
+
+    pub async fn get_agent_by_namespace(
+        &self,
+        namespace: &str,
+    ) -> PaymentResult<Option<AgentRecord>> {
+        let row = sqlx::query("SELECT * FROM agents WHERE namespace = ?")
+            .bind(namespace)
+            .fetch_optional(&self.pool)
+            .await
+            .map_err(|e| PaymentError::DatabaseError(e.to_string()))?;
+
+        match row {
+            Some(r) => Ok(Some(self.row_to_agent(r)?)),
+            None => Ok(None),
+        }
+    }
+
+    /// Create an agent if it does not exist (idempotent).
+    pub async fn ensure_agent_for_namespace(
+        &self,
+        namespace: &str,
+        profile: &str,
+        ai_provider: Option<&str>,
+        ai_model: Option<&str>,
+    ) -> PaymentResult<AgentRecord> {
+        // Fast path
+        if let Some(existing) = self.get_agent_by_namespace(namespace).await? {
+            return Ok(existing);
+        }
+
+        let id = Uuid::new_v4().to_string();
+        sqlx::query(
+            r#"
+            INSERT INTO agents (id, namespace, status, profile, ai_provider, ai_model)
+            VALUES (?, ?, 'active', ?, ?, ?)
+            "#,
+        )
+        .bind(&id)
+        .bind(namespace)
+        .bind(profile)
+        .bind(ai_provider)
+        .bind(ai_model)
+        .execute(&self.pool)
+        .await
+        .map_err(|e| PaymentError::DatabaseError(e.to_string()))?;
+
+        let row = sqlx::query("SELECT * FROM agents WHERE id = ?")
+            .bind(&id)
+            .fetch_one(&self.pool)
+            .await
+            .map_err(|e| PaymentError::DatabaseError(e.to_string()))?;
+
+        Ok(self.row_to_agent(row)?)
+    }
+
+    /// Bind a phone number to a namespace (releasing any existing active phone binding).
+    ///
+    /// Rule: if the number drops later, the agent does not.
+    pub async fn bind_phone_number(
+        &self,
+        namespace: &str,
+        provider: &str,
+        phone_number: &str,
+        metadata_json: Option<&str>,
+    ) -> PaymentResult<InterfaceBinding> {
+        // Release any existing active phone binding for this namespace
+        sqlx::query(
+            r#"
+            UPDATE interface_bindings
+            SET status = 'released', released_at = ?
+            WHERE namespace = ? AND binding_type = 'phone' AND status = 'active'
+            "#,
+        )
+        .bind(Utc::now())
+        .bind(namespace)
+        .execute(&self.pool)
+        .await
+        .map_err(|e| PaymentError::DatabaseError(e.to_string()))?;
+
+        let id = Uuid::new_v4().to_string();
+        sqlx::query(
+            r#"
+            INSERT INTO interface_bindings (
+                id, namespace, binding_type, provider, address, status, metadata_json
+            ) VALUES (?, ?, 'phone', ?, ?, 'active', ?)
+            "#,
+        )
+        .bind(&id)
+        .bind(namespace)
+        .bind(provider)
+        .bind(phone_number)
+        .bind(metadata_json)
+        .execute(&self.pool)
+        .await
+        .map_err(|e| PaymentError::DatabaseError(e.to_string()))?;
+
+        let row = sqlx::query("SELECT * FROM interface_bindings WHERE id = ?")
+            .bind(&id)
+            .fetch_one(&self.pool)
+            .await
+            .map_err(|e| PaymentError::DatabaseError(e.to_string()))?;
+
+        Ok(self.row_to_binding(row)?)
+    }
+
+    pub async fn get_active_phone_binding_by_number(
+        &self,
+        provider: &str,
+        phone_number: &str,
+    ) -> PaymentResult<Option<InterfaceBinding>> {
+        let row = sqlx::query(
+            r#"
+            SELECT *
+            FROM interface_bindings
+            WHERE binding_type = 'phone'
+              AND provider = ?
+              AND address = ?
+              AND status = 'active'
+            "#,
+        )
+        .bind(provider)
+        .bind(phone_number)
+        .fetch_optional(&self.pool)
+        .await
+        .map_err(|e| PaymentError::DatabaseError(e.to_string()))?;
+
+        match row {
+            Some(r) => Ok(Some(self.row_to_binding(r)?)),
+            None => Ok(None),
+        }
+    }
+
+    // =====================================================================
+    // Tamper-evident ledger
+    // =====================================================================
+
+    pub async fn append_namespace_ledger_event(
+        &self,
+        namespace: Option<&str>,
+        event_type: &str,
+        event_json: &str,
+    ) -> PaymentResult<()> {
+        let prev_hash: Option<String> = sqlx::query_scalar(
+            "SELECT hash FROM namespace_ledger ORDER BY seq DESC LIMIT 1",
+        )
+        .fetch_optional(&self.pool)
+        .await
+        .map_err(|e| PaymentError::DatabaseError(e.to_string()))?;
+
+        let prev = prev_hash.unwrap_or_default();
+        let now = Utc::now().to_rfc3339();
+
+        let mut hasher = Sha3_256::new();
+        hasher.update(prev.as_bytes());
+        hasher.update(b"|");
+        if let Some(ns) = namespace {
+            hasher.update(ns.as_bytes());
+        }
+        hasher.update(b"|");
+        hasher.update(event_type.as_bytes());
+        hasher.update(b"|");
+        hasher.update(event_json.as_bytes());
+        hasher.update(b"|");
+        hasher.update(now.as_bytes());
+        let hash = format!("{:x}", hasher.finalize());
+
+        sqlx::query(
+            r#"
+            INSERT INTO namespace_ledger (namespace, event_type, event_json, prev_hash, hash)
+            VALUES (?, ?, ?, ?, ?)
+            "#,
+        )
+        .bind(namespace)
+        .bind(event_type)
+        .bind(event_json)
+        .bind(if prev.is_empty() { None::<String> } else { Some(prev) })
+        .bind(hash)
+        .execute(&self.pool)
+        .await
+        .map_err(|e| PaymentError::DatabaseError(e.to_string()))?;
+
+        Ok(())
     }
 
     // =====================================================================
@@ -373,6 +562,29 @@ impl Database {
         self.void_affiliate_earnings_for_payment(&pi.id, reason).await
     }
 
+    /// Sum affiliate earnings for a payment intent.
+    ///
+    /// This is used for signed "funding truth" receipts.
+    pub async fn get_affiliate_earned_cents_for_payment(
+        &self,
+        payment_intent_uuid: &Uuid,
+    ) -> PaymentResult<u64> {
+        let cents: i64 = sqlx::query_scalar(
+            r#"
+            SELECT COALESCE(SUM(amount_cents), 0)
+            FROM affiliate_earnings
+            WHERE payment_intent_id = ?
+              AND status IN ('earned','paid')
+            "#,
+        )
+        .bind(payment_intent_uuid.to_string())
+        .fetch_one(&self.pool)
+        .await
+        .map_err(|e| PaymentError::DatabaseError(e.to_string()))?;
+
+        Ok(cents.max(0) as u64)
+    }
+
     /// Create new payment intent record
     pub async fn create_payment_intent(
         &self,
@@ -382,9 +594,11 @@ impl Database {
             r#"
             INSERT INTO payment_intents (
                 id, stripe_payment_intent_id, amount_cents, currency,
-                customer_email, namespace_reserved, rarity_tier, status,
+                customer_email, namespace_reserved,
+                nil_name, nil_role, nil_pair_key,
+                rarity_tier, status,
                 created_at, partner_id, affiliate_id
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             "#,
         )
         .bind(payment_intent.id.to_string())
@@ -393,6 +607,12 @@ impl Database {
         .bind(&payment_intent.currency)
         .bind(&payment_intent.customer_email)
         .bind(&payment_intent.namespace_reserved)
+        .bind(&payment_intent.nil_name)
+        .bind(payment_intent.nil_role.as_ref().map(|r| match r {
+            NilRole::City => "city",
+            NilRole::Mascot => "mascot",
+        }))
+        .bind(&payment_intent.nil_pair_key)
         .bind(&payment_intent.rarity_tier)
         .bind(serde_json::to_string(&payment_intent.status).unwrap())
         .bind(payment_intent.created_at)
@@ -447,6 +667,43 @@ impl Database {
         }
     }
 
+    /// Returns true if a namespace is already issued OR reserved by an in-flight payment intent.
+    ///
+    /// Treats most non-terminal payment statuses as reserving the namespace.
+    pub async fn is_namespace_taken_or_reserved(&self, namespace: &str) -> PaymentResult<bool> {
+        // Issued (or pending/processing) issuance
+        let issued = sqlx::query_scalar::<_, i64>(
+            r#"SELECT 1 FROM issuances WHERE namespace = ? LIMIT 1"#,
+        )
+        .bind(namespace)
+        .fetch_optional(&self.pool)
+        .await
+        .map_err(|e| PaymentError::DatabaseError(e.to_string()))?
+        .is_some();
+
+        if issued {
+            return Ok(true);
+        }
+
+        // Reserved by a non-terminal payment intent
+        let reserved = sqlx::query_scalar::<_, i64>(
+            r#"
+            SELECT 1
+            FROM payment_intents
+            WHERE namespace_reserved = ?
+              AND status NOT IN ('canceled', 'failed', 'refunded')
+            LIMIT 1
+            "#,
+        )
+        .bind(namespace)
+        .fetch_optional(&self.pool)
+        .await
+        .map_err(|e| PaymentError::DatabaseError(e.to_string()))?
+        .is_some();
+
+        Ok(reserved)
+    }
+
     /// Update payment intent status
     pub async fn update_payment_status(
         &self,
@@ -484,15 +741,23 @@ impl Database {
         sqlx::query(
             r#"
             INSERT INTO issuances (
-                id, payment_intent_id, namespace, certificate_ipfs_cid,
+                id, payment_intent_id, namespace,
+                nil_name, nil_role, nil_pair_key,
+                certificate_ipfs_cid,
                 certificate_hash_sha3, customer_email, issued_at,
                 download_token, download_expires_at
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             "#,
         )
         .bind(issuance.id.to_string())
         .bind(issuance.payment_intent_id.to_string())
         .bind(&issuance.namespace)
+        .bind(&issuance.nil_name)
+        .bind(issuance.nil_role.as_ref().map(|r| match r {
+            NilRole::City => "city",
+            NilRole::Mascot => "mascot",
+        }))
+        .bind(&issuance.nil_pair_key)
         .bind(&issuance.certificate_ipfs_cid)
         .bind(&issuance.certificate_hash_sha3)
         .bind(&issuance.customer_email)
@@ -582,6 +847,20 @@ impl Database {
             currency: row.get("currency"),
             customer_email: row.get("customer_email"),
             namespace_reserved: row.get("namespace_reserved"),
+            nil_name: row.try_get::<Option<String>, _>("nil_name").ok().flatten(),
+            nil_role: row
+                .try_get::<Option<String>, _>("nil_role")
+                .ok()
+                .flatten()
+                .and_then(|s| match s.as_str() {
+                    "city" => Some(NilRole::City),
+                    "mascot" => Some(NilRole::Mascot),
+                    _ => None,
+                }),
+            nil_pair_key: row
+                .try_get::<Option<String>, _>("nil_pair_key")
+                .ok()
+                .flatten(),
             rarity_tier: row.get("rarity_tier"),
             status: serde_json::from_str(&row.get::<String, _>("status"))
                 .map_err(|e| PaymentError::DatabaseError(e.to_string()))?,
@@ -628,6 +907,20 @@ impl Database {
                 .map_err(|e| PaymentError::DatabaseError(e.to_string()))?,
             namespace: row.get("namespace"),
             tier: row.try_get("tier").unwrap_or_else(|_| "unknown".to_string()),
+            nil_name: row.try_get::<Option<String>, _>("nil_name").ok().flatten(),
+            nil_role: row
+                .try_get::<Option<String>, _>("nil_role")
+                .ok()
+                .flatten()
+                .and_then(|s| match s.as_str() {
+                    "city" => Some(NilRole::City),
+                    "mascot" => Some(NilRole::Mascot),
+                    _ => None,
+                }),
+            nil_pair_key: row
+                .try_get::<Option<String>, _>("nil_pair_key")
+                .ok()
+                .flatten(),
             certificate_ipfs_cid: row.get("certificate_ipfs_cid"),
             certificate_hash_sha3: row.get("certificate_hash_sha3"),
             customer_email: row.get("customer_email"),
@@ -636,6 +929,32 @@ impl Database {
             download_expires_at: row.get("download_expires_at"),
             retry_count: row.get::<i64, _>("retry_count") as u32,
             last_error: row.get("last_error"),
+        })
+    }
+
+    fn row_to_agent(&self, row: sqlx::sqlite::SqliteRow) -> PaymentResult<AgentRecord> {
+        Ok(AgentRecord {
+            id: row.get::<String, _>("id"),
+            namespace: row.get::<String, _>("namespace"),
+            status: row.get::<String, _>("status"),
+            profile: row.get::<String, _>("profile"),
+            ai_provider: row.get("ai_provider"),
+            ai_model: row.get("ai_model"),
+            created_at: row.get::<DateTime<Utc>, _>("created_at"),
+        })
+    }
+
+    fn row_to_binding(&self, row: sqlx::sqlite::SqliteRow) -> PaymentResult<InterfaceBinding> {
+        Ok(InterfaceBinding {
+            id: row.get::<String, _>("id"),
+            namespace: row.get::<String, _>("namespace"),
+            binding_type: row.get::<String, _>("binding_type"),
+            provider: row.get::<String, _>("provider"),
+            address: row.get::<String, _>("address"),
+            status: row.get::<String, _>("status"),
+            metadata_json: row.get("metadata_json"),
+            created_at: row.get::<DateTime<Utc>, _>("created_at"),
+            released_at: row.get("released_at"),
         })
     }
 
@@ -737,6 +1056,9 @@ impl Database {
         payment_intent_id: &Uuid,
         namespace: &str,
         customer_email: &str,
+        nil_name: Option<&str>,
+        nil_role: Option<NilRole>,
+        nil_pair_key: Option<&str>,
     ) -> PaymentResult<Uuid> {
         let issuance_id = Uuid::new_v4();
         
@@ -744,15 +1066,22 @@ impl Database {
             r#"
             INSERT INTO issuances (
                 id, payment_intent_id, namespace, 
+                nil_name, nil_role, nil_pair_key,
                 certificate_ipfs_cid, certificate_hash_sha3,
                 customer_email, issued_at, download_token, 
                 download_expires_at, state, retry_count
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 0)
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', 0)
             "#,
         )
         .bind(issuance_id.to_string())
         .bind(payment_intent_id.to_string())
         .bind(namespace)
+        .bind(nil_name)
+        .bind(nil_role.as_ref().map(|r| match r {
+            NilRole::City => "city",
+            NilRole::Mascot => "mascot",
+        }))
+        .bind(nil_pair_key)
         .bind("")  // Placeholder, will be filled when issued
         .bind("")  // Placeholder
         .bind(customer_email)

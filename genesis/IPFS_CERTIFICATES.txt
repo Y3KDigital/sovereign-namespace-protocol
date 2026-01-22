@@ -1,0 +1,48 @@
+﻿Y3K Ceremonial Certificates - IPFS Publication Record
+Generated: 2026-01-18 06:53:19 UTC
+
+========================================
+brad.x
+========================================
+CID: QmWMfeBLr2N1QyBUv4k1gUw7jrMAya18T2rPeSQV3HXwHq
+
+Verify at:
+- https://cloudflare-ipfs.com/ipfs/QmWMfeBLr2N1QyBUv4k1gUw7jrMAya18T2rPeSQV3HXwHq
+- https://gateway.pinata.cloud/ipfs/QmWMfeBLr2N1QyBUv4k1gUw7jrMAya18T2rPeSQV3HXwHq
+
+========================================
+77.x
+========================================
+CID: QmZeQNtUg1MuhHe8Ext4YxiK9A1dg7URRX6zVka3fjE2cA
+
+Verify at:
+- https://cloudflare-ipfs.com/ipfs/QmZeQNtUg1MuhHe8Ext4YxiK9A1dg7URRX6zVka3fjE2cA
+- https://gateway.pinata.cloud/ipfs/QmZeQNtUg1MuhHe8Ext4YxiK9A1dg7URRX6zVka3fjE2cA
+
+========================================
+88.x
+========================================
+CID: QmW9Y5Fxk52ivXW9BwpQLomrKWqRUxphVnPZq59waJgd45
+
+Verify at:
+- https://cloudflare-ipfs.com/ipfs/QmW9Y5Fxk52ivXW9BwpQLomrKWqRUxphVnPZq59waJgd45
+- https://gateway.pinata.cloud/ipfs/QmW9Y5Fxk52ivXW9BwpQLomrKWqRUxphVnPZq59waJgd45
+
+========================================
+222.x
+========================================
+CID: QmQXBQsdcZPefLfpHKgE7Jsp4ic2ELE8ArgWSi6YUUi2av
+
+Verify at:
+- https://cloudflare-ipfs.com/ipfs/QmQXBQsdcZPefLfpHKgE7Jsp4ic2ELE8ArgWSi6YUUi2av
+- https://gateway.pinata.cloud/ipfs/QmQXBQsdcZPefLfpHKgE7Jsp4ic2ELE8ArgWSi6YUUi2av
+
+========================================
+333.x
+========================================
+CID: QmZ2Wbx1AUiJvSQDVcXQjurBikoSTVf1mJBzpEB21qb4dJ
+
+Verify at:
+- https://cloudflare-ipfs.com/ipfs/QmZ2Wbx1AUiJvSQDVcXQjurBikoSTVf1mJBzpEB21qb4dJ
+- https://gateway.pinata.cloud/ipfs/QmZ2Wbx1AUiJvSQDVcXQjurBikoSTVf1mJBzpEB21qb4dJ
+

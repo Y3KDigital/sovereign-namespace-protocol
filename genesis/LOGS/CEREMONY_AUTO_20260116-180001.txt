@@ -1,0 +1,65 @@
+﻿**********************
+Windows PowerShell transcript start
+Start time: 20260116180001
+Username: Donk\Kevan
+RunAs User: Donk\Kevan
+Configuration Name: 
+Machine: DONK (Microsoft Windows NT 10.0.26200.0)
+Host Application: PowerShell.exe -ExecutionPolicy Bypass -NoProfile -WindowStyle Normal -File C:\Users\Kevan\web3 true web3 rarity\genesis\run-genesis-and-enable-minting.ps1
+Process ID: 91080
+PSVersion: 5.1.26100.7462
+PSEdition: Desktop
+PSCompatibleVersions: 1.0, 2.0, 3.0, 4.0, 5.0, 5.1.26100.7462
+BuildVersion: 10.0.26100.7462
+CLRVersion: 4.0.30319.42000
+WSManStackVersion: 3.0
+PSRemotingProtocolVersion: 2.3
+SerializationVersion: 1.1.0.1
+**********************
+Transcript started, output file is C:\Users\Kevan\web3 true web3 rarity\genesis\LOGS\CEREMONY_AUTO_20260116-180001.txt
+=====================================
+Y3K AUTOMATED GENESIS CEREMONY
+=====================================
+
+Scheduled Time: 2026-01-16T20:00:00Z
+Current Time: 2026-01-16T18:00:01.1064787-05:00
+Dry Run: False
+
+=== PHASE 1: ENTROPY MATERIALIZATION ===
+
+[1.1] Locking execution timestamp...
+  Ceremony Start: 2026-01-16T18:00:01.1144712-05:00
+
+[1.2] Fetching Bitcoin block...
+  Height: 932569
+  Hash: 00000000000000000001d8e076fa59d1f6ffb902028de15a2cd3300f6c4bf5a4
+PS>TerminatingError(Get-Date): "A parameter cannot be found that matches parameter name 'UnixTimeSeconds'."
+  âŒ Bitcoin fetch failed: A parameter cannot be found that matches parameter name 'UnixTimeSeconds'.
+  Using fallback block data...
+
+[1.3] Fetching NIST Beacon pulse...
+  Index:
+  Output:
+  Timestamp:
+  âœ… Pulse retrieved
+
+[1.4] Loading operator seed...
+  Seed: 1e477ac0898844cad7233b70f492736aff0768d60d3839f9e3f988da88899bfb
+  âœ… Operator seed loaded
+
+[1.5] Creating entropy bundle...
+PS>TerminatingError(Get-Date): "A parameter cannot be found that matches parameter name 'UnixTimeSeconds'."
+>> TerminatingError(Get-Date): "A parameter cannot be found that matches parameter name 'UnixTimeSeconds'."
+>> TerminatingError(Get-Date): "A parameter cannot be found that matches parameter name 'UnixTimeSeconds'."
+A parameter cannot be found that matches parameter name 'UnixTimeSeconds'.
+Get-Date : A parameter cannot be found that matches parameter name 'UnixTimeSeconds'.
+At C:\Users\Kevan\web3 true web3 rarity\genesis\run-automated-ceremony.ps1:124 char:35
++             timestamp = (Get-Date -UnixTimeSeconds $btcBlock.time -Fo ...
++                                   ~~~~~~~~~~~~~~~~
+    + CategoryInfo          : InvalidArgument: (:) [Get-Date], ParentContainsErrorRecordException
+    + FullyQualifiedErrorId : NamedParameterNotFound,Microsoft.PowerShell.Commands.GetDateCommand
+
+**********************
+Windows PowerShell transcript end
+End time: 20260116180002
+**********************

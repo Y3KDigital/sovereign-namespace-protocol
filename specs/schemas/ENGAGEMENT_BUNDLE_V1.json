@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ENGAGEMENT_BUNDLE_V1",
+  "description": "The atomic unit of onboarding. Links identity, role, and payout logic to a specific deal scope.",
+  "type": "object",
+  "properties": {
+    "schema_version": { "type": "string", "const": "1.0.0" },
+    "deal_id": { "type": "string", "description": "Scope of this engagement." },
+    "participant_id": { "type": "string", "description": "DID or Wallet Address." },
+    "role_declaration": { "$ref": "./ROLE_DECLARATION_V1.json" },
+    "payout_routing": { "$ref": "./PAYOUT_ROUTING_V1.json" },
+    "terms_hash": { "type": "string", "description": "SHA-256 hash of the legal/engagement terms agreed to." },
+    "relationship_edge_id": { "type": "string", "description": "Optional UUID of the introduction event." },
+    "signature": {
+      "type": "object",
+      "properties": {
+        "method": { "type": "string" },
+        "value": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["value", "timestamp"]
+    }
+  },
+  "required": ["schema_version", "deal_id", "participant_id", "role_declaration", "payout_routing", "terms_hash", "signature"]
+}

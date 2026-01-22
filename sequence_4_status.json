@@ -1,0 +1,9 @@
+{
+  "sequence": "4 - Calendar as Policy",
+  "status": "in-progress",
+  "features": [
+    "calendar-structs",
+    "policy-types",
+    "cli-integration"
+  ]
+}

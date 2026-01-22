@@ -1,0 +1,58 @@
+{
+  "contract_address": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
+  "open_source_repo": "https://github.com/unstoppabledomains/dot-crypto",
+  "standard": "ERC-721 (MIT License)",
+  "simulated_mints": [
+    {
+      "domain": "crypto.x",
+      "token_id": 99006778894326908568256871689830447965535893948808770102842621016902816518350,
+      "owner": "0x6Da9bFE383dE453c43AB55b3196C67f33a6D62a2",
+      "contract": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
+      "standard": "ERC-721",
+      "ud_price": "$51,546",
+      "actual_cost": "$0.01",
+      "open_source": true
+    },
+    {
+      "domain": "money.x",
+      "token_id": 73938817319326377855332283526470104736554847874751022892672752268072727712465,
+      "owner": "0x9493c2E088239cd21Add9b56B760e36659F5bbdF",
+      "contract": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
+      "standard": "ERC-721",
+      "ud_price": "$25,000",
+      "actual_cost": "$0.01",
+      "open_source": true
+    },
+    {
+      "domain": "elite.crypto",
+      "token_id": 21269524651470342107313134489655001576177372706372009061537117627268705870652,
+      "owner": "0x881f50634b232cDAc2c365e00c40c68aaEA700Ab",
+      "contract": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
+      "standard": "ERC-721",
+      "ud_price": "$5,000",
+      "actual_cost": "$0.01",
+      "open_source": true
+    },
+    {
+      "domain": "vault.crypto",
+      "token_id": 75889300316669528262701462307074918577926827456707268276141058057552644898719,
+      "owner": "0x40c980e012Ea5e2397e880aC6389197DDE21D5C5",
+      "contract": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
+      "standard": "ERC-721",
+      "ud_price": "$3,500",
+      "actual_cost": "$0.01",
+      "open_source": true
+    },
+    {
+      "domain": "master.x",
+      "token_id": 43645931520663259704244297723572037929395622136952271363313557210190098317708,
+      "owner": "0xC17E4d527b53b53B6a18E7E879B7acFf0FF2B497",
+      "contract": "0xa9a6A3626993D487d2Dbda3173cf58cA1a9D9e9f",
+      "standard": "ERC-721",
+      "ud_price": "$5,000",
+      "actual_cost": "$0.01",
+      "open_source": true
+    }
+  ],
+  "conclusion": "UD uses standard open-source contracts with 500,000x+ markup"
+}

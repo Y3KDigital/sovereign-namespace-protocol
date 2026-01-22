@@ -2,64 +2,34 @@
 
 const rarityTiers = [
   {
-    name: "Mythic",
+    name: "Crown Letters",
     color: "from-pink-600 to-red-600",
     textColor: "text-pink-500",
     borderColor: "border-pink-500/50",
-    probability: "Tier 6",
-    score: "901–1000",
-    example: "1.x",
-    description: "Legendary one-of-a-kind namespaces with perfect cryptographic properties",
+    count: "26 total",
+    availability: "Protocol Reserved",
+    examples: "a, b, c ... x, y, z",
+    description: "Single letter namespaces. Maximum rarity. Reserved for protocol infrastructure.",
   },
   {
-    name: "Legendary",
+    name: "Crown Digits",
     color: "from-yellow-500 to-orange-500",
     textColor: "text-yellow-500",
     borderColor: "border-yellow-500/50",
-    probability: "Tier 5",
-    score: "751–900",
-    example: "42.x",
-    description: "Extraordinarily rare with exceptional hash patterns",
+    count: "10 total",
+    availability: "Protocol Reserved",
+    examples: "0, 1, 2 ... 7, 8, 9",
+    description: "Single digit namespaces. Legendary status. Reserved for protocol bridges.",
   },
   {
-    name: "Epic",
+    name: "Three-Digit Genesis",
     color: "from-purple-600 to-indigo-600",
     textColor: "text-purple-500",
     borderColor: "border-purple-500/50",
-    probability: "Tier 4",
-    score: "501–750",
-    example: "777.x",
-    description: "Highly valuable with remarkable structural uniqueness",
-  },
-  {
-    name: "Rare",
-    color: "from-blue-500 to-cyan-500",
-    textColor: "text-blue-500",
-    borderColor: "border-blue-500/50",
-    probability: "Tier 3",
-    score: "251–500",
-    example: "1337.x",
-    description: "Uncommon namespaces with strong cryptographic traits",
-  },
-  {
-    name: "Uncommon",
-    color: "from-green-500 to-emerald-500",
-    textColor: "text-green-500",
-    borderColor: "border-green-500/50",
-    probability: "Tier 2",
-    score: "101–250",
-    example: "8888.x",
-    description: "Above-average uniqueness with notable properties",
-  },
-  {
-    name: "Common",
-    color: "from-gray-500 to-gray-600",
-    textColor: "text-gray-500",
-    borderColor: "border-gray-500/50",
-    probability: "Tier 1",
-    score: "0–100",
-    example: "123456.x",
-    description: "Standard namespaces with baseline cryptographic security",
+    count: "900 total",
+    availability: "Available to Claim",
+    examples: "100, 200, 500, 777, 999",
+    description: "Public genesis roots. Position-based pricing. Available for Friends & Family, then public claiming.",
   },
 ];
 
@@ -68,18 +38,14 @@ export function RarityShowcase() {
     <section className="py-24 px-4">
       <div className="max-w-7xl mx-auto">
         <h2 className="text-4xl md:text-5xl font-bold text-center mb-4 gradient-text">
-          Rarity Tiers
+          Genesis Root Tiers
         </h2>
         <p className="text-center text-gray-400 mb-16 max-w-2xl mx-auto">
-          Every namespace is assigned a deterministic rarity score (0-1000) based on cryptographic properties:
-          hash entropy, byte distribution, and structural complexity.
-        </p>
-
-        <p className="text-center text-gray-500 mb-10 max-w-3xl mx-auto text-sm">
-          Examples are illustrative only; rarity is computed solely from cryptographic properties, not numeric meaning.
+          The 955 genesis roots are organized into three tiers based on format and availability.
+          All roots are cryptographically unique and locked by genesis hash.
         </p>
         
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-6">
           {rarityTiers.map((tier) => (
             <div
               key={tier.name}
@@ -90,19 +56,19 @@ export function RarityShowcase() {
                   {tier.name}
                 </h3>
                 <div className="text-sm text-gray-400">
-                  {tier.probability}
+                  {tier.count}
                 </div>
               </div>
               
               <div className="mb-4">
-                <div className="text-sm text-gray-400 mb-1">Score Range</div>
-                <div className="text-xl font-mono font-bold">{tier.score}</div>
+                <div className="text-sm text-gray-400 mb-1">Availability</div>
+                <div className="text-lg font-semibold">{tier.availability}</div>
               </div>
 
               <div className="mb-4">
-                <div className="text-sm text-gray-400 mb-1">Example</div>
-                <code className={`text-lg font-mono ${tier.textColor}`}>
-                  {tier.example}
+                <div className="text-sm text-gray-400 mb-1">Examples</div>
+                <code className={`text-base font-mono ${tier.textColor}`}>
+                  {tier.examples}
                 </code>
               </div>
 
@@ -117,12 +83,16 @@ export function RarityShowcase() {
           ))}
         </div>
 
-        <div className="mt-12 text-center">
+        <div className="mt-12 text-center space-y-4">
+          <p className="text-gray-400 text-sm max-w-2xl mx-auto">
+            <strong className="text-white">900 three-digit roots</strong> are available for claiming.
+            Friends & Family holders get 24-hour early access, then public claiming opens.
+          </p>
           <a
-            href="/docs/rarity"
-            className="text-purple-400 hover:text-purple-300 transition underline"
+            href="/genesis"
+            className="inline-block text-purple-400 hover:text-purple-300 transition underline"
           >
-            Learn how rarity is calculated →
+            View ceremony details and verification →
           </a>
         </div>
       </div>

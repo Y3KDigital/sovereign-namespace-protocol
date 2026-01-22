@@ -1,0 +1,255 @@
+/* Protocol Console Standard CSS v1.0.0 */
+/* Implements: PROTOCOL_CONSOLE_STANDARD.md */
+
+.protocol-console {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #000;
+  color: #fff;
+  font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+  border: 1px solid #333;
+  border-radius: 8px;
+}
+
+/* 1. Identity Header */
+.console-identity {
+  text-align: center;
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid #333;
+}
+
+.identity-badge {
+  margin-bottom: 1rem;
+}
+
+.badge-icon {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.canonical-id {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.5rem 0;
+  color: #fff;
+}
+
+.type-description {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: #888;
+  margin: 0 0 1rem 0;
+}
+
+.authority-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  color: #00ff00;
+  padding: 0.5rem 1rem;
+  background: rgba(0, 255, 0, 0.1);
+  border-radius: 4px;
+}
+
+.authority-badge.contested {
+  color: #ff9800;
+  background: rgba(255, 152, 0, 0.1);
+}
+
+.verify-icon {
+  font-weight: 700;
+}
+
+/* 2. QR Interface */
+.console-qr {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.qr-container {
+  display: inline-block;
+  padding: 2rem;
+  background: #fff;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.qr-container svg {
+  display: block;
+}
+
+.qr-instruction {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #fff;
+  margin: 1rem 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.qr-fallback {
+  font-size: 0.75rem;
+  color: #666;
+  margin: 0;
+}
+
+.qr-fallback a {
+  color: #0066cc;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.qr-fallback a:hover {
+  color: #4da3ff;
+}
+
+/* 3. Actions */
+.console-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 3rem;
+}
+
+.console-action {
+  padding: 1rem;
+  background: #fff;
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.console-action:hover:not(.disabled) {
+  background: #f0f0f0;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 255, 255, 0.1);
+}
+
+.console-action.disabled {
+  background: #333;
+  color: #666;
+  cursor: not-allowed;
+}
+
+/* 4. State Grid */
+.console-state {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.state-block {
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  background: #111;
+  border: 1px solid #333;
+  border-radius: 4px;
+  transition: border-color 0.15s ease;
+}
+
+.state-block:hover {
+  border-color: #555;
+}
+
+.state-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+  margin-bottom: 0.5rem;
+}
+
+.state-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.2;
+}
+
+/* Footer */
+.console-footer {
+  text-align: center;
+  padding-top: 1.5rem;
+  border-top: 1px solid #333;
+}
+
+.protocol-version {
+  font-size: 0.625rem;
+  color: #555;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .protocol-console {
+    padding: 1.5rem;
+  }
+  
+  .canonical-id {
+    font-size: 1.5rem;
+  }
+  
+  .qr-container {
+    padding: 1.5rem;
+  }
+  
+  .console-state {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Theme Support */
+.protocol-console[data-theme="light"] {
+  background: #fff;
+  color: #000;
+  border-color: #e0e0e0;
+}
+
+.protocol-console[data-theme="light"] .canonical-id {
+  color: #000;
+}
+
+.protocol-console[data-theme="light"] .console-action {
+  background: #000;
+  color: #fff;
+}
+
+.protocol-console[data-theme="light"] .console-action:hover:not(.disabled) {
+  background: #333;
+}
+
+.protocol-console[data-theme="light"] .state-block {
+  background: #f5f5f5;
+  border-color: #e0e0e0;
+}
+
+/* Print Styles (for QR posters) */
+@media print {
+  .protocol-console {
+    border: none;
+    max-width: none;
+  }
+  
+  .console-actions {
+    display: none;
+  }
+  
+  .console-footer {
+    display: none;
+  }
+}

@@ -36,6 +36,16 @@ export default function SuccessClient() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const downloadHref = useMemo(() => {
+    const raw = order?.download_url;
+    if (!raw) return null;
+    if (/^https?:\/\//i.test(raw)) return raw;
+    // API currently returns a relative path like "/api/downloads/{token}".
+    // If the API is on a different origin than the web app, prefix it.
+    if (raw.startsWith("/")) return `${apiBase}${raw}`;
+    return `${apiBase}/${raw}`;
+  }, [order?.download_url, apiBase]);
+
   useEffect(() => {
     if (!orderId) return;
 
@@ -103,7 +113,7 @@ export default function SuccessClient() {
             </Link>
             <div className="flex gap-8">
               <Link href="/mint" className="hover:text-purple-400 transition">
-                Mint
+                Claims
               </Link>
               <Link href="/trust" className="hover:text-purple-400 transition">
                 Trust
@@ -120,9 +130,9 @@ export default function SuccessClient() {
       </nav>
 
       <div className="max-w-3xl mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold mb-2">Mint status</h1>
+        <h1 className="text-4xl font-bold mb-2">Claim Status</h1>
         <p className="text-gray-400 mb-8">
-          We’ll keep checking your order while issuance finalizes.
+          We’ll keep checking your order while allocation finalizes.
         </p>
 
         {!orderId ? (
@@ -186,7 +196,7 @@ export default function SuccessClient() {
               {order?.download_url ? (
                 <div className="mt-4">
                   <Link
-                    href={order.download_url}
+                    href={downloadHref ?? order.download_url}
                     className="block text-center px-4 py-3 rounded-lg bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 transition"
                   >
                     Download certificate
@@ -211,6 +221,20 @@ export default function SuccessClient() {
           </div>
         )}
       </div>
+      
+      <div className="mt-12 p-8 bg-gradient-to-br from-green-900/10 to-blue-900/10 border border-green-500/20 rounded-2xl max-w-2xl mx-auto">
+        <h3 className="text-xl font-bold text-white mb-4">Understand What You Own</h3>
+        <p className="text-gray-400 mb-6">
+          Your root is secured. Now learn what you own, how the keys work, what survives Y3K, and how to transfer.
+        </p>
+        <Link 
+          href="/mint/ownership"
+          className="inline-block w-full sm:w-auto bg-white text-black font-bold py-3 px-8 rounded-lg hover:bg-gray-200 transition text-center"
+        >
+          Read Complete Orientation →
+        </Link>
+      </div>
+
     </main>
   );
 }

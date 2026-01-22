@@ -1,0 +1,9 @@
+{
+  "chain_id": "uny-korn-l1",
+  "policy_hash": "0xPOLICY_HASH_PLACEHOLDER",
+  "namespaces": [
+    { "name": "y3k", "controller": "GENESIS_GOV_KEY_PLACEHOLDER" }
+  ],
+  "validators": [],
+  "tev_enforced": true
+}

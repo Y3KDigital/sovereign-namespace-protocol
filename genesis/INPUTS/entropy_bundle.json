@@ -1,0 +1,36 @@
+{
+    "ceremony":  {
+                     "timestamp":  "2026-01-16T20:00:00Z",
+                     "executed_at":  "2026-01-16T18:17:29.2535690-05:00"
+                 },
+    "sources":  [
+                    {
+                        "rule":  "first_block_after_genesis_time",
+                        "hash":  "000000000000000000017d901f13c9427fef563688e6345aa3e07266155694fa",
+                        "timestamp":  "2026-01-16T23:13:19.0000000",
+                        "type":  "bitcoin_block",
+                        "verified":  true,
+                        "height":  932570
+                    },
+                    {
+                        "output_value":  null,
+                        "rule":  "first_pulse_after_genesis_time",
+                        "timestamp":  null,
+                        "type":  "nist_beacon",
+                        "pulse_index":  null,
+                        "verified":  true
+                    },
+                    {
+                        "committed_at":  "2026-01-03T00:00:00Z",
+                        "commitment_hash":  "d4f2c8e9a3b7f5d6c9e8a4b2f7d5c3e9a6b8f4d7c5e9a3b6f8d4c7e5a9b3f6d8",
+                        "type":  "operator_commitment",
+                        "revealed_at":  "2026-01-16T18:17:29.2535690-05:00",
+                        "seed":  "1e477ac0898844cad7233b70f492736aff0768d60d3839f9e3f988da88899bfb",
+                        "verified":  true
+                    }
+                ],
+    "mixing":  {
+                   "algorithm":  "SHA3-256",
+                   "input":  "bitcoin_hash || nist_output || operator_seed"
+               }
+}

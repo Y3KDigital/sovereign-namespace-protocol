@@ -1,0 +1,18 @@
+{
+  "data": {
+    "event_type": "call.initiated",
+    "id": "evt_12345",
+    "occurred_at": "2026-01-17T14:50:00Z",
+    "record_type": "event",
+    "payload": {
+      "call_control_id": "v2:12345",
+      "call_leg_id": "leg_1",
+      "call_session_id": "sess_1",
+      "connection_id": "conn_1",
+      "direction": "incoming",
+      "from": "+13212788323",
+      "to": "+15555555555",
+      "state": "parked"
+    }
+  }
+}

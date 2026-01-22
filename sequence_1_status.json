@@ -1,0 +1,17 @@
+{
+  "sequence": "1 - Mobile Companion",
+  "status": "complete",
+  "features": [
+    "companion-server",
+    "mobile-ui",
+    "pairing-flow",
+    "cloudflared-tunnel"
+  ],
+  "checklist": {
+      "server_built": true,
+      "ui_embedded": true,
+      "tunnel_guide": true,
+      "approval_logic": "mocked",
+      "emergency_logic": "mocked"
+  }
+}

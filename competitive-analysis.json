@@ -1,0 +1,139 @@
+{
+  "analyzed_date": "2026-01-21",
+  "architecture_model": {
+    "description": "Y3K sells root namespaces, not names. Each root can generate unlimited subdomains, but only the root is scarce.",
+    "layers": {
+      "tld": ".x, .z, .1 (protocol infrastructure, NOT for sale)",
+      "roots": "kevan.1, crypto.x, ryan.z (955 ROOTS - THE PRODUCT)",
+      "subdomains": "auth.kevan.1, pay.crypto.x (unlimited, FREE with root)"
+    },
+    "analogy": "UD sells apartment units forever. Y3K sells land parcels once, owners build cities.",
+    "unique_value": "Roots are scarce (955), subdomains are infinite utility"
+  },
+  "competitors": {
+    "Unstoppable Domains": {
+      "url": "https://unstoppabledomains.com",
+      "tlds": [
+        ".crypto",
+        ".x",
+        ".nft",
+        ".wallet",
+        ".blockchain",
+        ".dao",
+        ".bitcoin",
+        ".zil",
+        ".888"
+      ],
+      "pricing": "$5-$51,546",
+      "supply": "Unlimited",
+      "blockchain": "Polygon, Ethereum",
+      "notes": "Market leader, high prices"
+    },
+    "ENS (Ethereum Name Service)": {
+      "url": "https://ens.domains",
+      "tlds": [
+        ".eth"
+      ],
+      "pricing": "$5-$640/year (3-4 char)",
+      "supply": "Unlimited",
+      "blockchain": "Ethereum",
+      "notes": "Most established, renewal fees"
+    },
+    "Handshake": {
+      "url": "https://handshake.org",
+      "tlds": [
+        "Custom TLDs"
+      ],
+      "pricing": "Auction-based",
+      "supply": "Unlimited TLDs",
+      "blockchain": "Handshake blockchain",
+      "notes": "Decentralized DNS root"
+    },
+    "Freename": {
+      "url": "https://freename.io",
+      "tlds": [
+        "Custom TLDs",
+        ".metaverse",
+        ".web3"
+      ],
+      "pricing": "$10-$1,000+",
+      "supply": "Unlimited",
+      "blockchain": "Polygon",
+      "notes": "TLD marketplace"
+    },
+    "Bonfida (.sol)": {
+      "url": "https://naming.bonfida.org",
+      "tlds": [
+        ".sol"
+      ],
+      "pricing": "$20-$3,000/year",
+      "supply": "Unlimited",
+      "blockchain": "Solana",
+      "notes": "Solana ecosystem"
+    },
+    "Space ID": {
+      "url": "https://space.id",
+      "tlds": [
+        ".bnb",
+        ".arb",
+        ".sei"
+      ],
+      "pricing": "$5-$640/year",
+      "supply": "Unlimited",
+      "blockchain": "Multi-chain",
+      "notes": "Multi-chain naming"
+    },
+    "Lens Protocol": {
+      "url": "https://lens.xyz",
+      "tlds": [
+        ".lens"
+      ],
+      "pricing": "Free-$50",
+      "supply": "Unlimited",
+      "blockchain": "Polygon",
+      "notes": "Social graph focus"
+    },
+    "Basename": {
+      "url": "https://base.org",
+      "tlds": [
+        ".base.eth"
+      ],
+      "pricing": "$5-$100/year",
+      "supply": "Unlimited",
+      "blockchain": "Base (L2)",
+      "notes": "Coinbase's Base chain"
+    },
+    ".bit (formerly DAS)": {
+      "url": "https://did.id",
+      "tlds": [
+        ".bit"
+      ],
+      "pricing": "$5-$1,000/year",
+      "supply": "Unlimited",
+      "blockchain": "Multi-chain",
+      "notes": "Cross-chain identity"
+    },
+    "Tezos Domains": {
+      "url": "https://tezos.domains",
+      "tlds": [
+        ".tez"
+      ],
+      "pricing": "$1-$100/year",
+      "supply": "Unlimited",
+      "blockchain": "Tezos",
+      "notes": "Tezos ecosystem"
+    }
+  },
+  "cashme_status": "Not a Web3 competitor (cash.me is Cash App)",
+  "y3k_advantages": [
+    "Only fixed supply (955)",
+    "No renewal fees",
+    "Unlimited subdomains",
+    "85% cheaper than UD",
+    "Genesis-locked proof",
+    "ERC-6551 support",
+    "Soulbound option"
+  ],
+  "market_size": "$500M+",
+  "y3k_opportunity": "$25M-$50M (5-10% market share)"
+}

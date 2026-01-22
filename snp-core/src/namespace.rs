@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use crate::genesis::GenesisContext;
-use crate::sovereignty::SovereigntyClass;
+use crate::sovereignty::{SovereigntyClass, TransferPolicy};
 use crate::crypto::hash::{sha3_256_domain, DOMAIN_NAMESPACE};
 use crate::errors::{Result, SnpError};
 
@@ -17,7 +17,7 @@ pub struct Namespace {
     #[serde(with = "hex_bytes")]
     pub id: [u8; 32],
     
-    /// Human-readable label
+    /// Human-readable label (e.g., "law.y3k" or "intake.law.y3k")
     pub label: String,
     
     /// Sovereignty class (set at creation, immutable)
@@ -26,6 +26,65 @@ pub struct Namespace {
     /// Genesis context binding
     #[serde(with = "hex_bytes")]
     pub genesis_hash: [u8; 32],
+    
+    /// Parent namespace ID (if this is a subdomain)
+    #[serde(skip_serializing_if = "Option::is_none")]
+    #[serde(with = "option_hex_bytes")]
+    pub parent_id: Option<[u8; 32]>,
+    
+    /// Subdomain depth (0 = root, 1 = first level, etc.)
+    #[serde(default)]
+    pub depth: u8,
+}
+
+/// Subdomain delegation record
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SubdomainDelegation {
+    /// The subdomain namespace
+    pub subdomain: Namespace,
+    
+    /// The parent namespace that delegated it
+    #[serde(with = "hex_bytes")]
+    pub parent_id: [u8; 32],
+    
+    /// Delegatee (owner address or identity)
+    pub delegatee: String,
+    
+    /// Delegation terms (lease, partnership, sale, etc.)
+    pub terms: DelegationTerms,
+    
+    /// Timestamp of delegation
+    pub delegated_at: u64,
+    
+    /// Optional expiration timestamp
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub expires_at: Option<u64>,
+}
+
+/// Delegation terms for a subdomain
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub enum DelegationTerms {
+    /// Commercial lease with annual fee
+    Lease {
+        annual_fee: u64,
+        currency: String, // "USD", "Y3K", etc.
+    },
+    
+    /// Partnership delegation (no fee, strategic)
+    Partnership {
+        description: String,
+    },
+    
+    /// One-time sale
+    Sale {
+        purchase_price: u64,
+        currency: String,
+    },
+    
+    /// Protocol grant (free allocation)
+    ProtocolGrant {
+        reason: String,
+    },
 }
 
 impl Namespace {
@@ -58,7 +117,90 @@ impl Namespace {
             label: label.to_string(),
             sovereignty,
             genesis_hash: ctx.genesis_hash,
+            parent_id: None,
+            depth: 0,
         })
+    }
+    
+    /// Derive a subdomain from a parent namespace
+    /// 
+    /// Formula: SHA3-256("SNP::NAMESPACE" || genesis_hash || full_label || sovereignty || parent_id)
+    pub fn derive_subdomain(
+        parent: &Self,
+        subdomain_label: &str,
+        sovereignty: SovereigntyClass,
+    ) -> Result<Self> {
+        // Check if parent allows subdomain delegation
+        let transfer_policy = parent.sovereignty.default_transfer_policy();
+        if !transfer_policy.allows_subdomain_delegation() {
+            return Err(SnpError::InvalidLabel(
+                "Parent namespace does not allow subdomain delegation".to_string()
+            ));
+        }
+        
+        // Check maximum depth
+        if let Some(max_depth) = transfer_policy.max_subdomain_depth() {
+            if parent.depth >= max_depth {
+                return Err(SnpError::InvalidLabel(
+                    format!("Maximum subdomain depth of {} exceeded", max_depth)
+                ));
+            }
+        }
+        
+        // Validate subdomain label
+        Self::validate_label(subdomain_label)?;
+        
+        // Construct full label: subdomain.parent
+        let full_label = format!("{}.{}", subdomain_label, parent.label);
+        
+        // Compute subdomain ID (includes parent_id for uniqueness)
+        let ctx = GenesisContext::new(parent.genesis_hash);
+        let id = sha3_256_domain(
+            DOMAIN_NAMESPACE,
+            &[
+                &ctx.genesis_hash,
+                full_label.as_bytes(),
+                sovereignty.as_str().as_bytes(),
+                &parent.id,
+            ],
+        );
+        
+        Ok(Self {
+            id,
+            label: full_label,
+            sovereignty,
+            genesis_hash: parent.genesis_hash,
+            parent_id: Some(parent.id),
+            depth: parent.depth + 1,
+        })
+    }
+    
+    /// Check if this namespace is a subdomain
+    pub fn is_subdomain(&self) -> bool {
+        self.parent_id.is_some()
+    }
+    
+    /// Get the transfer policy for this namespace
+    pub fn transfer_policy(&self) -> TransferPolicy {
+        self.sovereignty.default_transfer_policy()
+    }
+    
+    /// Parse a namespace label to extract components
+    /// E.g., "intake.law.y3k" -> ["intake", "law", "y3k"]
+    pub fn parse_label_components(&self) -> Vec<&str> {
+        self.label.split('.').collect()
+    }
+    
+    /// Get the root label (rightmost component)
+    /// E.g., "intake.law.y3k" -> "y3k"
+    pub fn root_label(&self) -> Option<&str> {
+        self.parse_label_components().last().copied()
+    }
+    
+    /// Get the immediate subdomain label (leftmost component)
+    /// E.g., "intake.law.y3k" -> "intake"
+    pub fn subdomain_label(&self) -> Option<&str> {
+        self.parse_label_components().first().copied()
     }
 
     /// Validate a label according to protocol rules
@@ -130,6 +272,43 @@ mod hex_bytes {
         let mut array = [0u8; 32];
         array.copy_from_slice(&bytes);
         Ok(array)
+    }
+}
+
+/// Custom serde module for Option<[u8; 32]> with hex encoding
+mod option_hex_bytes {
+    use serde::{Deserialize, Deserializer, Serializer};
+
+    pub fn serialize<S>(bytes: &Option<[u8; 32]>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        match bytes {
+            Some(b) => serializer.serialize_str(&format!("0x{}", hex::encode(b))),
+            None => serializer.serialize_none(),
+        }
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<[u8; 32]>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let opt: Option<String> = Option::deserialize(deserializer)?;
+        match opt {
+            Some(s) => {
+                let s = s.strip_prefix("0x").unwrap_or(&s);
+                let bytes = hex::decode(s).map_err(serde::de::Error::custom)?;
+                
+                if bytes.len() != 32 {
+                    return Err(serde::de::Error::custom("Expected 32 bytes"));
+                }
+
+                let mut array = [0u8; 32];
+                array.copy_from_slice(&bytes);
+                Ok(Some(array))
+            },
+            None => Ok(None),
+        }
     }
 }
 

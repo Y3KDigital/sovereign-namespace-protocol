@@ -1,0 +1,10 @@
+{
+  "registry": {
+    "version": "1.0.0",
+    "network": "Digital Giant Private Network ; January 2026",
+    "horizon_url": "http://localhost:18000",
+    "issuer": "GDMPZQEQHWZ7KGEILXYVBNOT4QCOWSVFDDHMWL42IM2VZWUEZC6AQ72M",
+    "last_updated": "2026-01-21T00:00:00Z"
+  },
+  "issuances": []
+}

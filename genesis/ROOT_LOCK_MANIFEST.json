@@ -1,0 +1,209 @@
+{
+  "version": "1.0.0",
+  "protocol": "Y3K Sovereign Namespace Protocol",
+  "manifest_type": "ROOT_LOCK_MANIFEST",
+  "generated_at": "2026-01-13T00:00:00Z",
+  "genesis_hash": "0x6787f9320ad087315948d2b60c210c674dc1844f451436a9f25156f9d54096fc",
+  "authority": "Y3K Protocol Governance",
+  "policy": "ROOTS_ONLY_NEVER_SOLD",
+  
+  "lock_policy": {
+    "transferability": "PROHIBITED",
+    "public_listing": "PROHIBITED",
+    "disclosure": "INTENT_BASED_ONLY",
+    "subdomain_issuance": "GOVERNANCE_CONTROLLED",
+    "revocation": "ALWAYS_AVAILABLE"
+  },
+  
+  "tier_0_crown_roots": {
+    "description": "Absolute crown roots - single character alpha and numeric. Layer-1 atoms. Never sold, never auctioned, never delegated by default. Future protocol expansion capacity.",
+    "sovereignty_class": "ProtocolReserved",
+    "count": 36,
+    "mint_priority": 1,
+    
+    "single_letter_alpha": [
+      "a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
+      "k", "l", "m", "n", "o", "p", "q", "r", "s", "t",
+      "u", "v", "w", "x", "y", "z"
+    ],
+    
+    "single_digit_numeric": [
+      "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"
+    ],
+    
+    "rules": {
+      "transfer": "NEVER",
+      "auction": "NEVER",
+      "delegation": "GOVERNANCE_ONLY",
+      "purpose": "FUTURE_PROTOCOL_EXPANSION"
+    }
+  },
+  
+  "tier_1_short_primitives": {
+    "description": "Two-character roots - extreme scarcity primitives for cryptography, identity, execution, epochs. Protocol-owned, delegation by governance only.",
+    "sovereignty_class": "ProtocolReserved",
+    "count": 18,
+    "mint_priority": 2,
+    
+    "alpha_primitives": [
+      "ai", "id", "io", "ip", "vm", "os", "tx", "db", "zk", "pq"
+    ],
+    
+    "numeric_primitives": [
+      "00", "01", "10", "11", "21", "33", "42", "99"
+    ],
+    
+    "rules": {
+      "transfer": "NEVER",
+      "public_mint": "PROHIBITED",
+      "delegation": "GOVERNANCE_ONLY",
+      "reserved_for": [
+        "cryptography",
+        "identity",
+        "execution",
+        "epochs",
+        "versions"
+      ]
+    }
+  },
+  
+  "tier_2_economic_roots": {
+    "description": "Core economic roots - highest-value semantic roots in Web3 and finance. Roots only, not brands. Must be locked before any market activity.",
+    "sovereignty_class": "ProtocolControlled",
+    "count": 17,
+    "mint_priority": 3,
+    
+    "roots": [
+      "law",
+      "bank",
+      "cash",
+      "pay",
+      "auto",
+      "claim",
+      "asset",
+      "rwa",
+      "ai",
+      "agent",
+      "id",
+      "name",
+      "number",
+      "verify",
+      "proof",
+      "settle",
+      "trust"
+    ],
+    
+    "rules": {
+      "transfer": "GOVERNANCE_RESTRICTED",
+      "public_listing": "PROHIBITED",
+      "subdomain_issuance": "AFTER_ROOT_LOCK",
+      "usage_before_delegation": "REQUIRED"
+    }
+  },
+  
+  "tier_3_protocol_roots": {
+    "description": "Protocol and governance roots - define how the system itself exists. Referenced in specs, used internally, never treated as commercial inventory.",
+    "sovereignty_class": "ProtocolReserved",
+    "count": 11,
+    "mint_priority": 4,
+    
+    "roots": [
+      "y3k",
+      "root",
+      "protocol",
+      "network",
+      "chain",
+      "registry",
+      "governance",
+      "treasury",
+      "oracle",
+      "audit",
+      "status"
+    ],
+    
+    "rules": {
+      "transfer": "NEVER",
+      "commercial_use": "PROHIBITED",
+      "internal_only": true,
+      "spec_referenced": true
+    }
+  },
+  
+  "mint_schedule": {
+    "phase_1_tier_0": {
+      "description": "Single-character alpha and numeric roots",
+      "count": 36,
+      "target_block": "GENESIS",
+      "batch": "ATOMIC_IF_POSSIBLE"
+    },
+    "phase_2_tier_1": {
+      "description": "Two-character primitives",
+      "count": 18,
+      "target_block": "GENESIS_PLUS_1",
+      "batch": "ATOMIC_IF_POSSIBLE"
+    },
+    "phase_3_tier_2": {
+      "description": "Core economic roots",
+      "count": 17,
+      "target_block": "GENESIS_PLUS_2"
+    },
+    "phase_4_tier_3": {
+      "description": "Protocol governance roots",
+      "count": 11,
+      "target_block": "GENESIS_PLUS_3"
+    }
+  },
+  
+  "total_locked_roots": 82,
+  
+  "usage_intentions": {
+    "law": {
+      "purpose": "Legal services routing authority",
+      "phone_routing": "+1-800-LAW-Y3K",
+      "api_endpoint": "https://api.law.y3k",
+      "ai_agent": "agent://law.y3k/intake-bot",
+      "settlement": "y3k:law:payments"
+    },
+    "bank": {
+      "purpose": "Banking and settlement services",
+      "api_endpoint": "https://api.bank.y3k",
+      "settlement": "y3k:bank:settlement"
+    },
+    "ai": {
+      "purpose": "AI services and agent registry",
+      "api_endpoint": "https://api.ai.y3k",
+      "registry": "agent://ai.y3k/registry"
+    },
+    "number": {
+      "purpose": "Telecommunications number registry",
+      "routing_authority": "Global phone number to namespace mapping"
+    }
+  },
+  
+  "disclosure_policy": {
+    "public_by_default": false,
+    "intent_based_only": true,
+    "exhaustive_listing": false,
+    "statement": "All Y3K root namespaces are sovereign-locked and privately held by the protocol. Access is granted only through intent-based delegation; roots are never sold."
+  },
+  
+  "technical_enforcement": {
+    "sovereignty_classes": [
+      "ProtocolReserved",
+      "ProtocolControlled"
+    ],
+    "transfer_policies": [
+      "NonTransferable",
+      "Restricted"
+    ],
+    "on_chain_validation": true,
+    "governance_multisig_required": true
+  },
+  
+  "ipfs_attestation": {
+    "manifest_hash": "TO_BE_GENERATED",
+    "certificate_cid": "TO_BE_GENERATED",
+    "timestamp": "2026-01-13T00:00:00Z",
+    "signed_by": "Y3K_PROTOCOL_GENESIS_KEY"
+  }
+}

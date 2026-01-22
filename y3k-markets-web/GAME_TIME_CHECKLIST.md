@@ -2,6 +2,12 @@
 
 This is the short, do-not-think checklist to be ready for bowl-week traffic.
 
+## Production endpoints
+
+- Web: <https://y3kmarkets.com>
+- Public Payments API: <https://api.y3kmarkets.com>
+- Health: `GET https://api.y3kmarkets.com/api/health`
+
 ## 0) Preflight: decide your deployment mode
 
 This web app uses `next.config.mjs` with `output: 'export'`.
@@ -18,6 +24,11 @@ Set these at build time:
 - `NEXT_PUBLIC_API_URL` (points to the deployed `payments-api` base)
 - `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (Stripe publishable key, e.g. `pk_live_...`)
 - Optional: `NEXT_PUBLIC_IPFS_GATEWAY` (defaults can be fine)
+
+Notes:
+
+- On Cloudflare Pages, these must be set as **build-time** environment variables and then the site must be redeployed.
+- If `/mint` shows “Stripe publishable key not configured”, the build did not include `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`.
 
 Sanity check routes:
 
@@ -36,7 +47,8 @@ In production you want Stripe to be *mandatory*:
 
 Stripe secrets:
 
-- `STRIPE_API_KEY=sk_live_...`
+- `STRIPE_API_KEY=sk_live_...` (preferred)
+  - alias accepted: `STRIPE_SECRET_KEY` or `STRIPE_SECRET`
 - `STRIPE_WEBHOOK_SECRET=whsec_...`
 
 Operational / safety:
@@ -48,11 +60,17 @@ Health check:
 
 - `GET /api/health` should show `stripe_configured: true`
 
+Repo tooling that helps:
+
+- `payments-api/verify-public-api.ps1` validates public health + inventory.
+- `payments-api/restart-payments-api.ps1` restarts the local API and prints health.
+- `payments-api/run-tunnel.ps1` runs the repo-local Cloudflare tunnel runner (avoids user-profile tunnel collisions).
+
 ## 3) Stripe webhook: verify delivery
 
 - Stripe dashboard → Developers → Webhooks
 - Confirm your endpoint points to:
-  - `POST https://YOUR_API_HOST/api/payments/webhook`
+  - `POST https://api.y3kmarkets.com/api/payments/webhook`
 - Confirm recent deliveries are **200 OK**
 
 If you’re testing locally, follow:
@@ -81,4 +99,9 @@ If you’re testing locally, follow:
   - `GET /api/namespaces/availability?namespace=1.x`
 - Support workflow:
   - If an order is paid but issuance is delayed, use the retry endpoint (see `payments-api` tooling) or check webhook delivery.
+
+If the success page stays stuck in "processing":
+
+- Check Stripe webhook deliveries (status, retries, error bodies).
+- Check `payments-api` logs for webhook signature errors (wrong `STRIPE_WEBHOOK_SECRET`) or DB errors.
 

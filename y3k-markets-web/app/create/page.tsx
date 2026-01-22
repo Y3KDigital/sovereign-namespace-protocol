@@ -76,8 +76,16 @@ export default function CreatePage() {
         </p>
 
         <div className="bg-white/5 border border-white/10 rounded-lg p-8">
+          <div className="mb-4 bg-yellow-500/10 border border-yellow-500/30 rounded-lg p-4 text-yellow-100 text-sm">
+            <div className="font-semibold">Security note</div>
+            <div className="mt-1">
+              Do <span className="font-semibold">not</span> paste a wallet seed phrase, private key, or exchange credentials here.
+              Use a fresh, random entropy string for namespace generation.
+            </div>
+          </div>
+
           <label className="block text-sm font-semibold text-gray-200 mb-2">
-            Seed Phrase <span className="text-gray-500">(min 32 characters recommended)</span>
+            Entropy Seed <span className="text-gray-500">(min 32 characters recommended)</span>
           </label>
           <textarea
             value={seed}
@@ -86,7 +94,7 @@ export default function CreatePage() {
               setPreviewHash(null);
             }}
             rows={4}
-            placeholder="Enter a seed phrase..."
+            placeholder="Click “Random Seed” (recommended) or enter a fresh random string…"
             className="w-full bg-black/40 border border-white/10 rounded-lg p-3 text-gray-100 placeholder:text-gray-500 focus:outline-none focus:border-purple-500/60"
           />
           <div className="mt-2 flex items-center justify-between gap-4">
@@ -139,7 +147,7 @@ export default function CreatePage() {
             </div>
 
             <p className="mt-4 text-xs text-gray-500">
-              ⚠️ Your seed generates your namespace and keys. Store it securely. We cannot recover lost seeds.
+              ⚠️ This entropy seed influences namespace generation. Store it securely. We cannot recover lost seeds.
             </p>
           </div>
         </div>

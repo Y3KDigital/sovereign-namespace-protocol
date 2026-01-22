@@ -1,0 +1,204 @@
+{
+  "version": "1.0.0",
+  "generated_at": "2026-01-13T00:00:00Z",
+  "description": "Protocol-reserved namespaces for genesis minting",
+  "genesis_hash": "0x6787f9320ad087315948d2b60c210c674dc1844f451436a9f25156f9d54096fc",
+  "protocol_authority": "Y3K Foundation Multisig",
+  
+  "tier_0_constitutional": {
+    "description": "Non-transferable constitutional namespaces",
+    "sovereignty_class": "ProtocolReserved",
+    "namespaces": [
+      "y3k",
+      "y3k.protocol",
+      "y3k.network",
+      "y3k.chain",
+      "y3k.registry",
+      "y3k.root",
+      "y3k.genesis",
+      "y3k.governance",
+      "y3k.node",
+      "y3k.validator",
+      "y3k.oracle",
+      "y3k.bridge",
+      "y3k.relay",
+      "y3k.rpc",
+      "y3k.standard",
+      "y3k.spec",
+      "y3k.api",
+      "y3k.sdk",
+      "y3k.docs"
+    ]
+  },
+  
+  "tier_1_strategic_legal": {
+    "description": "Strategic legal and compliance assets",
+    "sovereignty_class": "ProtocolControlled",
+    "namespaces": [
+      "law",
+      "legal",
+      "compliance",
+      "regulatory",
+      "jurisdiction"
+    ]
+  },
+  
+  "tier_1_strategic_financial": {
+    "description": "Strategic financial services assets",
+    "sovereignty_class": "ProtocolControlled",
+    "namespaces": [
+      "bank",
+      "cash",
+      "pay",
+      "settle",
+      "clearing",
+      "custody",
+      "treasury"
+    ]
+  },
+  
+  "tier_1_strategic_assets": {
+    "description": "Strategic asset management",
+    "sovereignty_class": "ProtocolControlled",
+    "namespaces": [
+      "asset",
+      "rwa",
+      "property",
+      "deed",
+      "title",
+      "claim"
+    ]
+  },
+  
+  "tier_1_strategic_identity": {
+    "description": "Strategic identity and verification",
+    "sovereignty_class": "ProtocolControlled",
+    "namespaces": [
+      "identity",
+      "verify",
+      "kyc",
+      "did",
+      "credential"
+    ]
+  },
+  
+  "tier_1_strategic_ai": {
+    "description": "Strategic AI and agent services",
+    "sovereignty_class": "ProtocolControlled",
+    "namespaces": [
+      "ai",
+      "agent",
+      "agents",
+      "model",
+      "inference"
+    ]
+  },
+  
+  "tier_1_strategic_telco": {
+    "description": "Strategic telecommunications",
+    "sovereignty_class": "ProtocolControlled",
+    "namespaces": [
+      "number",
+      "phone",
+      "tel",
+      "sms",
+      "voice"
+    ]
+  },
+  
+  "tier_1_strategic_auto": {
+    "description": "Strategic automotive and transportation",
+    "sovereignty_class": "ProtocolControlled",
+    "namespaces": [
+      "auto",
+      "vehicle",
+      "vin",
+      "transport",
+      "logistics"
+    ]
+  },
+  
+  "tier_1_strategic_insurance": {
+    "description": "Strategic insurance and risk",
+    "sovereignty_class": "ProtocolControlled",
+    "namespaces": [
+      "insurance",
+      "risk",
+      "underwriting",
+      "actuarial"
+    ]
+  },
+  
+  "usage_mapping": {
+    "law": {
+      "phone_numbers": ["+1-800-LAW-Y3K"],
+      "api_endpoints": ["https://api.law.y3k"],
+      "routing_authority": "legal intake and case management",
+      "planned_subdomains": [
+        "intake.law",
+        "ca.law",
+        "ny.law",
+        "uk.law",
+        "verify.law",
+        "compliance.law"
+      ]
+    },
+    "bank": {
+      "api_endpoints": ["https://api.bank.y3k"],
+      "routing_authority": "banking and settlement services",
+      "planned_subdomains": [
+        "settle.bank",
+        "clearing.bank",
+        "custody.bank"
+      ]
+    },
+    "number": {
+      "routing_authority": "telecommunications number registry",
+      "planned_subdomains": [
+        "us.number",
+        "uk.number",
+        "ca.number"
+      ]
+    },
+    "ai": {
+      "api_endpoints": ["https://api.ai.y3k"],
+      "routing_authority": "AI services and agent registry",
+      "planned_subdomains": [
+        "agent.ai",
+        "model.ai",
+        "inference.ai"
+      ]
+    }
+  },
+  
+  "minting_schedule": {
+    "phase_1_immediate": {
+      "description": "Genesis mint before public launch",
+      "namespaces": [
+        "tier_0_constitutional",
+        "tier_1_strategic_legal",
+        "tier_1_strategic_financial",
+        "tier_1_strategic_assets",
+        "tier_1_strategic_identity",
+        "tier_1_strategic_ai",
+        "tier_1_strategic_telco",
+        "tier_1_strategic_auto",
+        "tier_1_strategic_insurance"
+      ],
+      "target_date": "2026-01-15",
+      "mint_to": "protocol_treasury_multisig"
+    },
+    "phase_2_delegations": {
+      "description": "Begin subdomain delegations",
+      "target_date": "2026-02-01",
+      "initial_delegations": [
+        {
+          "subdomain": "intake.law",
+          "delegatee": "LegalTech Partner",
+          "terms": "commercial_lease",
+          "annual_fee": 50000
+        }
+      ]
+    }
+  }
+}

@@ -2,7 +2,6 @@ use clap::{Parser, Subcommand};
 use sqlx::SqlitePool;
 use uuid::Uuid;
 use payments_api::genesis::GenesisManager;
-use chrono::Utc;
 
 #[derive(Parser)]
 #[command(name = "admin")]

@@ -1,0 +1,11 @@
+﻿==================================
+eSIM STATUS CHECK
+==================================
+Status:     blocked
+Phone:      
+Voice:      False
+Data:       
+ICCID:      
+UUID:       f648a79a-d1ba-4d61-80b0-f7dc6e396c70
+==================================
+

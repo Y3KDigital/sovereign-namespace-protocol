@@ -1,0 +1,23 @@
+[package]
+name = "rust-l1-indexer"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# Unykorn state (reads ChainState)
+uny-korn-state = { path = "../crates/state" }
+
+# HTTP server
+axum = "0.7"
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+tracing = "0.1"
+tracing-subscriber = "0.3"
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+# State persistence (optional: for checkpointing)
+# For now we assume in-memory ChainState, but could add RocksDB later
+anyhow = "1"

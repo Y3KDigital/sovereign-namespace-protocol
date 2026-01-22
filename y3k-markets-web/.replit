@@ -1,0 +1,12 @@
+run = "npm run build && npm start"
+hidden = [".next", "node_modules", ".env", ".env.local"]
+
+[nix]
+channel = "stable-22_11"
+
+[deployment]
+run = ["npm", "run", "start"]
+deploymentTarget = "cloudrun"
+
+[env]
+NODE_ENV = "production"

@@ -1,0 +1,61 @@
+{
+    "totals":  {
+                   "protocol_reserved":  55,
+                   "public_sale":  900,
+                   "total_namespaces":  955
+               },
+    "genesis_hash":  "0x6787f9320ad087315948d2b60c210c674dc1844f451436a9f25156f9d54096fc",
+    "integrity":  {
+                      "no_duplicates":  true,
+                      "genesis_hash":  "0x6787f9320ad087315948d2b60c210c674dc1844f451436a9f25156f9d54096fc",
+                      "all_certificates_timestamped":  true,
+                      "attestation_is_canonical_truth":  true,
+                      "certificate_count_verified":  955
+                  },
+    "version":  "1.0.0",
+    "certification":  {
+                          "signature_algorithm":  "Ed25519",
+                          "signed_by":  "Y3K Genesis Key",
+                          "offline_ceremony":  true,
+                          "immutability_guarantee":  "All certificates derived from genesis hash - no pre-genesis certificates exist"
+                      },
+    "publication":  {
+                        "ipfs_directory_cid":  "bafybeidelwnl2eavhx654t3dj6t3naoy6stsjxag5p74pjlm7gqjtbyv5e",
+                        "ipfs_attestation_cid":  "bafybeidelwnl2eavhx654t3dj6t3naoy6stsjxag5p74pjlm7gqjtbyv5e",
+                        "verification_url":  "https://y3k.digital/verify",
+                        "publication_timestamp":  "2026-01-16T19:20:00-05:00",
+                        "ipfs_gateway_url":  "https://ipfs.io/ipfs/bafybeidelwnl2eavhx654t3dj6t3naoy6stsjxag5p74pjlm7gqjtbyv5e"
+                    },
+    "ceremony_timestamp":  "2026-01-16T18:20:10-05:00",
+    "breakdown":  {
+                      "single_digit_roots":  10,
+                      "three_digit_roots":  900,
+                      "single_letter_roots":  26,
+                      "protocol_infrastructure":  19
+                  },
+    "entropy_sources":  {
+                            "operator_seed_hash":  "1e477ac0898844cad7233b70f492736aff0768d60d3839f9e3f988da88899bfb",
+                            "bitcoin_block":  {
+                                                  "hash":  "00000000000000000001d8e076fa59d1f6ffb902028de15a2cd3300f6c4bf5a4",
+                                                  "timestamp":  "2026-01-16T18:00:00Z",
+                                                  "height":  932569
+                                              },
+                            "nist_beacon":  {
+                                                "note":  "NIST randomness beacon pulse included in derivation",
+                                                "incorporated":  true
+                                            }
+                        },
+    "generated_at":  "2026-01-16T19:15:18.6634684-05:00",
+    "ceremony":  {
+                     "operator":  "Y3K Genesis Operator",
+                     "method":  "deterministic_derivation",
+                     "executed_at":  "2026-01-16T18:20:10-05:00",
+                     "offline":  true,
+                     "emergency_fix":  {
+                                           "original_attempt":  "2026-01-16T18:00:01-05:00",
+                                           "note":  "PowerShell 5.1 compatibility issue resolved",
+                                           "successful_execution":  "2026-01-16T18:20:10-05:00"
+                                       }
+                 },
+    "protocol":  "Y3K Sovereign Namespace Protocol"
+}

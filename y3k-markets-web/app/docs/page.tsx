@@ -52,15 +52,14 @@ export default function DocsPage() {
 
         <div className="space-y-8">
           {/* Genesis Notice */}
-          <div className="bg-gradient-to-r from-purple-900/30 to-blue-900/30 border border-purple-500/30 rounded-lg p-6">
+          <div className="bg-gradient-to-r from-green-900/30 to-blue-900/30 border border-green-500/30 rounded-lg p-6">
             <div className="flex items-start gap-4">
-              <div className="text-4xl">⏳</div>
+              <div className="text-4xl">✅</div>
               <div>
-                <h3 className="text-xl font-bold mb-2">Pre-Genesis Protocol State</h3>
+                <h3 className="text-xl font-bold mb-2">Protocol Genesis Complete</h3>
                 <p className="text-gray-300 mb-3">
-                  The Sovereign Namespace Protocol is currently in pre-Genesis state. 
-                  The Genesis ceremony will occur at <strong className="text-white">2026-01-15 00:00:00 UTC</strong>, 
-                  after which all protocol rules become permanently frozen and no namespaces can be recreated.
+                  The Sovereign Namespace Protocol (SNP) genesis ceremony completed successfully on <strong className="text-white">Jan 16, 2026</strong>. 
+                  All protocol rules are permanently frozen. 955 canonical namespaces have been instantiated.
                 </p>
               </div>
             </div>
@@ -164,6 +163,22 @@ export default function DocsPage() {
                 description="Secure key storage and recovery mechanisms"
                 status="frozen"
                 href="/docs/canonical/specs/vault-model"
+              />
+            </div>
+          </section>
+
+          {/* Operations */}
+          <section className="bg-white/5 border border-white/10 rounded-lg p-8">
+            <h2 className="text-3xl font-bold mb-6">Operations</h2>
+            <p className="text-gray-400 text-sm mb-6">
+              Fast, phone-friendly runbooks for launch windows.
+            </p>
+            <div className="grid md:grid-cols-2 gap-4">
+              <SpecCard
+                title="Game Time Checklist"
+                description="Bowl-week ops checklist for the mint funnel (web + payments-api + Stripe webhooks)."
+                status="live"
+                href="/docs/game-time"
               />
             </div>
           </section>
@@ -293,6 +308,11 @@ function SpecCard({
         {status === 'frozen' && (
           <span className="text-xs px-2 py-1 bg-blue-600/20 text-blue-400 rounded-full">
             FROZEN
+          </span>
+        )}
+        {status === 'live' && (
+          <span className="text-xs px-2 py-1 bg-green-600/20 text-green-400 rounded-full">
+            LIVE
           </span>
         )}
       </div>

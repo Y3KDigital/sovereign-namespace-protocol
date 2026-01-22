@@ -1,0 +1,9 @@
+{
+  "sequence": "2 - Family & Delegation",
+  "status": "complete",
+  "features": [
+    "delegation-structs",
+    "policy-check-logic",
+    "config-integration"
+  ]
+}

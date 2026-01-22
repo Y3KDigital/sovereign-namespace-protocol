@@ -1,0 +1,32 @@
+{
+  "events": [
+    {
+      "seq": 1,
+      "prev_hash": "",
+      "hash": "3e634af8600d50529c605f0d36328e67a0ab71e1aa6c3159270ab72ce23e68ca",
+      "meta": {
+        "height": 0,
+        "slot": 0
+      },
+      "event_type": "genesis_namespace",
+      "event_json": {
+        "name": "y3k",
+        "state_root": "5776783f1136a8afe0afeb8f5d3b7d9eb484288733706e9721916ab60ba66a55"
+      }
+    },
+    {
+      "seq": 2,
+      "prev_hash": "3e634af8600d50529c605f0d36328e67a0ab71e1aa6c3159270ab72ce23e68ca",
+      "hash": "1f170920b1528500ce3255cd3b20fdc54b1d6167014a0aacbe6804cabc2a11d0",
+      "meta": {
+        "height": 1,
+        "slot": 0
+      },
+      "event_type": "tick",
+      "event_json": {
+        "mint_attempt": "TEV denied: no decision present",
+        "state_root": "5776783f1136a8afe0afeb8f5d3b7d9eb484288733706e9721916ab60ba66a55"
+      }
+    }
+  ]
+}

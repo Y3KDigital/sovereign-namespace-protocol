@@ -37,24 +37,25 @@ export default function AboutPage() {
       <div className="max-w-4xl mx-auto px-4 py-12">
         <h1 className="text-5xl font-bold mb-4 gradient-text">About</h1>
         <p className="text-gray-400 text-lg mb-8">
-          Y3K Markets is building a marketplace for cryptographically unique namespaces where rarity is
-          provable from deterministic cryptographic properties.
+          Y3K provides permanent cryptographic roots created during a single genesis ceremony. 
+          955 total supply. No renewals. No custody. Client-side key generation only.
         </p>
 
         <div className="space-y-6">
           <section className="bg-white/5 border border-white/10 rounded-lg p-8">
-            <h2 className="text-2xl font-bold mb-3">What we believe</h2>
+            <h2 className="text-2xl font-bold mb-3">Core Principles</h2>
             <ul className="space-y-2 text-gray-300 ml-6">
-              <li>• Scarcity should be mathematical, not social.</li>
-              <li>• Users should own keys and verify offline.</li>
-              <li>• Protocol rules should be immutable after Genesis.</li>
+              <li>• Scarcity must be cryptographic, not social.</li>
+              <li>• Users control keys. No custody.</li>
+              <li>• Protocol rules are immutable after genesis.</li>
+              <li>• Ownership persists independently of Y3K.</li>
             </ul>
           </section>
 
           <section className="bg-white/5 border border-white/10 rounded-lg p-8">
-            <h2 className="text-2xl font-bold mb-3">Open source</h2>
+            <h2 className="text-2xl font-bold mb-3">Verification</h2>
             <p className="text-gray-300 mb-4">
-              Canonical protocol documents are published for public review.
+              Genesis ceremony used public entropy sources. All roots IPFS-locked. Protocol documents published for independent review.
             </p>
             <Link
               href="/docs/canonical/readme"

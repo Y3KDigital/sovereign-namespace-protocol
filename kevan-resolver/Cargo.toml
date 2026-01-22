@@ -1,0 +1,43 @@
+[package]
+name = "kevan-resolver"
+version = "0.1.0"
+edition = "2021"
+
+[[bin]]
+name = "kevan-resolver"
+path = "src/main.rs"
+
+[lib]
+name = "kevan_resolver"
+path = "src/lib.rs"
+
+[dependencies]
+# Web framework
+axum = "0.7"
+tokio = { version = "1", features = ["full"] }
+tower = "0.4"
+tower-http = { version = "0.5", features = ["cors", "trace"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Crypto
+ed25519-dalek = "2.1"
+sha2 = "0.10"
+hex = "0.4"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+# Time
+chrono = "0.4"
+# Environment
+dotenvy = "0.15"
+
+[dev-dependencies]
+reqwest = "0.11"

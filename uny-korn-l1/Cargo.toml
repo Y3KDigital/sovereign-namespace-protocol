@@ -1,0 +1,28 @@
+[workspace]
+resolver = "2"
+
+members = [
+  "crates/consensus",
+  "crates/state",
+  "crates/governance",
+  "crates/tev",
+  "crates/execution",
+  "crates/audit",
+  "crates/runtime",
+  "crates/verifier",
+  "node",
+  "indexer",
+]
+
+[workspace.package]
+edition = "2021"
+license = "MIT OR Apache-2.0"
+
+[workspace.dependencies]
+anyhow = "1"
+thiserror = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+hex = "0.4"
+blake3 = "1"
+time = { version = "0.3", features = ["formatting", "macros"] }

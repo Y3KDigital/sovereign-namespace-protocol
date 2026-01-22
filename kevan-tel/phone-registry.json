@@ -1,0 +1,23 @@
+{
+  "phone_registry": {
+    "version": "1.0",
+    "updated_at": "2026-01-17T00:00:00Z",
+    "entries": [
+      {
+        "phone_number": "+13212788323",
+        "namespace": "kevan.x",
+        "device_name": "Unykorn iPhone 11 Pro Max",
+        "imei": "35285211282235",
+        "certificate_fingerprint": "kevan.x.genesis.01",
+        "auth_level": "owner",
+        "verified_at": "2026-01-17T00:00:00Z",
+        "status": "active",
+        "capabilities": [
+          "voice",
+          "sms",
+          "namespace_authentication"
+        ]
+      }
+    ]
+  }
+}

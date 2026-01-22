@@ -1,0 +1,34 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PAYOUT_ROUTING_V1",
+  "description": "Defines how value should flow to a participant. Identity-agnostic.",
+  "type": "object",
+  "properties": {
+    "preference_type": {
+      "type": "string",
+      "enum": ["self_custody", "custodial", "escrow_pending"],
+      "description": "The mechanism for receiving value."
+    },
+    "destination": {
+      "type": "object",
+      "properties": {
+        "network": { "type": "string", "enum": ["xrpl", "evm", "bitcoin", "fiat_rail"] },
+        "address": { "type": "string" },
+        "tag": { "type": "string" },
+        "provider": { "type": "string" },
+        "account_ref": { "type": "string" }
+      },
+      "description": "Routing details. schema varies by preference_type."
+    },
+    "acknowledgments": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Specific acknowledgments (e.g., 'I control these keys', 'I accept custodial risk')."
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["preference_type", "destination", "updated_at"]
+}

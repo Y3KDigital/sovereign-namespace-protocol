@@ -1,0 +1,62 @@
+{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "WebSite",
+      "@id": "https://y3kmarkets.com/#website",
+      "url": "https://y3kmarkets.com/",
+      "name": "Y3K Markets",
+      "description": "True Web3 Rarity - Cryptographically guaranteed uniqueness",
+      "publisher": {
+        "@id": "https://y3kmarkets.com/#organization"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": "https://y3kmarkets.com/explore?q={search_term_string}",
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://y3kmarkets.com/#organization",
+      "name": "Y3K Digital",
+      "url": "https://y3kmarkets.com/",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://y3kmarkets.com/logo.png"
+      },
+      "sameAs": [
+        "https://twitter.com/Y3KDigital"
+      ]
+    },
+    {
+      "@type": "Product",
+      "@id": "https://y3kmarkets.com/#product",
+      "name": "Y3K Genesis Roots",
+      "description": "955 cryptographically unique namespace roots. Post-quantum signatures. IPFS-backed certificates. True Web3 rarity.",
+      "brand": {
+        "@id": "https://y3kmarkets.com/#organization"
+      },
+      "offers": {
+        "@type": "AggregateOffer",
+        "priceCurrency": "USD",
+        "lowPrice": "35",
+        "highPrice": "7500",
+        "offerCount": "900",
+        "availability": "https://schema.org/InStock",
+        "url": "https://y3kmarkets.com/mint"
+      }
+    },
+    {
+      "@type": "SoftwareApplication",
+      "name": "Sovereign Namespace Protocol",
+      "applicationCategory": "Blockchain",
+      "operatingSystem": "Cross-platform",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+  ]
+}

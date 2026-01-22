@@ -130,7 +130,7 @@ Write-Host "  Hash: $($btcLatest.hash)"
 Write-Host "  Time: $(Get-Date -UnixTimeSeconds $btcLatest.time -Format 'o')"
 
 # Verify time >= 2026-01-15T00:00:00Z
-$genesisUnix = 1736899200
+$genesisUnix = 1768435200
 if ($btcLatest.time -ge $genesisUnix) {
     Write-Host "✅ Block satisfies rule (time >= genesis timestamp)"
 } else {
@@ -155,7 +155,7 @@ if ($btcLatest.time -ge $genesisUnix) {
 
 ```powershell
 # Query NIST Beacon at genesis timestamp
-$genesisUnix = 1736899200
+$genesisUnix = 1768435200
 $nistUrl = "https://beacon.nist.gov/beacon/2.0/chain/1/pulse/time/$genesisUnix"
 
 try {
@@ -184,6 +184,25 @@ try {
 - Output Value: _______________________________________________
 - Timestamp: _______________
 - Rule satisfied: [ ] Yes [ ] No
+
+**Status:** [ ]
+
+---
+
+#### Step 1.3.1: Re-Disable Network (Critical Security Window)
+
+**⚠️ CRITICAL: Network must be disabled BEFORE seed reveal**
+
+```powershell
+# Hard network shutdown before revealing operator seed
+Get-NetAdapter | Disable-NetAdapter -Confirm:$false
+
+# Verify shutdown
+Test-Connection google.com -Count 1
+# Must fail: "Destination host unreachable" or "No route to host"
+```
+
+**Network Disabled Before Reveal:** [ ] Yes [ ] No
 
 **Status:** [ ]
 
@@ -566,12 +585,19 @@ Write-Host "✅ Public package ready (NO PRIVATE KEYS)"
 #### Step 6.2: Compute Package Hash
 
 ```powershell
-# Hash entire public package
-$packageHash = (Get-FileHash -Path genesis\PUBLIC_IPFS_PACKAGE\ -Algorithm SHA256).Hash
-Write-Host "Public Package Hash: $packageHash"
+# Create TAR archive for canonical hashing
+tar -cf genesis\public_package.tar genesis\PUBLIC_IPFS_PACKAGE
+
+# Hash TAR file
+$packageHash = (Get-FileHash genesis\public_package.tar -Algorithm SHA256).Hash
+Write-Host "Public Package Hash (TAR): $packageHash"
+Write-Host "TAR File: genesis\public_package.tar"
+Write-Host "TAR Created: $(Get-Date -Format 'o')"
 ```
 
-**Package Hash:** _______________________________________________
+**Package TAR Hash:** _______________________________________________  
+**TAR Filename:** `public_package.tar`  
+**TAR Created:** _______________
 
 ---
 

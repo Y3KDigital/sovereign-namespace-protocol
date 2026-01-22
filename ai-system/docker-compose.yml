@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  ai_system:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+      - huggingface_cache:/root/.cache/huggingface
+    env_file:
+      - .env
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    command: ["python", "api/main.py"]
+
+volumes:
+  huggingface_cache:

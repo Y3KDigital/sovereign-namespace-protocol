@@ -1,11 +1,13 @@
 use uuid::Uuid;
 use chrono::{Utc, Duration};
 use sha3::{Digest, Sha3_256};
+use std::env;
 
-use crate::types::{IssuanceRecord, PaymentStatus};
+use crate::types::{IssuanceRecord, NilRole, PaymentStatus};
 use crate::errors::{PaymentError, PaymentResult};
 use crate::database::Database;
 use crate::genesis::GenesisManager;
+use crate::signing;
 
 #[derive(Clone)]
 pub struct IssuanceService {
@@ -61,8 +63,13 @@ impl IssuanceService {
             }
         }
 
-        // Generate namespace
-        let namespace = self.generate_namespace(&payment_intent.rarity_tier)?;
+        // Choose namespace
+        // - Preferred: user-chosen namespace reserved at create-intent time
+        // - Fallback: legacy random namespace generation
+        let namespace = match payment_intent.namespace_reserved.as_deref() {
+            Some(ns) if !ns.trim().is_empty() => ns.to_string(),
+            _ => self.generate_namespace(&payment_intent.rarity_tier)?,
+        };
 
         // =====================================================================
         // STEP 1: Create issuance in PENDING state
@@ -72,6 +79,9 @@ impl IssuanceService {
                 &payment_intent.id,
                 &namespace,
                 &payment_intent.customer_email,
+                payment_intent.nil_name.as_deref(),
+                payment_intent.nil_role.clone(),
+                payment_intent.nil_pair_key.as_deref(),
             )
             .await?;
 
@@ -96,7 +106,12 @@ impl IssuanceService {
         // STEP 3: External work (NO DB LOCK HELD)
         // =====================================================================
         // Generate certificate
-        let certificate = match self.generate_certificate(&namespace) {
+        let certificate = match self.generate_certificate(
+            &namespace,
+            payment_intent.nil_name.as_deref(),
+            payment_intent.nil_role.as_ref(),
+            payment_intent.nil_pair_key.as_deref(),
+        ) {
             Ok(cert) => cert,
             Err(e) => {
                 tracing::error!("Certificate generation failed: {}", e);
@@ -143,6 +158,78 @@ impl IssuanceService {
         )
         .await?;
 
+        // =====================================================================
+        // STEP 4.5: Provision agent immediately (Y3K requirement)
+        // =====================================================================
+        // NOTE: This occurs after issuance is finalized. Do NOT return an error from here,
+        // otherwise we'd end up with an issued certificate but a failing webhook handler.
+        // Instead: attempt provisioning, log loudly if it fails, and allow follow-up repair.
+        let ai_provider = env::var("AI_PROVIDER").ok();
+        let ai_model = env::var("AI_MODEL").ok();
+
+        // Ledger: internal audit trail (tamper-evident hash chain)
+        if let Err(e) = db
+            .append_namespace_ledger_event(
+                Some(&namespace),
+                "namespace_issued",
+                &serde_json::json!({
+                    "issuance_id": issuance_id.to_string(),
+                    "payment_intent_id": payment_intent.id.to_string(),
+                    "tier": payment_intent.rarity_tier,
+                    "nil_name": payment_intent.nil_name,
+                    "nil_role": payment_intent.nil_role,
+                    "nil_pair_key": payment_intent.nil_pair_key,
+                    "ipfs_cid": ipfs_cid,
+                })
+                .to_string(),
+            )
+            .await
+        {
+            tracing::error!("Ledger append failed (namespace_issued): namespace={}, err={}", namespace, e);
+        }
+
+        match db
+            .ensure_agent_for_namespace(
+                &namespace,
+                "default",
+                ai_provider.as_deref(),
+                ai_model.as_deref(),
+            )
+            .await
+        {
+            Ok(agent) => {
+                if let Err(e) = db
+                    .append_namespace_ledger_event(
+                        Some(&namespace),
+                        "agent_provisioned",
+                        &serde_json::json!({
+                            "agent_id": agent.id,
+                            "profile": agent.profile,
+                            "ai_provider": agent.ai_provider,
+                            "ai_model": agent.ai_model,
+                        })
+                        .to_string(),
+                    )
+                    .await
+                {
+                    tracing::error!("Ledger append failed (agent_provisioned): namespace={}, err={}", namespace, e);
+                }
+            }
+            Err(e) => {
+                tracing::error!("Agent provisioning failed: namespace={}, err={}", namespace, e);
+                if let Err(e2) = db
+                    .append_namespace_ledger_event(
+                        Some(&namespace),
+                        "agent_provision_failed",
+                        &serde_json::json!({ "error": e.to_string() }).to_string(),
+                    )
+                    .await
+                {
+                    tracing::error!("Ledger append failed (agent_provision_failed): namespace={}, err={}", namespace, e2);
+                }
+            }
+        }
+
         tracing::info!(
             "Issuance finalized: id={}, state=ISSUED, ipfs_cid={}",
             issuance_id, ipfs_cid
@@ -178,21 +265,100 @@ impl IssuanceService {
     }
 
     // Placeholder: Generate certificate (will integrate with certificate-gen)
-    fn generate_certificate(&self, namespace: &str) -> PaymentResult<String> {
-        // For MVP, return simple JSON
-        // In production, this will use certificate-gen with Ed25519 signature
-        Ok(serde_json::json!({
-            "version": "1.0",
-            "namespace": namespace,
-            "issued_at": Utc::now().to_rfc3339(),
-            "protocol": "SNP",
-            "signature": "placeholder_signature"
+    fn generate_certificate(
+        &self,
+        namespace: &str,
+        nil_name: Option<&str>,
+        nil_role: Option<&NilRole>,
+        nil_pair_key: Option<&str>,
+    ) -> PaymentResult<String> {
+        #[derive(serde::Serialize)]
+        struct Nil<'a> {
+            name: Option<&'a str>,
+            role: Option<&'a NilRole>,
+            pair_key: Option<&'a str>,
+        }
+
+        #[derive(serde::Serialize)]
+        struct UnsignedCertificate<'a> {
+            version: &'static str,
+            namespace: &'a str,
+            nil: Nil<'a>,
+            issued_at: String,
+            protocol: &'static str,
+        }
+
+        #[derive(serde::Serialize)]
+        struct SignedCertificate<'a> {
+            version: &'static str,
+            namespace: &'a str,
+            nil: Nil<'a>,
+            issued_at: String,
+            protocol: &'static str,
+
+            signature_alg: &'static str,
+            signing_public_key_b64: Option<String>,
+            signature_b64: String,
+            signed_payload_json: String,
+        }
+
+        let issued_at = Utc::now().to_rfc3339();
+        let unsigned = UnsignedCertificate {
+            version: "1.0",
+            namespace,
+            nil: Nil {
+                name: nil_name,
+                role: nil_role,
+                pair_key: nil_pair_key,
+            },
+            issued_at: issued_at.clone(),
+            protocol: "SNP",
+        };
+
+        // Canonical payload: serde struct field order is stable.
+        let payload_json = serde_json::to_string(&unsigned).map_err(|e| {
+            PaymentError::CertificateGenerationFailed(format!("serialize failed: {e}"))
+        })?;
+
+        let require_sig = env::var("REQUIRE_CERT_SIGNATURE")
+            .ok()
+            .map(|v| matches!(v.to_ascii_lowercase().as_str(), "1" | "true" | "yes" | "on"))
+            .unwrap_or(false);
+
+        let signing_key = signing::load_ed25519_signing_key_from_env("Y3K_SIGNING_KEY_ED25519")?;
+
+        let (signature_b64, public_key_b64) = match signing_key {
+            Some(key) => (
+                signing::ed25519_sign_b64(&key, payload_json.as_bytes()),
+                Some(signing::ed25519_public_key_b64(&key)),
+            ),
+            None => {
+                if require_sig {
+                    return Err(PaymentError::SigningKeyNotConfigured(
+                        "Y3K_SIGNING_KEY_ED25519 is not set".to_string(),
+                    ));
+                }
+                // Dev fallback: still produces deterministic payload + hash, but not cryptographically verifiable.
+                ("placeholder_signature".to_string(), None)
+            }
+        };
+
+        Ok(serde_json::to_string(&SignedCertificate {
+            version: unsigned.version,
+            namespace: unsigned.namespace,
+            nil: unsigned.nil,
+            issued_at,
+            protocol: unsigned.protocol,
+            signature_alg: "ed25519",
+            signing_public_key_b64: public_key_b64,
+            signature_b64,
+            signed_payload_json: payload_json,
         })
-        .to_string())
+        .map_err(|e| PaymentError::CertificateGenerationFailed(format!("serialize failed: {e}")))?)
     }
 
     // Placeholder: Upload to IPFS (will integrate with ipfs-integration)
-    async fn upload_to_ipfs(&self, data: &str) -> PaymentResult<String> {
+    async fn upload_to_ipfs(&self, _data: &str) -> PaymentResult<String> {
         // For MVP, return mock CID
         // In production, this will use ipfs-integration
         // Simulate network delay

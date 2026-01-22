@@ -1,0 +1,13 @@
+[
+  { "symbol": "FTH",     "name": "Future Tech Holdings", "decimals": 18, "policy_uri": "ipfs://fth-policy" },
+  { "symbol": "MOG",     "name": "Men of God",           "decimals": 18, "policy_uri": "ipfs://mog-policy" },
+  { "symbol": "XXXIII",  "name": "XXXIII Markets",       "decimals": 18, "policy_uri": "ipfs://xxxiii-policy" },
+  { "symbol": "OPTKAS1", "name": "Optima Asset 1",       "decimals": 18, "policy_uri": "ipfs://optkas1-policy" },
+  { "symbol": "KBURNS",  "name": "K Burns",              "decimals": 18, "policy_uri": "ipfs://kb-policy" },
+  { "symbol": "UUSD",    "name": "Unykorn USD",          "decimals": 18, "policy_uri": "ipfs://uusd-por" },
+  { "symbol": "UCRED",   "name": "Unykorn Credits",      "decimals": 18, "policy_uri": "ipfs://ucred-policy" },
+  { "symbol": "GOLD",    "name": "Tokenized Gold",       "decimals": 18, "policy_uri": "ipfs://gold-policy" },
+  { "symbol": "EUR",     "name": "Euro IOU",             "decimals": 18, "policy_uri": "ipfs://eur-policy" },
+  { "symbol": "GBP",     "name": "Pound IOU",            "decimals": 18, "policy_uri": "ipfs://gbp-policy" },
+  { "symbol": "DRUNKS",  "name": "Drunks Token",         "decimals": 18, "policy_uri": "ipfs://drunks-policy" }
+]

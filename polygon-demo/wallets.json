@@ -1,0 +1,48 @@
+{
+  "description": "5 Polygon wallets for UD .x and .crypto comparison demo",
+  "network": "Polygon Mainnet",
+  "chain_id": 137,
+  "wallets": [
+    {
+      "id": 1,
+      "name": "Demo Wallet 1",
+      "address": "0x0000000000000000000000000000000000000000",
+      "private_key": "WILL_BE_GENERATED",
+      "purpose": "UD .x domain mint (high-end)",
+      "target_domain": "crypto.x or money.x equivalent"
+    },
+    {
+      "id": 2,
+      "name": "Demo Wallet 2",
+      "address": "0x0000000000000000000000000000000000000000",
+      "private_key": "WILL_BE_GENERATED",
+      "purpose": "UD .x domain mint (premium)",
+      "target_domain": "master.x equivalent"
+    },
+    {
+      "id": 3,
+      "name": "Demo Wallet 3",
+      "address": "0x0000000000000000000000000000000000000000",
+      "private_key": "WILL_BE_GENERATED",
+      "purpose": "UD .crypto domain mint",
+      "target_domain": "elite.crypto or pro.crypto"
+    },
+    {
+      "id": 4,
+      "name": "Demo Wallet 4",
+      "address": "0x0000000000000000000000000000000000000000",
+      "private_key": "WILL_BE_GENERATED",
+      "purpose": "UD .crypto domain mint",
+      "target_domain": "vault.crypto or finance.crypto"
+    },
+    {
+      "id": 5,
+      "name": "Demo Wallet 5",
+      "address": "0x0000000000000000000000000000000000000000",
+      "private_key": "WILL_BE_GENERATED",
+      "purpose": "Y3K comparison wallet",
+      "target_domain": "Compare costs and features"
+    }
+  ],
+  "instructions": "Run generate-wallets.py to create actual wallet keys"
+}

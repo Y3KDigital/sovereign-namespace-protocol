@@ -1,0 +1,37 @@
+{
+    "distribution":  {
+                         "protocol_reserved":  55,
+                         "friends_family_eligible":  900,
+                         "public_sale":  900
+                     },
+    "genesis_hash":  "0x6787f9320ad087315948d2b60c210c674dc1844f451436a9f25156f9d54096fc",
+    "tier_breakdown":  {
+                           "single_digit_roots":  10,
+                           "three_digit_public":  900,
+                           "single_letter_roots":  26,
+                           "protocol_infrastructure":  19
+                       },
+    "version":  "1.0.0",
+    "certificate_count":  955,
+    "certificate_directory":  "./certificates/",
+    "launch_phases":  {
+                          "friends_family":  {
+                                                 "duration_hours":  24,
+                                                 "total_eligible":  900,
+                                                 "eligible_namespaces":  "100-999 (public tier)",
+                                                 "start":  "2026-01-16T20:00:00-05:00"
+                                             },
+                          "public_sale":  {
+                                              "start":  "2026-01-17T20:00:00-05:00",
+                                              "eligible_namespaces":  "remaining public tier"
+                                          }
+                      },
+    "verification_url":  "https://y3k.digital/verify",
+    "total_namespaces":  955,
+    "generated_at":  "2026-01-16T19:15:18.6634684-05:00",
+    "ipfs":  {
+                 "directory_cid":  "TO_BE_PUBLISHED",
+                 "publication_method":  "Full directory publish - ipfs add -r ARTIFACTS"
+             },
+    "protocol":  "Y3K Sovereign Namespace Protocol"
+}

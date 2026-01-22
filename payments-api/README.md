@@ -1,52 +1,69 @@
-# Payments API
+# Genesis Payment Monitor v1
 
-Rust-based payment processing service for Y3K namespace purchases.
+Sovereign payment monitoring for Y3K Genesis Roots.
+
+## What This Does
+
+Monitors YOUR wallet addresses for incoming payments:
+- **BTC**: `bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh`
+- **ETH/USDC/USDT**: `0x71C7656EC7ab88b098defB751B7401B5f6d8976F`
+
+No custody. No intermediaries. Blockchain truth only.
 
 ## Architecture
 
-**Stripe as convenience layer, not authority.**
+**Direct wallet payments. Pattern 1 (Simplest).**
 
 ```
 ┌──────────────┐
-│   Customer   │
+│     User     │ 1. Choose root (777)
 └──────┬───────┘
-       │ 1. Create payment
+       │ 2. Create payment intent (UUID)
        ▼
 ┌──────────────────────┐
-│  payments-api (Rust) │
-└──────┬───────────────┘
-       │ 2. Create PaymentIntent
+│   payments-api       │ 3. Store: root, asset, $29 USD
+│   (Node.js)          │    Status: pending
+└──────────────────────┘
+       │ 4. Show wallet addresses
        ▼
 ┌──────────────┐
-│    Stripe    │
+│     User     │ 5. Send BTC/ETH/USDC/USDT
+└──────┬───────┘       to YOUR wallet (direct)
+       │
+       ▼
+┌──────────────┐
+│  Blockchain  │ 6. Transaction broadcast
 └──────┬───────┘
-       │ 3. Webhook: payment_intent.succeeded
+       │
        ▼
 ┌──────────────────────┐
-│  payments-api        │
-│  ├─ Verify webhook   │
-│  ├─ Issue namespace  │
-│  ├─ Generate cert    │
-│  └─ Upload to IPFS   │
-└──────┬───────────────┘
-       │ 4. Deliver certificate
+│  Payment Monitor     │ 7. Poll every 30s
+│  (blockchain APIs)   │ 8. Match: amount + time
+└──────┬───────────────┘ 9. Check confirmations
+       │                  10. Status: confirmed
        ▼
 ┌──────────────┐
-│   Customer   │
+│  /mint/success│ 11. Generate Ed25519 keys
+│  (client-side)│ 12. Create certificate
+└──────┬───────┘ 13. Publish to IPFS
+       │
+       ▼
+┌──────────────┐
+│     User     │ 14. Download paper wallet
 └──────────────┘
 ```
 
 ## Features
 
-- ✅ Stripe PaymentIntent creation
-- ✅ Webhook signature verification
-- ✅ Idempotent certificate issuance
-- ✅ SQLite database (local dev)
-- ✅ Secure download tokens (30-day expiry)
-- ✅ Partner/affiliate tracking
-- 🔄 Integration with namespace-core (placeholder)
-- 🔄 Integration with certificate-gen (placeholder)
-- 🔄 Integration with ipfs-integration (placeholder)
+- ✅ Direct wallet payments (no custody)
+- ✅ BTC monitoring via Blockchain.info API
+- ✅ ETH/USDC/USDT monitoring via ethers.js
+- ✅ Price oracle integration (CoinGecko)
+- ✅ Confirmation tracking (6 BTC, 12 ETH)
+- ✅ SQLite database
+- ✅ Payment matching (amount ±2%, time window)
+- ✅ Open source, self-hosted
+- ❌ No Stripe, no custodians, no intermediaries
 
 ## Setup
 
@@ -54,20 +71,48 @@ Rust-based payment processing service for Y3K namespace purchases.
 
 ```powershell
 cd payments-api
-cargo build
+npm install
 ```
 
-### 2. Create `.env` File
+### 2. Configure Environment
+
+Copy `.env.example` to `.env` and verify wallet addresses:
 
 ```env
-STRIPE_API_KEY=sk_test_your_stripe_key
-STRIPE_WEBHOOK_SECRET=whsec_your_webhook_secret
-DATABASE_URL=sqlite://payments.db
-BIND_ADDRESS=127.0.0.1:8081
-RUST_LOG=info
+# Wallet Addresses (Payments go HERE - you control these)
+WALLET_BTC=bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh
+WALLET_ETH=0x71C7656EC7ab88b098defB751B7401B5f6d8976F
+
+# RPC Endpoints (Use public APIs or your own nodes)
+ETH_RPC_URL=https://eth.llamarpc.com
+
+# Price Oracle API (for BTC/ETH to USD conversion)
+PRICE_API=https://api.coingecko.com/api/v3/simple/price
+
+# Confirmation Thresholds
+BTC_CONFIRMATIONS=6
+ETH_CONFIRMATIONS=12
+
+# Payment Configuration
+EXPECTED_USD=29.00
+PRICE_TOLERANCE=0.02  # ±2% for BTC/ETH
+POLL_INTERVAL=30      # seconds
+PAYMENT_WINDOW_HOURS=24
+
+# Database
+DB_PATH=./genesis-payments.db
+
+# Logging
+LOG_LEVEL=info  # debug, info, warn, error
 ```
 
-### 3. Run Migrations
+### 3. Initialize Database
+
+```powershell
+npm run init-db
+```
+
+Creates SQLite database with payment tracking table.
 
 ```powershell
 cargo install sqlx-cli --no-default-features --features sqlite
@@ -82,6 +127,31 @@ cargo run
 
 Server runs on `http://127.0.0.1:8081`
 
+### (Optional) Expose publicly via Cloudflare Tunnel
+
+If your DNS is already routed to the `payments-api` tunnel, you can publish your local server at:
+
+- `https://api.y3kmarkets.com`
+
+This repo includes an example tunnel config (`payments-api/cloudflared.example.yml`) and a helper script (`payments-api/run-tunnel.ps1`) so you don't accidentally start the wrong tunnel from your user profile config.
+
+Copy the example to `payments-api/cloudflared.yml` and update the `credentials-file` path for your machine.
+
+1. Start the API (local): `run-payments-api.cmd`
+2. Start the tunnel: `run-tunnel.ps1`
+
+Then verify:
+
+- `GET https://api.y3kmarkets.com/api/health`
+
+### Verify the public API surface
+
+For a quick auditor-friendly check (raw status, headers, and JSON shape), run:
+
+```powershell
+./verify-public-api.ps1 -BaseUrl https://api.y3kmarkets.com -Origin https://y3kmarkets.com
+```
+
 ## API Endpoints
 
 ### Create Payment Intent
@@ -92,6 +162,7 @@ Content-Type: application/json
 
 {
   "customer_email": "buyer@example.com",
+  "namespace": "1.x",
   "rarity_tier": "rare",
   "partner_id": "partner_abc",
   "affiliate_id": "affiliate_xyz"
@@ -105,8 +176,22 @@ Content-Type: application/json
   "client_secret": "pi_..._secret_...",
   "amount_cents": 35000,
   "currency": "usd",
-  "namespace_reserved": null
+  "namespace_reserved": "1.x"
 }
+
+### Check Namespace Availability
+
+```http
+GET /api/namespaces/availability?namespace=1.x
+```
+
+**Response:**
+```json
+{
+  "namespace": "1.x",
+  "available": true
+}
+```
 ```
 
 ### Stripe Webhook

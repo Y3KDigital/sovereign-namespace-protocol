@@ -1,0 +1,24 @@
+{
+  "name": "@y3k/resolver-cli",
+  "version": "1.0.0",
+  "description": "Y3K Namespace Resolver CLI - Manage your .x domains",
+  "main": "index.js",
+  "bin": {
+    "y3k-resolver": "./cli.js",
+    "y3k": "./cli.js"
+  },
+  "scripts": {
+    "start": "node cli.js"
+  },
+  "keywords": ["y3k", "namespace", "web3", "dns", "resolver", "ipfs"],
+  "author": "Y3K Digital",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^11.1.0",
+    "@noble/ed25519": "^2.0.0",
+    "chalk": "^4.1.2",
+    "inquirer": "^8.2.5",
+    "ora": "^5.4.1",
+    "node-fetch": "^2.7.0"
+  }
+}

@@ -1,0 +1,101 @@
+# Object Type: Namespace
+# ID: 777.y3k
+# Status: Genesis Root (Locked Forever)
+
+object_type: namespace
+canonical_id: "777.y3k"
+display_name: "Genesis Root 777"
+description: "SOVEREIGN NAMESPACE • Genesis Root"
+
+# Authority and verification
+authority:
+  entity: "Y3K Protocol"
+  context: "Genesis Root Lock"
+  verification: verified
+  verification_method: "cryptographic"
+  genesis_timestamp: "2025-12-15T00:00:00Z"
+
+# QR Configuration (Primary Interface)
+qr:
+  protocol: "y3k"
+  payload: "y3k://777"
+  fallback_url: "https://y3k.xyz/777"
+  encoding: protocol-native
+  size: large
+
+# Deterministic Actions (Max 5)
+actions:
+  - id: send_payment
+    label: "Send Payment"
+    enabled: true
+    endpoint: "/api/payment/create"
+    requires_auth: false
+    
+  - id: verify_ownership
+    label: "Verify Ownership"
+    enabled: true
+    endpoint: "/api/verify"
+    requires_auth: false
+    
+  - id: view_certificate
+    label: "View Certificate"
+    enabled: true
+    endpoint: "/api/certificate/777"
+    requires_auth: false
+
+# State Blocks (Infrastructure Metrics Only)
+state:
+  - label: "Root Number"
+    value: 777
+    unit: ""
+    format: number
+    
+  - label: "Rarity Tier"
+    value: "CROWN"
+    unit: ""
+    color: "#FFD700"
+    
+  - label: "Price"
+    value: 29
+    unit: "USD"
+    format: currency
+    
+  - label: "Status"
+    value: "Genesis"
+    unit: ""
+    color: "#00ff00"
+    
+  - label: "Supply"
+    value: 1
+    unit: "of 1"
+    format: number
+    
+  - label: "Created"
+    value: "2025-12-15"
+    unit: ""
+    format: date
+
+# Metadata (Optional)
+metadata:
+  created: 2025-12-15T00:00:00Z
+  genesis_event: true
+  immutable: true
+  chain: ethereum
+  category: triple-digit
+  rarity_score: 100.0
+  ipfs_certificate: "QmXxx..."  # Placeholder
+  
+# Blockchain State
+blockchain:
+  chain_id: 1
+  network: mainnet
+  contract: "0x..."  # Placeholder
+  token_id: 777
+  owner: null  # Not yet claimed
+  
+# Visual Theme
+theme:
+  primary_color: "#FFD700"
+  accent_color: "#000000"
+  badge_icon: "👑"
+  rarity_class: "crown"

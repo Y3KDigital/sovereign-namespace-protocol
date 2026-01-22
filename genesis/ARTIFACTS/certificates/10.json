@@ -1,0 +1,21 @@
+{
+    "cryptographic_properties":  {
+                                     "hash_function":  "SHA3-256",
+                                     "uniqueness_proof":  "genesis_derived",
+                                     "algorithm":  "Ed25519"
+                                 },
+    "genesis_hash":  "0x6787f9320ad087315948d2b60c210c674dc1844f451436a9f25156f9d54096fc",
+    "sovereignty_class":  "ProtocolReserved",
+    "version":  "1.0.0",
+    "certificate_hash":  "0xad53c7cc567e0bc7f27e71eecb3d7e7d2ae4ffdc1751587051c08454ee97c26e",
+    "genesis_index":  49,
+    "genesis_metadata":  {
+                             "generated_at":  "2026-01-16T18:18:29.2195611-05:00",
+                             "immutable":  true,
+                             "transferable":  false,
+                             "protocol_version":  "1.0.0"
+                         },
+    "namespace":  "10",
+    "tier":  "protocol_primitive",
+    "mint_priority":  2
+}

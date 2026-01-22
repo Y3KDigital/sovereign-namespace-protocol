@@ -1,18 +1,21 @@
 [workspace]
 members = [
-    "namespace-core",
-    "rarity-engine",
-    "ipfs-integration",
-    "certificate-gen",
-    "smart-contract",
-    "api-server",
-    "snp-verifier",
-    "snp-genesis-cli",
-    "snp-core",
-    "snp-cli",
-    "snp-policy",
-    "snp-keygen",
     "payments-api",
+    "snp-core",
+    "snp-verifier",
+    "snp-cli",
+    "kevan-resolver",
+    "kevan-auth",
+    "kevan-events",
+    "kevan-policy",
+    "kevan-finance",
+    "kevan-tel",
+    "kevan-mail",
+    "kevan-vault",
+    "kevan-os",
+    "kevan-contacts",
+    "kevan-calendar",
+    "uny-korn-l1/registry-api",
 ]
 resolver = "2"
 
@@ -40,6 +43,7 @@ sha3 = "0.10"
 blake3 = "1.5"
 ed25519-dalek = "2.1"
 rand = "0.8"
+hex = "0.4"
 
 # IPFS
 ipfs-api-backend-hyper = "0.6"

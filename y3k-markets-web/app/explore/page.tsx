@@ -1,266 +1,159 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
+import { useState } from "react";
 import Link from "next/link";
-import { getPublicApiBase } from "@/lib/publicApiBase";
 
-interface Namespace {
-  namespace: string;
-  tier: string;
-  ipfs_cid: string;
-  issued_at: string;
-}
+// Generate 100-999 (PUBLIC ROOTS ONLY)
+const PUBLIC_NUMERIC = Array.from({ length: 900 }, (_, i) => (i + 100).toString());
 
-const tierColors: Record<string, string> = {
-  mythic: "text-pink-500",
-  legendary: "text-yellow-500",
-  epic: "text-purple-500",
-  rare: "text-blue-500",
-  uncommon: "text-green-500",
-  common: "text-gray-500",
-};
+const IPFS_BASE_URL = "https://dweb.link/ipfs/bafybeidelwnl2eavhx654t3dj6t3naoy6stsjxag5p74pjlm7gqjtbyv5e";
 
-const GENESIS_DATE = "2026-01-15T00:00:00Z";
+const ITEMS_PER_PAGE = 50;
 
 export default function ExplorePage() {
-  const [namespaces, setNamespaces] = useState<Namespace[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [selectedTier, setSelectedTier] = useState<string | null>(null);
-  const [genesisFinalized, setGenesisFinalized] = useState(false);
-  const [apiAvailable, setApiAvailable] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
-  useEffect(() => {
-    fetchNamespaces();
-  }, [selectedTier]);
+  // Filter public roots only
+  const filteredRoots = PUBLIC_NUMERIC.filter(rootName => 
+    rootName.includes(searchTerm)
+  );
 
-  const fetchNamespaces = async () => {
-    setLoading(true);
-
-    try {
-      const apiUrl = getPublicApiBase();
-      const url = selectedTier 
-        ? `${apiUrl}/api/namespaces?tier=${selectedTier}&limit=100`
-        : `${apiUrl}/api/namespaces?limit=100`;
-      
-      const response = await fetch(url);
-      
-      if (!response.ok) {
-        setApiAvailable(false);
-        setNamespaces([]);
-        return;
-      }
-
-      const data = await response.json();
-      setNamespaces(data);
-      setApiAvailable(true);
-      
-      if (data.length > 0) {
-        setGenesisFinalized(true);
-      }
-    } catch (err) {
-      setApiAvailable(false);
-      setNamespaces([]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filterByTier = (tier: string | null) => {
-    setSelectedTier(tier);
-  };
-
-  const getDaysUntilGenesis = () => {
-    const now = new Date();
-    const genesis = new Date(GENESIS_DATE);
-    const diff = genesis.getTime() - now.getTime();
-    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
-    return days > 0 ? days : 0;
-  };
+  // Pagination
+  const totalPages = Math.ceil(filteredRoots.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const displayedRoots = filteredRoots.slice(startIndex, endIndex);
 
   return (
-    <main className="min-h-screen pt-16">
-      <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="text-2xl font-bold gradient-text">
-              Y3K Markets
-            </Link>
-            <div className="flex gap-8">
-              <Link href="/" className="hover:text-purple-400 transition">
-                Home
-              </Link>
-              <Link href="/practice" className="hover:text-purple-400 transition">
-                Practice
-              </Link>
-              <Link href="/explore" className="text-purple-400">
-                Explore
-              </Link>
-              <Link href="/docs" className="hover:text-purple-400 transition">
-                Docs
-              </Link>
-              <Link href="/trust" className="hover:text-purple-400 transition">
-                Trust
-              </Link>
-              <Link href="/status" className="hover:text-purple-400 transition">
-                Status
-              </Link>
-            </div>
-          </div>
+    <main className="min-h-screen pt-24 pb-12 px-4 bg-black text-white">
+      {/* Nav Overlay */}
+      <nav className="fixed top-0 left-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
+        <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+           <Link href="/" className="text-xl font-bold gradient-text">Y3K Markets</Link>
+           <div className="flex gap-4 text-sm">
+             <Link href="/" className="hover:text-white text-gray-400">Home</Link>
+             <Link href="/mint" className="hover:text-white text-gray-400">Claim</Link>
+           </div>
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <div className="mb-8">
-          <h1 className="text-5xl font-bold mb-2 gradient-text">Namespace Registry</h1>
-          <p className="text-gray-400 text-lg">Public read-only view of cryptographically unique namespaces</p>
+      <div className="max-w-7xl mx-auto">
+        {/* Header */}
+        <div className="mb-12 text-center">
+           <h1 className="text-4xl md:text-6xl font-bold mb-4">
+             Claim Your <span className="gradient-text">Genesis Root</span>
+           </h1>
+           <div className="max-w-3xl mx-auto space-y-4">
+             <p className="text-xl text-gray-300">
+               Choose from <strong className="text-white">900 three-digit genesis roots</strong> (100-999)
+             </p>
+             <div className="bg-blue-900/20 border border-blue-500/30 rounded-xl p-6">
+               <h3 className="text-lg font-bold text-blue-400 mb-2">What You're Claiming:</h3>
+               <ul className="text-left text-gray-300 space-y-2">
+                 <li>✅ <strong>A Cryptographic Root Namespace</strong> — already exists on IPFS, verified</li>
+                 <li>✅ <strong>Full Cryptographic Keys</strong> — you control the identity, forever</li>
+                 <li>✅ <strong>Unlimited Sub-Namespaces</strong> — create kevan.100, wallet.100, agent.100, etc.</li>
+                 <li>✅ <strong>Post-Quantum Security</strong> — protected with NIST-standard cryptography</li>
+               </ul>
+             </div>
+           </div>
         </div>
 
-        <div className="flex gap-4 mb-8 flex-wrap">
-          <button 
-            onClick={() => filterByTier(null)}
-            className={`px-4 py-2 rounded-lg ${!selectedTier ? 'bg-purple-600 text-white' : 'bg-white/5 border border-white/10 hover:border-white/30'} transition`}
-          >
-            All
-          </button>
-          {['mythic', 'legendary', 'epic', 'rare', 'uncommon', 'common'].map((tier) => (
-            <button
-              key={tier}
-              onClick={() => filterByTier(tier)}
-              className={`px-4 py-2 rounded-lg capitalize ${selectedTier === tier ? 'bg-purple-600 text-white' : 'bg-white/5 border border-white/10 hover:border-white/30'} transition`}
+        {/* Controls */}
+        <div className="mb-8 flex flex-col md:flex-row gap-4 items-center justify-between sticky top-20 z-40 bg-black/90 p-4 rounded-xl border border-white/10 backdrop-blur-xl transition shadow-xl">
+          <div className="text-sm text-gray-400">
+            Showing {startIndex + 1}-{Math.min(endIndex, filteredRoots.length)} of {filteredRoots.length} roots
+          </div>
+
+          <div className="w-full md:w-64">
+            <input 
+              type="text" 
+              placeholder="Search number (e.g. 100, 777)..." 
+              value={searchTerm}
+              onChange={(e) => {
+                setSearchTerm(e.target.value);
+                setCurrentPage(1); // Reset to page 1 on search
+              }}
+              className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white placeholder-gray-500 focus:outline-none focus:border-purple-500 transition"
+            />
+          </div>
+        </div>
+
+        {/* Grid */}
+        <div className="grid grid-cols-3 md:grid-cols-5 lg:grid-cols-10 gap-3">
+          {displayedRoots.map((rootName) => (
+            <Link 
+              key={rootName}
+              href={`/mint?namespace=${rootName}`}
+              className="group relative p-4 rounded-xl border bg-white/5 border-white/10 hover:border-purple-500 transition hover:scale-105 flex flex-col items-center justify-center aspect-square"
             >
-              {tier}
-            </button>
+              <div className="text-3xl font-bold text-white group-hover:text-purple-400 transition">
+                {rootName}
+              </div>
+              <div className="text-xs text-gray-500 mt-2 opacity-0 group-hover:opacity-100 transition">
+                Click to Claim
+              </div>
+            </Link>
           ))}
         </div>
 
-        {!loading && !genesisFinalized && (
-          <div className="mb-8 bg-gradient-to-r from-purple-900/30 to-blue-900/30 border border-purple-500/30 rounded-lg p-6">
-            <div className="flex items-start gap-4">
-              <div className="text-4xl">⏳</div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold mb-2">Genesis Ceremony Pending</h3>
-                <p className="text-gray-300 mb-3">
-                  The Genesis ceremony will occur at <strong className="text-white">2026-01-15 00:00:00 UTC</strong>.
-                  Until then, namespace issuance is frozen and the registry remains empty.
-                </p>
-                <div className="flex items-center gap-4 text-sm">
-                  <span className="px-3 py-1 bg-purple-600/20 rounded-full">
-                    📅 {getDaysUntilGenesis()} days remaining
-                  </span>
-                  <span className="text-gray-400">
-                    0 namespaces issued
-                  </span>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="mt-12 flex justify-center items-center gap-2">
+            <button
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 hover:border-white/30 disabled:opacity-30 disabled:cursor-not-allowed transition"
+            >
+              ← Previous
+            </button>
 
-        {loading && (
-          <div className="text-center py-12">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-purple-500"></div>
-            <p className="mt-4 text-gray-400">Loading registry...</p>
-          </div>
-        )}
-
-        {!loading && namespaces.length === 0 && !apiAvailable && (
-          <div className="text-center py-12">
-            <div className="bg-white/5 border border-white/10 rounded-lg p-12 max-w-3xl mx-auto">
-              <div className="text-6xl mb-4">📜</div>
-              <h3 className="text-2xl font-bold mb-3">Registry Empty</h3>
-              <p className="text-gray-400 mb-6 max-w-xl mx-auto">
-                No namespaces exist yet. Issuance begins after the Genesis ceremony on{' '}
-                <span className="text-white font-semibold">January 15, 2026</span>.
-              </p>
-              <div className="grid md:grid-cols-3 gap-4 mt-8 text-left">
-                <div className="bg-white/5 rounded-lg p-4">
-                  <div className="text-purple-400 font-semibold mb-1">Genesis-Locked Supply</div>
-                  <div className="text-sm text-gray-400">Fixed tier allocations frozen at Genesis</div>
-                </div>
-                <div className="bg-white/5 rounded-lg p-4">
-                  <div className="text-purple-400 font-semibold mb-1">Cryptographic Uniqueness</div>
-                  <div className="text-sm text-gray-400">Each namespace permanently unique via SHA3-256</div>
-                </div>
-                <div className="bg-white/5 rounded-lg p-4">
-                  <div className="text-purple-400 font-semibold mb-1">IPFS Permanence</div>
-                  <div className="text-sm text-gray-400">Certificates stored on decentralized IPFS</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {!loading && namespaces.length === 0 && apiAvailable && genesisFinalized && (
-          <div className="text-center py-12">
-            <div className="bg-white/5 border border-white/10 rounded-lg p-8 max-w-2xl mx-auto">
-              <h3 className="text-xl font-bold mb-2">No Namespaces Match Filter</h3>
-              <p className="text-gray-400 mb-4">
-                {selectedTier 
-                  ? `No ${selectedTier} tier namespaces have been issued yet.`
-                  : 'Adjust your filters or check back later.'}
-              </p>
-              {selectedTier && (
-                <button
-                  onClick={() => filterByTier(null)}
-                  className="px-6 py-2 bg-purple-600 hover:bg-purple-700 rounded-lg transition"
-                >
-                  Clear Filters
-                </button>
-              )}
-            </div>
-          </div>
-        )}
-
-        {!loading && namespaces.length > 0 && (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {namespaces.map((ns) => {
-              const tierColor = tierColors[ns.tier as keyof typeof tierColors] || "text-gray-500";
-              return (
-                <div 
-                  key={ns.namespace}
-                  className="bg-white/5 border border-white/10 hover:border-purple-500/50 rounded-lg p-6 transition-all hover:shadow-lg hover:shadow-purple-500/20"
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <code className="text-2xl font-mono font-bold text-purple-400">
-                      {ns.namespace}
-                    </code>
-                    <span className={`px-3 py-1 rounded-full text-xs font-semibold capitalize ${tierColor} bg-white/5`}>
-                      {ns.tier}
-                    </span>
-                  </div>
-
-                  <div className="space-y-2 mb-4">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Tier</span>
-                      <span className={`font-semibold capitalize ${tierColor}`}>{ns.tier}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Issued</span>
-                      <span className="font-mono text-xs">{new Date(ns.issued_at).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-gray-400">Certificate</span>
-                      <span className="font-mono text-xs text-purple-400">{ns.ipfs_cid.substring(0, 10)}...</span>
-                    </div>
-                  </div>
-
-                  <Link href={`/explore/verify?namespace=${ns.namespace}`}>
-                    <button className="w-full py-2 rounded-lg bg-gradient-to-r from-purple-600/80 to-blue-600/80 hover:from-purple-600 hover:to-blue-600 text-white font-semibold transition">
-                      View Certificate
+            <div className="flex gap-2">
+              {[...Array(totalPages)].map((_, i) => {
+                const page = i + 1;
+                // Show first, last, current, and neighbors
+                if (
+                  page === 1 ||
+                  page === totalPages ||
+                  (page >= currentPage - 1 && page <= currentPage + 1)
+                ) {
+                  return (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-4 py-2 rounded-lg border transition ${
+                        currentPage === page
+                          ? "bg-purple-600 border-purple-500 text-white"
+                          : "bg-white/5 border-white/10 hover:border-white/30"
+                      }`}
+                    >
+                      {page}
                     </button>
-                  </Link>
-                </div>
-              );
-            })}
+                  );
+                } else if (
+                  page === currentPage - 2 ||
+                  page === currentPage + 2
+                ) {
+                  return <span key={page} className="px-2 text-gray-500">...</span>;
+                }
+                return null;
+              })}
+            </div>
+
+            <button
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 hover:border-white/30 disabled:opacity-30 disabled:cursor-not-allowed transition"
+            >
+              Next →
+            </button>
           </div>
         )}
 
-        {!loading && (
-          <div className="mt-12 bg-white/5 border border-white/10 rounded-lg p-6 text-center">
-            <p className="text-gray-400 text-sm">
-              <strong className="text-white">Public Registry Notice:</strong> This is a read-only verification surface.
-              Namespaces cannot be purchased through this interface. All issuance occurs via Genesis-locked protocol rules.
-            </p>
+        {filteredRoots.length === 0 && (
+          <div className="text-center py-20 text-gray-500">
+            No roots found matching "{searchTerm}"
           </div>
         )}
       </div>

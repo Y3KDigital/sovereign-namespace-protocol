@@ -59,6 +59,9 @@ payments-api/affiliates.created.csv
 payments-api/affiliates.created.*.csv
 payments-api/outreach/
 
+# Ignore machine-specific Cloudflare Tunnel config (contains absolute paths)
+payments-api/cloudflared.yml
+
 # Ignore broker roster inputs (can contain PII)
 payments-api/affiliates.brokers*.csv
 
@@ -68,6 +71,9 @@ payments-api/affiliates.brokers*.csv
 # Ignore temporary files
 *.tmp
 *.temp
+
+# UNY-KORN L1 generated artifacts
+uny-korn-l1/audit.sample.new.json
 
 # Ignore IPFS data (if running local node)
 .ipfs/

@@ -1,3 +1,8 @@
 name = "y3kmarkets"
 compatibility_date = "2024-01-01"
 pages_build_output_dir = "out"
+
+# KV Namespace for blockchain registry
+[[kv_namespaces]]
+binding = "GENESIS_CERTIFICATES"
+id = "cb3d63366cc34958bcd4c17210eec9c2"

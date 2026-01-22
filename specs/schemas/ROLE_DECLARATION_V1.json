@@ -1,0 +1,35 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ROLE_DECLARATION_V1",
+  "description": "Canonical role definitions for deal participants. Determines entitlement logic and permission scope.",
+  "type": "object",
+  "properties": {
+    "role": {
+      "type": "string",
+      "enum": [
+        "introducer",
+        "broker",
+        "operator",
+        "counterparty",
+        "advisor",
+        "principal",
+        "limited_partner"
+      ],
+      "description": "The primary capacity in which the entity is acting."
+    },
+    "sub_role": {
+      "type": "string",
+      "description": "Optional specific designation (e.g., 'technical_advisor', 'listing_broker')."
+    },
+    "authority_level": {
+      "type": "string",
+      "enum": ["none", "read_only", "signatory", "admin"],
+      "default": "none"
+    },
+    "declared_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["role", "declared_at"]
+}

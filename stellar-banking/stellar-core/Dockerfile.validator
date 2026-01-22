@@ -1,0 +1,42 @@
+# Dockerfile for Stellar Core Validator Node
+FROM ubuntu:22.04
+
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    wget \
+    gnupg \
+    apt-transport-https \
+    postgresql-client \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Add Stellar repository
+RUN wget -qO - https://apt.stellar.org/SDF.asc | apt-key add - && \
+    echo "deb https://apt.stellar.org focal stable" | tee -a /etc/apt/sources.list.d/SDF.list
+
+# Install Stellar Core
+RUN apt-get update && apt-get install -y stellar-core && \
+    rm -rf /var/lib/apt/lists/*
+
+# Create directories
+RUN mkdir -p /data /history /var/log && \
+    chown -R stellar:stellar /data /history /var/log
+
+# Set working directory
+WORKDIR /data
+
+# Create config directory
+RUN mkdir -p /etc/stellar && chown -R stellar:stellar /etc/stellar
+
+# Expose ports
+EXPOSE 11625 11626
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD curl -f http://localhost:11626/info || exit 1
+
+# Switch to stellar user
+USER stellar
+
+# Start Stellar Core
+CMD ["stellar-core", "run"]

@@ -69,6 +69,12 @@ pub enum PaymentError {
     #[error("Unauthorized")]
     Unauthorized,
 
+    #[error("Too many requests")]
+    TooManyRequests,
+
+    #[error("Signing key not configured: {0}")]
+    SigningKeyNotConfigured(String),
+
     #[error("Affiliate not found")]
     AffiliateNotFound,
 
@@ -77,6 +83,9 @@ pub enum PaymentError {
 
     #[error("Lead already exists")]
     LeadAlreadyExists,
+
+    #[error("Not found: {0}")]
+    NotFound(String),
 
     #[error("Internal error: {0}")]
     InternalError(String),
@@ -116,6 +125,18 @@ impl actix_web::ResponseError for PaymentError {
                     "message": self.to_string()
                 }))
             }
+            PaymentError::TooManyRequests => {
+                actix_web::HttpResponse::TooManyRequests().json(serde_json::json!({
+                    "error": "rate_limited",
+                    "message": self.to_string()
+                }))
+            }
+            PaymentError::SigningKeyNotConfigured(_) => {
+                actix_web::HttpResponse::ServiceUnavailable().json(serde_json::json!({
+                    "error": "signing_key_not_configured",
+                    "message": self.to_string()
+                }))
+            }
             PaymentError::AffiliateNotFound => {
                 actix_web::HttpResponse::NotFound().json(serde_json::json!({
                     "error": "affiliate_not_found",
@@ -135,6 +156,12 @@ impl actix_web::ResponseError for PaymentError {
                 }))
             }
             PaymentError::PaymentIntentNotFound(_) => {
+                actix_web::HttpResponse::NotFound().json(serde_json::json!({
+                    "error": "not_found",
+                    "message": self.to_string()
+                }))
+            }
+            PaymentError::NotFound(_) => {
                 actix_web::HttpResponse::NotFound().json(serde_json::json!({
                     "error": "not_found",
                     "message": self.to_string()

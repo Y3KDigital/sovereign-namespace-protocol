@@ -8,13 +8,17 @@
 
 SNP defines a **non-recreatable, post-quantum, sovereign namespace system** where:
 
-- Each namespace is a **cryptographic asset**, not a label
-- **Single genesis** ensures namespaces can never be recreated on any other network
+- Each **root namespace** is a **cryptographic asset**, not a label
+- **Three-layer architecture**: TLDs (protocol) → ROOTS (scarce) → Subdomains (utility)
+- **955 fixed root supply** — can never be increased or recreated
+- **Single genesis** ensures roots can never be recreated on any other network
 - **No admin keys** exist post-genesis (provably destroyed)
 - **No governance** can change the rules (immutable protocol law)
 - **Post-quantum cryptography** (Dilithium5) ensures long-term security
 - **Stateless verification** works even if the chain dies
 - **Deterministic policy engine** enforces machine-readable governance rules
+
+**Economic Model**: "Y3K sells root namespaces, not names. Each root can generate unlimited subdomains, but only the root is scarce."
 
 This is **not** a domain system, identity service, or wallet protocol.
 

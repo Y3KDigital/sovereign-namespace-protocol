@@ -1,0 +1,12 @@
+# MANUAL VERIFICATION
+# After executing genesis-population.sql, run these checks:
+
+# Method 1: If you have sqlite3 CLI
+# sqlite3 payments.db < genesis-population.sql
+# sqlite3 payments.db "SELECT COUNT(*) FROM available_namespaces;"
+
+# Method 2: Use Rust tool
+# cargo run --bin verify-genesis-db
+
+# Method 3: Check via payments API
+# Start API server and hit GET /api/namespaces/stats

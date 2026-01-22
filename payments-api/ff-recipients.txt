@@ -1,0 +1,15 @@
+﻿# Y3K GENESIS - FRIENDS & FAMILY RECIPIENTS
+# Add 100 email addresses (one per line)
+# Lines starting with # are ignored
+
+# FOUNDER TIER (10 emails - codes F001-F010)
+# founder1@example.com
+# founder2@example.com
+# ...add 8 more founder emails
+
+# EARLY SUPPORTER TIER (90 emails - codes E011-E100)
+# early1@example.com
+# early2@example.com
+# ...add 88 more early supporter emails
+
+# When ready, uncomment emails and run: .\send-ff-emails.ps1

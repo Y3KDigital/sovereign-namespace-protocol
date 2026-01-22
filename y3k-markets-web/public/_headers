@@ -1,11 +1,33 @@
 /*
-  Cache-Control: no-store
-  X-Content-Type-Options: nosniff
-  Referrer-Policy: strict-origin-when-cross-origin
   X-Frame-Options: DENY
-  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
-  Strict-Transport-Security: max-age=31536000; includeSubDomains
-  Content-Security-Policy: default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: https:; font-src 'self' data: https:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline' blob:; connect-src 'self' https:; form-action 'self'; upgrade-insecure-requests
+  X-Content-Type-Options: nosniff
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(self)
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.cloudflare.com https://*.stripe.com https://js.stripe.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://*.cloudflare.com https://*.stripe.com https://api.stripe.com https://ipfs.io https://gateway.pinata.cloud wss://*.y3kmarkets.com; frame-src https://*.stripe.com; base-uri 'self'; form-action 'self'; upgrade-insecure-requests
+
+# Lock down the mint page - Sovereignty requires freshness
+/mint
+  Cache-Control: no-store, no-cache, must-revalidate, max-age=0
 
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable
+
+/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.png
+  Cache-Control: public, max-age=604800, must-revalidate
+
+/*.jpg
+  Cache-Control: public, max-age=604800, must-revalidate
+
+/*.svg
+  Cache-Control: public, max-age=604800, must-revalidate
+
+/api/*
+  Cache-Control: no-store, no-cache, must-revalidate
+
+/*.html
+  Cache-Control: public, max-age=3600, must-revalidate

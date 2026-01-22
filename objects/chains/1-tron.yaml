@@ -1,0 +1,76 @@
+# Object Type: Chain
+# ID: 1.tron
+# Status: Production Chain
+
+object_type: chain
+canonical_id: "1.tron"
+display_name: "TRON Mainnet"
+description: "BLOCKCHAIN • Layer 1"
+
+authority:
+  entity: "TRON LLC"
+  context: "Chain Authority"
+  verification: verified
+  verification_method: "official"
+
+qr:
+  protocol: "uny"
+  payload: "uny://chain/1.tron"
+  fallback_url: "https://uny.tron.network"
+  encoding: protocol-native
+  size: large
+
+actions:
+  - id: bridge_assets
+    label: "Bridge Assets"
+    enabled: true
+    endpoint: "/bridge/tron"
+    
+  - id: deploy_contract
+    label: "Deploy Contract"
+    enabled: true
+    endpoint: "/deploy/tron"
+    
+  - id: verify_block
+    label: "Verify Block"
+    enabled: true
+    endpoint: "/verify/tron"
+
+state:
+  - label: "Validators"
+    value: 27
+    unit: "nodes"
+    format: number
+    
+  - label: "Block Time"
+    value: 3
+    unit: "seconds"
+    format: number
+    
+  - label: "Total Txs"
+    value: 8200000000
+    unit: ""
+    format: number
+    
+  - label: "TVL"
+    value: 8900000000
+    unit: "USD"
+    format: currency
+    
+  - label: "Uptime"
+    value: 99.97
+    unit: "%"
+    format: percentage
+
+metadata:
+  chain_id: 1
+  network_type: mainnet
+  consensus: "DPoS"
+  native_token: "TRX"
+  explorer: "https://tronscan.org"
+  rpc_endpoint: "https://api.trongrid.io"
+
+theme:
+  primary_color: "#EB0029"
+  accent_color: "#000000"
+  badge_icon: "⛓️"

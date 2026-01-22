@@ -1,0 +1,82 @@
+# Object Type: Namespace
+# ID: 100.y3k
+# Status: Genesis Root (Available)
+
+object_type: namespace
+canonical_id: "100.y3k"
+display_name: "Genesis Root 100"
+description: "SOVEREIGN NAMESPACE • Genesis Root"
+
+authority:
+  entity: "Y3K Protocol"
+  context: "Genesis Root Lock"
+  verification: verified
+  verification_method: "cryptographic"
+  genesis_timestamp: "2025-12-15T00:00:00Z"
+
+qr:
+  protocol: "y3k"
+  payload: "y3k://100"
+  fallback_url: "https://y3k.xyz/100"
+  encoding: protocol-native
+  size: large
+
+actions:
+  - id: mint_namespace
+    label: "Mint This Root"
+    enabled: true
+    endpoint: "/mint?root=100"
+    requires_auth: false
+    
+  - id: check_availability
+    label: "Check Status"
+    enabled: true
+    endpoint: "/api/status/100"
+    requires_auth: false
+
+state:
+  - label: "Root Number"
+    value: 100
+    unit: ""
+    format: number
+    
+  - label: "Rarity Tier"
+    value: "MYTHIC"
+    unit: ""
+    color: "#9C27B0"
+    
+  - label: "Price"
+    value: 29
+    unit: "USD"
+    format: currency
+    
+  - label: "Status"
+    value: "Available"
+    unit: ""
+    color: "#00ff00"
+    
+  - label: "Category"
+    value: "100s"
+    unit: ""
+
+metadata:
+  created: 2025-12-15T00:00:00Z
+  genesis_event: true
+  immutable: false
+  chain: ethereum
+  category: triple-digit
+  rarity_score: 95.0
+  special_note: "First available root in 100s range"
+
+blockchain:
+  chain_id: 1
+  network: mainnet
+  contract: "0x..."
+  token_id: 100
+  owner: null
+
+theme:
+  primary_color: "#9C27B0"
+  accent_color: "#000000"
+  badge_icon: "💎"
+  rarity_class: "mythic"

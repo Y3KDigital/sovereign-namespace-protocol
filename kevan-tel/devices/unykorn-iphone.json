@@ -1,0 +1,49 @@
+{
+  "device_profile": {
+    "device_name": "Unykorn",
+    "model": "iPhone 11 Pro Max",
+    "model_number": "NWGF2LL/A",
+    "ios_version": "updating",
+    "apple_id": "kevan.x@icloud.com",
+    "imei": "35285211282235",
+    "imei_esim": "35285211288062",
+    "eid": "89049032005008882600051266509186",
+    "carrier": "WiFi-only (no cellular activated)",
+    "status": "unlocked",
+    "role": "canonical_kevan_x_device"
+  },
+  "namespace_binding": {
+    "namespace": "kevan.x",
+    "certificate_fingerprint": "kevan.x.genesis.01",
+    "auth_level": "owner",
+    "verified_at": "2026-01-17T00:00:00Z"
+  },
+  "telephony_config": {
+    "telnyx_number": "+13214858333",
+    "connection_type": "telnyx_app",
+    "messaging_enabled": true,
+    "voice_enabled": true,
+    "authentication_required": true
+  },
+  "network_config": {
+    "primary_sim": {
+      "iccid": "8901260608768313104",
+      "carrier": "T-Mobile",
+      "phone_number": "+13212788323"
+    },
+    "esim": {
+      "eid": "89049032005008882600051266509186",
+      "status": "available"
+    }
+  },
+  "security": {
+    "mdm_enabled": false,
+    "certificate_trust_enabled": true,
+    "device_passcode_set": true
+  },
+  "notes": [
+    "Reset and provisioned on 2026-01-17",
+    "Primary kevan.x namespace device",
+    "Telnyx app endpoint for namespace-authenticated calls"
+  ]
+}

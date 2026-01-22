@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0.0",
+  "deal_id": "PROJECT_JACKPOT_77",
+  "participant_id": "did:web:77.x",
+  "role_declaration": {
+    "role": "principal",
+    "sub_role": "sovereign_owner",
+    "authority_level": "admin",
+    "declared_at": "2025-01-20T12:00:00Z"
+  },
+  "payout_routing": {
+    "preference_type": "custodial",
+    "destination": {
+      "network": "us_treasury_compliant_rail",
+      "provider": "BLIND_TRUST_ESCROW",
+      "account_ref": "REF_77_VICTORY"
+    },
+    "acknowledgments": [
+      "I acknowledge 77.x is an immutable asset.",
+      "I accept the Jackpot Sovereign title.",
+      "I confirm this route is compliant with election finance regulations."
+    ],
+    "updated_at": "2025-01-18T16:00:00Z"
+  },
+  "terms_hash": "sha256:888777777...",
+  "status": "READY_TO_SIGN"
+}

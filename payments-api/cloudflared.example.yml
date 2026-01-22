@@ -1,0 +1,21 @@
+# Example Cloudflare Tunnel config for publishing the local payments-api.
+#
+# 1) Copy to `payments-api/cloudflared.yml`
+# 2) Update `credentials-file` to match your machine
+# 3) Run: `cloudflared tunnel --config payments-api/cloudflared.yml run`
+#
+# IMPORTANT:
+# - `payments-api/cloudflared.yml` is gitignored because it commonly contains machine-specific absolute paths.
+
+# Your tunnel UUID (from `cloudflared tunnel list`)
+tunnel: adc217c0-3815-40c1-a845-b84c4db93898
+
+# Path to the tunnel credentials JSON created when you ran `cloudflared tunnel create`.
+# Windows example:
+# credentials-file: C:\Users\<YOU>\.cloudflared\adc217c0-3815-40c1-a845-b84c4db93898.json
+credentials-file: C:\Users\<YOU>\.cloudflared\adc217c0-3815-40c1-a845-b84c4db93898.json
+
+ingress:
+  - hostname: api.y3kmarkets.com
+    service: http://127.0.0.1:8081
+  - service: http_status:404
