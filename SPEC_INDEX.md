@@ -48,6 +48,22 @@
 
 ---
 
+### 4. [PROTOCOL_CONSOLE_STANDARD.md](PROTOCOL_CONSOLE_STANDARD.md)
+**Purpose**: Universal UI standard for all Web3 objects
+
+**Defines**:
+- One canonical screen per object (not pages, not flows)
+- Four non-negotiable elements (Identity Header, QR Primary, Actions, State)
+- Object schema for universal rendering
+- QR-first interface philosophy
+- Infrastructure UX discipline (no marketing, no sprawl)
+
+**Status**: CANONICAL (v1.0.0)
+
+**Companion**: [PROTOCOL_CONSOLE_IMPLEMENTATION.md](PROTOCOL_CONSOLE_IMPLEMENTATION.md)
+
+---
+
 ### 4. [NAMESPACE_OBJECT.md](NAMESPACE_OBJECT.md)
 **Purpose**: Namespace as cryptographic asset
 
@@ -106,6 +122,9 @@
 ---
 
 ## Meta-Documents
+
+### [NUMBER_ANCHORED_AI_MESH.md](NUMBER_ANCHORED_AI_MESH.md)
+Applied architecture note: phone number (E.164) as the identity + routing spine for an AI-orchestrated device/value mesh
 
 ### [VERSION.md](VERSION.md)
 Version declaration, finality statement, enforcement model
