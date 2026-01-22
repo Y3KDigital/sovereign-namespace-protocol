@@ -25,13 +25,13 @@ actions:
   - id: mint_namespace
     label: "Mint This Root"
     enabled: true
-    endpoint: "/mint?root=100"
+    endpoint: "/mint/100"
     requires_auth: false
     
-  - id: check_availability
-    label: "Check Status"
+  - id: share_link
+    label: "Copy Mint Link"
     enabled: true
-    endpoint: "/api/status/100"
+    endpoint: "/mint/100"
     requires_auth: false
 
 state:
