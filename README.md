@@ -69,6 +69,33 @@ This is a **permanent trust primitive** and **digital scarcity substrate**.
 
 ---
 
+## Security & Audit Documentation
+
+**Repository Security Status:** ✅ **SECURE** (Last audit: 2026-01-25)
+
+### Security Resources
+
+1. **[SECURITY_DOCS_README.md](SECURITY_DOCS_README.md)** — Security documentation index
+2. **[SECURITY_AUDIT_CODESPACE_2026-01-25.md](SECURITY_AUDIT_CODESPACE_2026-01-25.md)** — Complete security audit report
+3. **[CODESPACE_TROUBLESHOOTING.md](CODESPACE_TROUBLESHOOTING.md)** — VS Code/Codespace issue resolution
+4. **[security-check.sh](security-check.sh)** — Automated security verification script
+
+**Quick Security Check:**
+```bash
+./security-check.sh
+```
+
+**Recent Security Audit Findings:**
+- ✅ No unauthorized access detected
+- ✅ All git commits from legitimate users only
+- ✅ No malicious code or vulnerabilities found
+- ✅ All dependencies from trusted sources
+- ✅ Environment is clean and secure
+
+See [SECURITY_DOCS_README.md](SECURITY_DOCS_README.md) for complete security documentation.
+
+---
+
 ## Reference Implementation (Rust)
 
 This repository contains a **specification-conformant reference implementation** in Rust.
