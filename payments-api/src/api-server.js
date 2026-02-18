@@ -306,6 +306,67 @@ app.get('/api/payment/status/:id', (req, res) => {
 });
 
 // ─────────────────────────────────────────────────────────
+// AI NUMBER LICENSING — Stripe Checkout Session
+// POST /api/stripe/create-license-session
+// Body: { number, vanity, tier, price, name, email, company }
+// ─────────────────────────────────────────────────────────
+const TIER_MONTHLY_CENTS = {
+  local:    29700,
+  tollfree: 49700,
+  premium:  99700,
+};
+
+app.post('/api/stripe/create-license-session', async (req, res) => {
+  try {
+    const ip = req.headers['x-forwarded-for'] || req.ip;
+    if (!checkRateLimit(ip)) return res.status(429).json({ error: 'Rate limit exceeded' });
+
+    const { number, vanity, tier, name, email, company } = req.body;
+    if (!number || !tier || !TIER_MONTHLY_CENTS[tier]) {
+      return res.status(400).json({ error: 'Missing required fields: number, tier' });
+    }
+
+    const amountCents = TIER_MONTHLY_CENTS[tier];
+    const tierLabel   = { local: 'Local Market', tollfree: 'Toll-Free Pro', premium: 'Premium 888' }[tier];
+    const origin      = req.headers.origin || process.env.FRONTEND_URL || 'https://y3kmarkets.com';
+
+    // Create Stripe Checkout Session (subscription-style one-off for now, easily upgradeable)
+    const session = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      payment_method_types: ['card'],
+      customer_email: email || undefined,
+      line_items: [{
+        price_data: {
+          currency: 'usd',
+          unit_amount: amountCents,
+          product_data: {
+            name: `AI Number License — ${vanity || number}`,
+            description: `${tierLabel} · ${number} · 1 Month AI Intake Service`,
+            metadata: { vanity: vanity || '', number, company: company || '' },
+          },
+        },
+        quantity: 1,
+      }],
+      metadata: {
+        product:    'ai_number_license',
+        number:     number,
+        vanity:     vanity || '',
+        tier:       tier,
+        buyerName:  name || '',
+        company:    company || '',
+      },
+      success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}&number=${encodeURIComponent(number)}&vanity=${encodeURIComponent(vanity || number)}`,
+      cancel_url:  `${origin}/checkout?number=${encodeURIComponent(number)}&vanity=${encodeURIComponent(vanity || number)}&tier=${tier}`,
+    });
+
+    res.json({ url: session.url, session_id: session.id });
+  } catch (err) {
+    console.error('create-license-session error:', err.message);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ─────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log(`\n🚀 Y3K Genesis API v3 → http://localhost:${PORT}`);
   console.log(`   Pricing:  bonding curve ($9 base, +$1/10 mints)`);
