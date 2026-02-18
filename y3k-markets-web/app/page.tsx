@@ -13,13 +13,13 @@ const TICKER = [
 ];
 
 const BILLBOARDS = [
-  { word: "STORM", number: "786-STORM", coverage: "Florida • Georgia • Arizona • Oklahoma" },
-  { word: "LAWYER", number: "888-LAW-AI", coverage: "National Toll-Free" },
-  { word: "HVAC", number: "833-HVAC-AI", coverage: "24/7 Emergency • National" },
-  { word: "HAIL", number: "414-HAIL", coverage: "Wisconsin • Midwest" },
-  { word: "CLAIM", number: "844-CLAIM", coverage: "Insurance Help • National" },
-  { word: "MONEY", number: "888-BUCK-AI", coverage: "Financial Services • National" },
-  { word: "NEED", number: "844-NEED-AI", coverage: "Universal Help • Routes to Every Vertical" },
+  { word: "STORM", number: "786-STORM", coverage: "Florida • Georgia • Arizona • Oklahoma", bg: "#0a0a0a", accent: "#f59e0b" },
+  { word: "LAWYER", number: "888-LAW-AI", coverage: "National Toll-Free", bg: "#0a0a0a", accent: "#a855f7" },
+  { word: "HVAC", number: "833-HVAC-AI", coverage: "24/7 Emergency • National", bg: "#0a0a0a", accent: "#06b6d4" },
+  { word: "HAIL", number: "414-HAIL", coverage: "Wisconsin • Midwest", bg: "#0a0a0a", accent: "#60a5fa" },
+  { word: "CLAIM", number: "844-CLAIM", coverage: "Insurance Help • National", bg: "#0a0a0a", accent: "#34d399" },
+  { word: "MONEY", number: "888-BUCK-AI", coverage: "Financial Services • National", bg: "#0a0a0a", accent: "#f59e0b" },
+  { word: "NEED", number: "844-NEED-AI", coverage: "Universal Help • Routes to Every Vertical", bg: "#4f46e5", accent: "#ffffff" },
 ];
 
 const VERTICALS = [
@@ -175,9 +175,9 @@ export default function Home() {
               { n: "24/7", l: "Always On" },
               { n: "0s", l: "Wait Time" },
             ].map(({ n, l }) => (
-              <div key={l} className="text-center">
-                <div className="text-4xl font-black text-white">{n}</div>
-                <div className="text-sm text-gray-500 mt-1">{l}</div>
+              <div key={l} className="text-center group">
+                <div className="text-4xl md:text-5xl font-black text-white tabular-nums">{n}</div>
+                <div className="text-xs text-gray-500 mt-1 uppercase tracking-widest font-semibold">{l}</div>
               </div>
             ))}
           </div>
@@ -185,7 +185,7 @@ export default function Home() {
 
         {/* Scrolling ticker */}
         <div className="overflow-hidden relative">
-          <div className="flex gap-6 animate-[ticker_30s_linear_infinite] whitespace-nowrap w-max">
+          <div className="flex gap-6 animate-ticker whitespace-nowrap w-max">
             {tickerDouble.map(({ icon, label }, i) => (
               <span key={i} className="flex items-center gap-2 text-sm text-gray-400 bg-white/5 border border-white/10 rounded-full px-4 py-2 shrink-0">
                 <span>{icon}</span> <span className="font-mono font-bold text-white">{label}</span>
@@ -221,22 +221,100 @@ export default function Home() {
             <p className="text-gray-400 max-w-2xl mx-auto">Our numbers follow billboard design rules: the word takes 70% of the board. No logos. No URLs. Just a word and a number people remember at 70 mph.</p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {BILLBOARDS.map(({ word, number, coverage }) => (
-              <div key={number} className="bg-white rounded-xl overflow-hidden group hover:scale-[1.02] transition-transform cursor-pointer">
-                <div className="bg-black p-6 flex flex-col items-center justify-center min-h-[140px] relative">
-                  <div className="text-4xl font-black text-white tracking-tight text-center leading-none mb-3">{word}</div>
-                  <div className="text-yellow-400 font-mono font-bold text-lg">{number}</div>
-                </div>
-                <div className="bg-white p-3 text-center">
-                  <div className="text-black text-xs font-medium">{coverage}</div>
+          {/* Billboard grid */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {BILLBOARDS.map(({ word, number, coverage, bg, accent }) => (
+              <div key={number} className="group cursor-pointer" style={{ perspective: "800px" }}>
+                {/* Billboard structure */}
+                <div className="relative hover:scale-[1.03] transition-transform duration-300">
+                  {/* Sky / atmosphere backdrop */}
+                  <div className="rounded-2xl overflow-hidden" style={{ background: "linear-gradient(180deg, #0f172a 0%, #1e293b 60%, #334155 100%)" }}>
+                    {/* Top bar (yellow trim) */}
+                    <div className="h-2 w-full" style={{ background: accent }} />
+
+                    {/* Board face */}
+                    <div
+                      className="relative flex flex-col items-center justify-center px-6 py-8 min-h-[180px]"
+                      style={{ background: bg, boxShadow: `inset 0 0 60px rgba(0,0,0,0.8), 0 0 0 2px ${accent}22` }}
+                    >
+                      {/* Reflective bolt corners */}
+                      <div className="absolute top-2 left-2 w-2 h-2 rounded-full opacity-60" style={{ background: accent }} />
+                      <div className="absolute top-2 right-2 w-2 h-2 rounded-full opacity-60" style={{ background: accent }} />
+                      <div className="absolute bottom-2 left-2 w-2 h-2 rounded-full opacity-60" style={{ background: accent }} />
+                      <div className="absolute bottom-2 right-2 w-2 h-2 rounded-full opacity-60" style={{ background: accent }} />
+
+                      {/* The WORD — 70% of the board */}
+                      <div
+                        className="font-black text-center leading-none tracking-tighter mb-4 select-none"
+                        style={{
+                          fontSize: word.length <= 4 ? "clamp(3.5rem, 10vw, 5rem)" : word.length <= 6 ? "clamp(2.5rem, 7vw, 3.8rem)" : "clamp(2rem, 6vw, 3rem)",
+                          color: "#ffffff",
+                          textShadow: `0 0 40px ${accent}66, 0 2px 4px rgba(0,0,0,0.9)`,
+                          fontFamily: "'Arial Black', 'Helvetica Neue', sans-serif",
+                          letterSpacing: "-0.02em",
+                        }}
+                      >
+                        {word}
+                      </div>
+
+                      {/* Number */}
+                      <div
+                        className="font-mono font-bold text-lg tracking-wide"
+                        style={{ color: accent, textShadow: `0 0 12px ${accent}88` }}
+                      >
+                        {number}
+                      </div>
+                    </div>
+
+                    {/* Bottom trim */}
+                    <div className="h-1.5 w-full" style={{ background: accent }} />
+
+                    {/* Posts */}
+                    <div className="flex justify-center gap-10 pb-3 pt-1">
+                      <div className="w-3 h-6 rounded-b" style={{ background: "#475569" }} />
+                      <div className="w-3 h-6 rounded-b" style={{ background: "#475569" }} />
+                    </div>
+                  </div>
+
+                  {/* Coverage tag below */}
+                  <div className="mt-3 text-center">
+                    <span className="text-xs text-gray-500 font-mono uppercase tracking-wider">{coverage}</span>
+                  </div>
+
+                  {/* Hover CTA */}
+                  <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 rounded-2xl" style={{ background: "rgba(0,0,0,0.75)" }}>
+                    <Link
+                      href="/sales"
+                      className="px-6 py-3 rounded-xl font-bold text-sm text-white transition"
+                      style={{ background: accent, color: bg === "#4f46e5" ? "#fff" : "#000" }}
+                    >
+                      License This Number →
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}
-            <div className="bg-purple-900/30 border-2 border-purple-500/40 border-dashed rounded-xl flex flex-col items-center justify-center min-h-[180px] p-6 hover:border-purple-400 transition cursor-pointer group">
-              <div className="text-3xl mb-2 group-hover:scale-110 transition">➕</div>
-              <div className="text-purple-300 font-bold text-center">Your Number Here</div>
-              <Link href="/sales" className="mt-3 text-xs text-purple-400 hover:text-purple-300 underline">License Now</Link>
+
+            {/* Your number here */}
+            <div className="group cursor-pointer" style={{ perspective: "800px" }}>
+              <div className="relative hover:scale-[1.03] transition-transform duration-300">
+                <div className="rounded-2xl overflow-hidden border-2 border-dashed border-purple-500/40 hover:border-purple-400 transition">
+                  <div className="h-2 w-full bg-purple-500/30" />
+                  <div className="flex flex-col items-center justify-center px-6 py-8 min-h-[180px] bg-purple-950/20">
+                    <div className="text-5xl font-black text-purple-400/30 mb-3">?</div>
+                    <div className="text-purple-300 font-black text-xl mb-1">YOUR WORD</div>
+                    <div className="text-purple-500 font-mono text-sm">YOUR-NUMBER</div>
+                  </div>
+                  <div className="h-1.5 w-full bg-purple-500/30" />
+                  <div className="flex justify-center gap-10 pb-3 pt-1">
+                    <div className="w-3 h-6 rounded-b bg-purple-900/50" />
+                    <div className="w-3 h-6 rounded-b bg-purple-900/50" />
+                  </div>
+                </div>
+                <div className="mt-3 text-center">
+                  <Link href="/sales" className="text-xs text-purple-400 hover:text-purple-300 font-semibold underline uppercase tracking-wider">License Your Number →</Link>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -539,13 +617,6 @@ export default function Home() {
         </div>
       </footer>
 
-      {/* Ticker animation */}
-      <style>{`
-        @keyframes ticker {
-          0% { transform: translateX(0); }
-          100% { transform: translateX(-50%); }
-        }
-      `}</style>
     </main>
   );
 }
