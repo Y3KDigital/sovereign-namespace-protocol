@@ -7,7 +7,7 @@ import { loadStripe } from "@stripe/stripe-js";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
-    "pk_test_51T29nr00TXpnKEHbc4bCq6sRoa3XW2OoTdbWY60Uf5hNjMELBMQHp56vuAHzZBgIdNn8HieWCnCTaNhGS5EiofqB001PFiPJmL"
+    "pk_live_51T29nh1OEzphv6FLsoRg4yMypc4eskdoSGXSwMgnLxbAB1ptZm4YQ1uZnekR3peDHSvLW8sTOa5Fh3062yVbU96j00gtK152kK"
 );
 
 interface PaymentStatus {
