@@ -65,6 +65,37 @@ export default function Home() {
         </div>
       </section>
 
+      {/* 888 Live Demo Banner */}
+      <section className="py-16 px-6 bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 border-y border-emerald-500/20">
+        <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+          <div className="space-y-3 text-center md:text-left">
+            <div className="inline-flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 rounded-full px-3 py-1 text-emerald-400 text-xs font-mono uppercase tracking-wider">
+              <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse"></div>
+              Live · AI-Answered · 24/7
+            </div>
+            <h2 className="text-3xl md:text-4xl font-bold text-white">
+              See It Working. <span className="text-emerald-400">Right Now.</span>
+            </h2>
+            <p className="text-slate-300 text-lg max-w-xl">
+              Call <span className="text-white font-bold font-mono">888-855-0209</span> and experience sovereign namespace 
+              infrastructure live — AI routing, identity resolution, and the full digital property stack in one call.
+            </p>
+          </div>
+          <div className="flex flex-col items-center gap-3 shrink-0">
+            <a
+              href="tel:+18888550209"
+              className="flex items-center gap-3 bg-emerald-600 text-white px-10 py-5 rounded-xl text-xl font-bold hover:bg-emerald-700 transition-all shadow-2xl shadow-emerald-900/60 whitespace-nowrap"
+            >
+              <span className="text-2xl">📞</span>
+              888-855-0209
+            </a>
+            <Link href="/demo" className="text-sm text-emerald-400 hover:text-emerald-300 transition underline underline-offset-2">
+              View the full demo stack →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* What This Actually Is */}
       <section className="py-20 px-6 border-t border-slate-800">
         <div className="max-w-6xl mx-auto">
@@ -464,6 +495,14 @@ export default function Home() {
                 <div>January 16, 2026</div>
                 <div>900 Total Supply</div>
                 <div>Numbers only (100-999)</div>
+              </div>
+            </div>
+            <div>
+              <div className="font-semibold text-white mb-3">Crown Roots</div>
+              <div className="space-y-2 text-sm text-slate-400">
+                <div>a–z · 0–9 · 00–99</div>
+                <div>174 sovereign roots locked</div>
+                <div><Link href="/demo" className="hover:text-blue-400 transition">View full stack →</Link></div>
               </div>
             </div>
           </div>
