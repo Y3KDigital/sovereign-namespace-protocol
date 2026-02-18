@@ -11,15 +11,21 @@
     "init-db": "node src/init-db.js",
     "test": "node src/test-monitor.js"
   },
-  "keywords": ["payment", "blockchain", "monitoring", "sovereign"],
+  "keywords": [
+    "payment",
+    "blockchain",
+    "monitoring",
+    "sovereign"
+  ],
   "author": "Y3K Digital",
   "license": "MIT",
   "dependencies": {
-    "ethers": "^6.11.1",
     "better-sqlite3": "^9.3.0",
-    "node-fetch": "^3.3.2",
+    "cors": "^2.8.5",
     "dotenv": "^16.4.1",
+    "ethers": "^6.11.1",
     "express": "^4.18.2",
-    "cors": "^2.8.5"
+    "node-fetch": "^3.3.2",
+    "stripe": "^20.3.1"
   }
 }

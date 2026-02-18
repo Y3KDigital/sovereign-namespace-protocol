@@ -1,8 +1,63 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
+import { loadStripe } from "@stripe/stripe-js";
+import {
+  Elements,
+  PaymentElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
+    "pk_test_51T29nr00TXpnKEHbc4bCq6sRoa3XW2OoTdbWY60Uf5hNjMELBMQHp56vuAHzZBgIdNn8HieWCnCTaNhGS5EiofqB001PFiPJmL"
+);
+
+// ── Inner card form (needs to be inside <Elements>) ──────
+function StripeCardForm({ root, onSuccess, onError }: {
+  root: number;
+  onSuccess: () => void;
+  onError: (msg: string) => void;
+}) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [paying, setPaying] = useState(false);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stripe || !elements) return;
+    setPaying(true);
+
+    const { error } = await stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: `${window.location.origin}/mint/success?stripe=1&root=${root}`,
+      },
+    });
+
+    if (error) {
+      onError(error.message || "Payment failed");
+      setPaying(false);
+    }
+    // on success Stripe redirects to return_url automatically
+  };
+
+  return (
+    <form onSubmit={handleSubmit} className="grid gap-4">
+      <PaymentElement />
+      <button
+        type="submit"
+        disabled={!stripe || paying}
+        className="w-full px-4 py-4 rounded-xl bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 transition disabled:opacity-50 font-bold text-lg"
+      >
+        {paying ? "Processing…" : "Pay $29 by Card"}
+      </button>
+    </form>
+  );
+}
 
 export default function MintClient() {
   const searchParams = useSearchParams();
@@ -10,10 +65,12 @@ export default function MintClient() {
   const presetNamespace = (searchParams.get("namespace") || "").trim() || "";
   
   const [namespace, setNamespace] = useState(presetNamespace);
-  const [selectedAsset, setSelectedAsset] = useState<"BTC" | "ETH" | "USDC" | "USDT">("BTC");
+  const [selectedAsset, setSelectedAsset] = useState<"BTC" | "ETH" | "USDC" | "USDT" | "CARD">("CARD");
   const [error, setError] = useState("");
   const [isCreatingPayment, setIsCreatingPayment] = useState(false);
   const [stage, setStage] = useState<"input" | "payment">("input");
+  const [stripeClientSecret, setStripeClientSecret] = useState<string | null>(null);
+  const [stripeRoot, setStripeRoot] = useState<number | null>(null);
 
   const handleInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
@@ -59,16 +116,34 @@ export default function MintClient() {
     setIsCreatingPayment(true);
     setError("");
 
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9000';
+
     try {
-      // Call API server (not Next.js API routes - those don't work with static export)
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9000';
+      if (selectedAsset === 'CARD') {
+        // ── Stripe card flow ────────────────────────────
+        const response = await fetch(`${apiUrl}/api/stripe/create-intent`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ root: num }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          setError(data.error || 'Failed to create payment');
+          setIsCreatingPayment(false);
+          return;
+        }
+        setStripeClientSecret(data.client_secret);
+        setStripeRoot(num);
+        setStage('payment');
+        setIsCreatingPayment(false);
+        return;
+      }
+
+      // ── Crypto flow (existing) ──────────────────────
       const response = await fetch(`${apiUrl}/api/payment/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          root: num,
-          asset: selectedAsset
-        })
+        body: JSON.stringify({ root: num, asset: selectedAsset }),
       });
 
       const data = await response.json();
@@ -79,7 +154,6 @@ export default function MintClient() {
         return;
       }
 
-      // Redirect to success page with payment ID
       router.push(`/mint/success?payment_id=${data.payment_id}`);
 
     } catch (err) {
@@ -124,6 +198,38 @@ export default function MintClient() {
           </p>
         </div>
 
+        {/* --- STAGE 2: STRIPE CARD PAYMENT --- */}
+        {stage === "payment" && stripeClientSecret && stripeRoot !== null && (
+          <div className="bg-white/5 border border-violet-500/30 rounded-xl p-6 shadow-2xl">
+            <div className="mb-4">
+              <h2 className="text-xl font-bold text-violet-300 mb-1">💳 Secure Card Payment</h2>
+              <p className="text-sm text-gray-400">Genesis Root <span className="text-white font-bold">#{stripeRoot}</span> · $29.00 USD · Powered by Stripe</p>
+            </div>
+            <Elements
+              stripe={stripePromise}
+              options={{
+                clientSecret: stripeClientSecret,
+                appearance: {
+                  theme: 'night',
+                  variables: { colorPrimary: '#7c3aed', borderRadius: '8px' },
+                },
+              }}
+            >
+              <StripeCardForm
+                root={stripeRoot}
+                onSuccess={() => {}}
+                onError={(msg) => { setError(msg); setStage('input'); }}
+              />
+            </Elements>
+            <button
+              onClick={() => { setStage('input'); setStripeClientSecret(null); }}
+              className="mt-3 text-xs text-gray-500 hover:text-gray-300 underline"
+            >
+              ← Back / Change root
+            </button>
+          </div>
+        )}
+
         {/* --- STAGE 1: INPUT --- */}
         {stage === "input" && (
           <div className="bg-white/5 border border-white/10 rounded-xl p-6 shadow-2xl">
@@ -164,14 +270,27 @@ export default function MintClient() {
 
               <label className="grid gap-2">
                 <span className="text-sm text-gray-300 font-medium">Payment Method</span>
-                <div className="grid grid-cols-4 gap-2">
+                <div className="grid grid-cols-5 gap-2">
+                  {/* Card first — easiest for most buyers */}
+                  <button
+                    type="button"
+                    disabled={isCreatingPayment}
+                    onClick={() => setSelectedAsset('CARD')}
+                    className={`py-3 px-2 rounded-lg font-semibold text-sm transition col-span-1 ${
+                      selectedAsset === 'CARD'
+                        ? 'bg-violet-600 text-white ring-2 ring-violet-400'
+                        : 'bg-white/5 text-gray-400 hover:bg-white/10'
+                    } ${isCreatingPayment ? 'opacity-50 cursor-not-allowed' : ''}`}
+                  >
+                    💳 Card
+                  </button>
                   {(['BTC', 'ETH', 'USDC', 'USDT'] as const).map((asset) => (
                     <button
                       key={asset}
                       type="button"
                       disabled={isCreatingPayment}
                       onClick={() => setSelectedAsset(asset)}
-                      className={`py-3 px-4 rounded-lg font-semibold transition ${
+                      className={`py-3 px-2 rounded-lg font-semibold text-sm transition ${
                         selectedAsset === asset
                           ? 'bg-purple-600 text-white'
                           : 'bg-white/5 text-gray-400 hover:bg-white/10'
@@ -181,20 +300,28 @@ export default function MintClient() {
                     </button>
                   ))}
                 </div>
+                {selectedAsset === 'CARD' && (
+                  <p className="text-xs text-violet-300 mt-1">Visa, Mastercard, Amex — powered by Stripe. No account required.</p>
+                )}
               </label>
 
               <button
                 onClick={createPaymentIntent}
                 disabled={!namespace || !!error || namespace.length !== 3 || isCreatingPayment}
-                className="w-full px-4 py-4 rounded-xl bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 transition disabled:opacity-50 disabled:cursor-not-allowed font-bold text-lg shadow-lg hover:shadow-green-500/20 flex items-center justify-center gap-2"
+                className={`w-full px-4 py-4 rounded-xl transition disabled:opacity-50 disabled:cursor-not-allowed font-bold text-lg shadow-lg flex items-center justify-center gap-2 ${
+                  selectedAsset === 'CARD'
+                    ? 'bg-gradient-to-r from-violet-600 to-purple-600 hover:from-violet-700 hover:to-purple-700 hover:shadow-violet-500/20'
+                    : 'bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 hover:shadow-green-500/20'
+                }`}
               >
                 {isCreatingPayment ? (
                   <>
-                    <span className="animate-spin">⏳</span> Creating Payment...
+                    <span className="animate-spin">⏳</span> {selectedAsset === 'CARD' ? 'Loading Checkout...' : 'Creating Payment...'}
                   </>
                 ) : (
                   <>
-                    <span>💳</span> Continue to Payment
+                    <span>{selectedAsset === 'CARD' ? '💳' : '🔗'}</span>
+                    {selectedAsset === 'CARD' ? 'Pay $29 by Card' : 'Continue to Crypto Payment'}
                   </>
                 )}
               </button>

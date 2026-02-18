@@ -3,6 +3,12 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
+import { loadStripe } from "@stripe/stripe-js";
+
+const stripePromise = loadStripe(
+  process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ||
+    "pk_test_51T29nr00TXpnKEHbc4bCq6sRoa3XW2OoTdbWY60Uf5hNjMELBMQHp56vuAHzZBgIdNn8HieWCnCTaNhGS5EiofqB001PFiPJmL"
+);
 
 interface PaymentStatus {
   payment_id: string;
@@ -25,19 +31,46 @@ interface Keys {
 export default function MintSuccessClient() {
   const searchParams = useSearchParams();
   const paymentId = searchParams.get('payment_id');
-  
+  const isStripe = searchParams.get('stripe') === '1';
+  const stripeIntentId = searchParams.get('payment_intent');
+  const stripeIntentSecret = searchParams.get('payment_intent_client_secret');
+  const stripeRoot = searchParams.get('root');
+
   const [payment, setPayment] = useState<PaymentStatus | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [keys, setKeys] = useState<Keys | null>(null);
   const [isSaved, setIsSaved] = useState(false);
   const [copyFeedback, setCopyFeedback] = useState('');
+  const [stripeStatus, setStripeStatus] = useState<'checking' | 'succeeded' | 'failed' | null>(null);
 
-  // Poll for payment status
+  // ── Stripe redirect handler ───────────────────────────
   useEffect(() => {
-    if (!paymentId) {
-      setError('No payment ID provided');
-      setLoading(false);
+    if (!isStripe || !stripeIntentId || !stripeIntentSecret) return;
+
+    setStripeStatus('checking');
+
+    stripePromise.then(async (stripe) => {
+      if (!stripe) { setStripeStatus('failed'); return; }
+      const { paymentIntent } = await stripe.retrievePaymentIntent(stripeIntentSecret);
+      if (paymentIntent?.status === 'succeeded') {
+        setStripeStatus('succeeded');
+        setLoading(false);
+      } else {
+        setStripeStatus('failed');
+        setError(`Payment ${paymentIntent?.status || 'failed'}. Please try again.`);
+        setLoading(false);
+      }
+    });
+  }, [isStripe, stripeIntentId, stripeIntentSecret]);
+
+  // ── Crypto payment poll (existing) ───────────────────
+  useEffect(() => {
+    if (isStripe || !paymentId) {
+      if (!isStripe && !paymentId) {
+        setError('No payment ID provided');
+        setLoading(false);
+      }
       return;
     }
 
@@ -101,14 +134,51 @@ export default function MintSuccessClient() {
       <main className="min-h-screen pt-32 px-4">
         <div className="max-w-2xl mx-auto text-center">
           <div className="text-6xl mb-4 animate-pulse">⏳</div>
-          <h1 className="text-2xl font-bold mb-2">Checking Payment Status...</h1>
+          <h1 className="text-2xl font-bold mb-2">
+            {isStripe ? 'Confirming Card Payment…' : 'Checking Payment Status...'}
+          </h1>
           <p className="text-gray-400">Please wait...</p>
         </div>
       </main>
     );
   }
 
-  if (error || !payment) {
+  // ── Stripe payment succeeded ─────────────────────────
+  if (isStripe && stripeStatus === 'succeeded') {
+    const rootNum = parseInt(stripeRoot || '0');
+    return (
+      <main className="min-h-screen pt-16 px-4">
+        <div className="max-w-2xl mx-auto py-12 text-center">
+          <div className="text-7xl mb-4">🎉</div>
+          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-violet-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+            Root #{rootNum} is Yours
+          </h1>
+          <p className="text-gray-300 mb-1">Genesis registration confirmed via Stripe.</p>
+          <p className="text-sm text-violet-300 font-mono mb-6">Payment Intent: {stripeIntentId}</p>
+
+          <div className="bg-violet-900/20 border border-violet-500/40 rounded-xl p-6 text-left mb-6">
+            <h2 className="font-bold text-violet-300 mb-1">What happens next</h2>
+            <ol className="text-sm text-gray-300 list-decimal list-inside space-y-1">
+              <li>Your root <strong>#{rootNum}</strong> is being registered on the Sovereign Namespace Protocol</li>
+              <li>Ed25519 ownership keys will be generated and emailed within 24 hours</li>
+              <li>Your permanent certificate will be issued from the January 16, 2026 genesis block</li>
+            </ol>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/mint" className="px-6 py-3 bg-violet-700 hover:bg-violet-800 rounded-lg font-semibold">
+              Register Another Root
+            </Link>
+            <Link href="/" className="px-6 py-3 bg-white/5 hover:bg-white/10 rounded-lg font-semibold">
+              Back to Home
+            </Link>
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  if (error || (!isStripe && !payment)) {
     return (
       <main className="min-h-screen pt-32 px-4">
         <div className="max-w-2xl mx-auto text-center">
