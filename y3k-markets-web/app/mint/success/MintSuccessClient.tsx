@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { loadStripe } from "@stripe/stripe-js";
@@ -10,166 +10,342 @@ const stripePromise = loadStripe(
     "pk_live_51T29nh1OEzphv6FLsoRg4yMypc4eskdoSGXSwMgnLxbAB1ptZm4YQ1uZnekR3peDHSvLW8sTOa5Fh3062yVbU96j00gtK152kK"
 );
 
-interface PaymentStatus {
-  payment_id: string;
-  root: number;
-  asset: string;
-  status: 'pending' | 'confirmed' | 'complete' | 'expired';
-  tx_hash: string | null;
-  confirmations: number;
-  created_at: number;
-  confirmed_at: number | null;
-  expires_at: number;
-  is_expired: boolean;
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL || "https://payments.y3kmarkets.com";
+
+interface MintStatus {
+  minted: boolean;
+  txHash?: string;
+  transferTxHash?: string;
+  polygonscan?: string;
+  error?: string;
 }
 
-interface Keys {
-  privateKey: string;
-  publicKey: string;
+function CopyButton({ text, label }: { text: string; label: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <button
+      onClick={() => {
+        navigator.clipboard.writeText(text);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      }}
+      className="text-xs px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 transition"
+    >
+      {copied ? "✓ Copied" : `Copy ${label}`}
+    </button>
+  );
 }
 
+// ── NFT mint status poller ─────────────────────────────────────────────────────
+function NftStatusBox({
+  paymentIntentId,
+  rootNum,
+  walletAddress,
+}: {
+  paymentIntentId: string;
+  rootNum: number;
+  walletAddress: string | null;
+}) {
+  const [status, setStatus] = useState<MintStatus>({ minted: false });
+  const [attempts, setAttempts] = useState(0);
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const poll = async () => {
+    try {
+      const res = await fetch(
+        `${API_URL}/api/stripe/intent/${paymentIntentId}`
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (data.tx_hash) {
+          setStatus({
+            minted: true,
+            txHash: data.tx_hash,
+            transferTxHash: data.transfer_tx_hash,
+            polygonscan: data.tx_hash
+              ? `https://polygonscan.com/tx/${data.tx_hash}`
+              : undefined,
+          });
+          return; // stop polling
+        }
+      }
+    } catch {
+      // silent — keep polling
+    }
+    setAttempts((n) => {
+      const next = n + 1;
+      if (next < 24) {
+        // poll for ~2 min max (5s × 24)
+        timerRef.current = setTimeout(poll, 5000);
+      }
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    // Start polling after a brief delay to allow webhook to fire
+    timerRef.current = setTimeout(poll, 6000);
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (status.minted && status.txHash) {
+    return (
+      <div className="bg-green-900/20 border border-green-500/40 rounded-xl p-5 text-left">
+        <div className="flex items-center gap-2 mb-3">
+          <span className="text-2xl">🔗</span>
+          <h3 className="font-bold text-green-400">
+            NFT Minted on Polygon Mainnet
+          </h3>
+        </div>
+        <div className="space-y-2 text-sm">
+          <div>
+            <span className="text-gray-400">Mint tx: </span>
+            <a
+              href={`https://polygonscan.com/tx/${status.txHash}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-400 hover:underline font-mono text-xs break-all"
+            >
+              {status.txHash}
+            </a>
+            <span className="ml-2">
+              <CopyButton text={status.txHash} label="tx" />
+            </span>
+          </div>
+          {status.transferTxHash && walletAddress && (
+            <div>
+              <span className="text-gray-400">Transfer to your wallet: </span>
+              <a
+                href={`https://polygonscan.com/tx/${status.transferTxHash}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-blue-400 hover:underline font-mono text-xs break-all"
+              >
+                {status.transferTxHash}
+              </a>
+            </div>
+          )}
+          {walletAddress && (
+            <div>
+              <span className="text-gray-400">Delivered to: </span>
+              <span className="font-mono text-xs text-white">
+                {walletAddress}
+              </span>
+            </div>
+          )}
+          {status.polygonscan && (
+            <a
+              href={status.polygonscan}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 px-4 py-2 mt-1 bg-purple-700 hover:bg-purple-800 rounded-lg font-semibold text-sm"
+            >
+              View on Polygonscan ↗
+            </a>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-purple-900/20 border border-purple-500/30 rounded-xl p-5 text-left">
+      <div className="flex items-center gap-3 mb-2">
+        <span className="text-xl animate-spin">⛏️</span>
+        <span className="font-semibold text-purple-300">
+          Minting your NFT on Polygon…
+        </span>
+      </div>
+      <p className="text-xs text-gray-400">
+        {attempts < 24
+          ? "This usually takes 15–60 seconds. Keep this page open."
+          : "Taking longer than expected — check back or contact support."}
+      </p>
+      {attempts > 0 && attempts < 24 && (
+        <div className="mt-2 w-full bg-white/10 rounded-full h-1">
+          <div
+            className="bg-purple-500 h-1 rounded-full transition-all"
+            style={{ width: `${Math.min(100, (attempts / 24) * 100)}%` }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Main page ──────────────────────────────────────────────────────────────────
 export default function MintSuccessClient() {
   const searchParams = useSearchParams();
-  const paymentId = searchParams.get('payment_id');
-  const isStripe = searchParams.get('stripe') === '1';
-  const stripeIntentId = searchParams.get('payment_intent');
-  const stripeIntentSecret = searchParams.get('payment_intent_client_secret');
-  const stripeRoot = searchParams.get('root');
+  const paymentId = searchParams.get("payment_id");
+  const isStripe = searchParams.get("stripe") === "1";
+  const stripeIntentId = searchParams.get("payment_intent");
+  const stripeIntentSecret = searchParams.get("payment_intent_client_secret");
+  const stripeRoot = searchParams.get("root");
+  const walletParam = searchParams.get("wallet");
 
-  const [payment, setPayment] = useState<PaymentStatus | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [keys, setKeys] = useState<Keys | null>(null);
-  const [isSaved, setIsSaved] = useState(false);
-  const [copyFeedback, setCopyFeedback] = useState('');
-  const [stripeStatus, setStripeStatus] = useState<'checking' | 'succeeded' | 'failed' | null>(null);
+  const [error, setError] = useState("");
+  const [stripeStatus, setStripeStatus] = useState<
+    "checking" | "succeeded" | "failed" | null
+  >(null);
 
-  // ── Stripe redirect handler ───────────────────────────
+  // ── Stripe redirect: confirm payment intent ────────────────────────────
   useEffect(() => {
     if (!isStripe || !stripeIntentId || !stripeIntentSecret) return;
-
-    setStripeStatus('checking');
+    setStripeStatus("checking");
 
     stripePromise.then(async (stripe) => {
-      if (!stripe) { setStripeStatus('failed'); return; }
-      const { paymentIntent } = await stripe.retrievePaymentIntent(stripeIntentSecret);
-      if (paymentIntent?.status === 'succeeded') {
-        setStripeStatus('succeeded');
+      if (!stripe) {
+        setStripeStatus("failed");
+        return;
+      }
+      const { paymentIntent } = await stripe.retrievePaymentIntent(
+        stripeIntentSecret
+      );
+      if (paymentIntent?.status === "succeeded") {
+        setStripeStatus("succeeded");
         setLoading(false);
       } else {
-        setStripeStatus('failed');
-        setError(`Payment ${paymentIntent?.status || 'failed'}. Please try again.`);
+        setStripeStatus("failed");
+        setError(`Payment ${paymentIntent?.status || "failed"}. Please try again.`);
         setLoading(false);
       }
     });
   }, [isStripe, stripeIntentId, stripeIntentSecret]);
 
-  // ── Crypto payment poll (existing) ───────────────────
+  // ── Crypto payments: handled below (no initial load needed) ──────────
   useEffect(() => {
-    if (isStripe || !paymentId) {
-      if (!isStripe && !paymentId) {
-        setError('No payment ID provided');
-        setLoading(false);
-      }
-      return;
+    if (isStripe) return;
+    if (!paymentId) {
+      setError("No payment ID provided");
     }
+    setLoading(false);
+  }, [isStripe, paymentId]);
 
-    const checkPayment = async () => {
-      try {
-        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:9000';
-        const response = await fetch(`${apiUrl}/api/payment/status/${paymentId}`, {
-          cache: 'no-store'
-        });
-
-        if (!response.ok) {
-          throw new Error('Failed to check payment status');
-        }
-
-        const data = await response.json();
-        setPayment(data);
-        setLoading(false);
-
-      } catch (err) {
-        console.error('Payment check error:', err);
-        setError('Failed to check payment status');
-        setLoading(false);
-      }
-    };
-
-    // Initial check
-    checkPayment();
-
-    // Poll every 5 seconds if pending
-    const interval = setInterval(() => {
-      if (payment?.status !== 'confirmed' && payment?.status !== 'complete') {
-        checkPayment();
-      }
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [paymentId, payment?.status]);
-
-  const generateKeys = () => {
-    // Ed25519 keypair generation using Web Crypto API
-    // This is the ONLY place keys are generated - after payment confirmation
-    const array = new Uint8Array(32);
-    window.crypto.getRandomValues(array);
-    
-    // For production, use nacl.sign.keyPair() from tweetnacl
-    // This is simplified for demonstration
-    const privateKey = Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('');
-    const publicKey = Array.from(array).map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 64);
-    
-    setKeys({ privateKey, publicKey });
-  };
-
-  const copyToClipboard = (text: string, label: string) => {
-    navigator.clipboard.writeText(text);
-    setCopyFeedback(`Copied ${label}!`);
-    setTimeout(() => setCopyFeedback(''), 2000);
-  };
-
+  // ── Loading ────────────────────────────────────────────────────────────
   if (loading) {
     return (
       <main className="min-h-screen pt-32 px-4">
         <div className="max-w-2xl mx-auto text-center">
           <div className="text-6xl mb-4 animate-pulse">⏳</div>
           <h1 className="text-2xl font-bold mb-2">
-            {isStripe ? 'Confirming Card Payment…' : 'Checking Payment Status...'}
+            {isStripe ? "Confirming payment…" : "Checking payment status…"}
           </h1>
-          <p className="text-gray-400">Please wait...</p>
+          <p className="text-gray-400">Please wait…</p>
         </div>
       </main>
     );
   }
 
-  // ── Stripe payment succeeded ─────────────────────────
-  if (isStripe && stripeStatus === 'succeeded') {
-    const rootNum = parseInt(stripeRoot || '0');
+  // ── Error ──────────────────────────────────────────────────────────────
+  if (error || (isStripe && stripeStatus === "failed")) {
+    return (
+      <main className="min-h-screen pt-32 px-4">
+        <div className="max-w-2xl mx-auto text-center">
+          <div className="text-6xl mb-4">❌</div>
+          <h1 className="text-2xl font-bold mb-2 text-red-400">
+            Payment Error
+          </h1>
+          <p className="text-gray-400 mb-6">{error || "Payment not confirmed."}</p>
+          <Link
+            href="/mint"
+            className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold"
+          >
+            Return to Mint Page
+          </Link>
+        </div>
+      </main>
+    );
+  }
+
+  // ── Stripe success ─────────────────────────────────────────────────────
+  if (isStripe && stripeStatus === "succeeded") {
+    const rootNum = parseInt(stripeRoot || "0", 10);
     return (
       <main className="min-h-screen pt-16 px-4">
-        <div className="max-w-2xl mx-auto py-12 text-center">
-          <div className="text-7xl mb-4">🎉</div>
-          <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-violet-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
-            Root #{rootNum} is Yours
-          </h1>
-          <p className="text-gray-300 mb-1">Genesis registration confirmed via Stripe.</p>
-          <p className="text-sm text-violet-300 font-mono mb-6">Payment Intent: {stripeIntentId}</p>
+        <nav className="fixed top-0 w-full z-50 bg-black/80 backdrop-blur-md border-b border-white/10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-16">
+              <Link href="/" className="text-2xl font-bold gradient-text">
+                Y3K Markets
+              </Link>
+            </div>
+          </div>
+        </nav>
 
-          <div className="bg-violet-900/20 border border-violet-500/40 rounded-xl p-6 text-left mb-6">
-            <h2 className="font-bold text-violet-300 mb-1">What happens next</h2>
-            <ol className="text-sm text-gray-300 list-decimal list-inside space-y-1">
-              <li>Your root <strong>#{rootNum}</strong> is being registered on the Sovereign Namespace Protocol</li>
-              <li>Ed25519 ownership keys will be generated and emailed within 24 hours</li>
-              <li>Your permanent certificate will be issued from the January 16, 2026 genesis block</li>
+        <div className="max-w-2xl mx-auto py-12">
+          <div className="text-center mb-8">
+            <div className="text-7xl mb-4">🎉</div>
+            <h1 className="text-4xl font-bold mb-3 bg-gradient-to-r from-violet-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
+              Root #{rootNum} is Yours
+            </h1>
+            <p className="text-gray-300 mb-1">
+              Genesis registration confirmed via Stripe.
+            </p>
+            <p className="text-xs text-gray-500 font-mono">
+              Intent: {stripeIntentId}
+            </p>
+          </div>
+
+          {/* NFT Mint status box */}
+          {stripeIntentId && (
+            <div className="mb-6">
+              <NftStatusBox
+                paymentIntentId={stripeIntentId}
+                rootNum={rootNum}
+                walletAddress={walletParam}
+              />
+            </div>
+          )}
+
+          {/* What happens next */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-6 mb-6">
+            <h2 className="font-bold text-white mb-3">
+              📋 Your Genesis Certificate
+            </h2>
+            <ol className="text-sm text-gray-300 list-decimal list-inside space-y-2">
+              <li>
+                Root{" "}
+                <strong className="text-white">#{rootNum}</strong> is
+                permanently registered on the Sovereign Namespace Protocol
+              </li>
+              <li>
+                The NumberRoot NFT (ERC-721) is being minted and transferred to
+                your Polygon wallet
+              </li>
+              <li>
+                Your cryptographic ownership certificate from the{" "}
+                <span className="text-yellow-400">
+                  January 16, 2026 genesis block
+                </span>{" "}
+                will be issued within 24 hours
+              </li>
             </ol>
+
+            {!walletParam && (
+              <div className="mt-4 p-3 bg-yellow-900/20 border border-yellow-500/30 rounded-lg text-xs text-yellow-300">
+                ⚠️ No wallet address was provided. Your NFT is held in the
+                protocol escrow. Contact support with your payment intent ID to
+                claim it: <strong>{stripeIntentId}</strong>
+              </div>
+            )}
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/mint" className="px-6 py-3 bg-violet-700 hover:bg-violet-800 rounded-lg font-semibold">
+            <Link
+              href="/mint"
+              className="px-6 py-3 bg-violet-700 hover:bg-violet-800 rounded-lg font-semibold text-center"
+            >
               Register Another Root
             </Link>
-            <Link href="/" className="px-6 py-3 bg-white/5 hover:bg-white/10 rounded-lg font-semibold">
+            <Link
+              href="/"
+              className="px-6 py-3 bg-white/5 hover:bg-white/10 rounded-lg font-semibold text-center"
+            >
               Back to Home
             </Link>
           </div>
@@ -178,224 +354,24 @@ export default function MintSuccessClient() {
     );
   }
 
-  if (error || (!isStripe && !payment)) {
-    return (
-      <main className="min-h-screen pt-32 px-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="text-6xl mb-4">❌</div>
-          <h1 className="text-2xl font-bold mb-2 text-red-400">Error</h1>
-          <p className="text-gray-400 mb-6">{error || 'Payment not found'}</p>
-          <Link href="/mint" className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold">
-            Return to Mint Page
-          </Link>
-        </div>
-      </main>
-    );
-  }
-
-  // Payment expired
-  if (payment.is_expired) {
-    return (
-      <main className="min-h-screen pt-32 px-4">
-        <div className="max-w-2xl mx-auto text-center">
-          <div className="text-6xl mb-4">⏱️</div>
-          <h1 className="text-2xl font-bold mb-2 text-orange-400">Payment Expired</h1>
-          <p className="text-gray-400 mb-2">This payment intent has expired (24-hour window).</p>
-          <p className="text-sm text-gray-500 mb-6">Root {payment.root} is still available.</p>
-          <Link href={`/mint?namespace=${payment.root}`} className="inline-block px-6 py-3 bg-blue-600 hover:bg-blue-700 rounded-lg font-semibold">
-            Try Again
-          </Link>
-        </div>
-      </main>
-    );
-  }
-
-  // Waiting for payment
-  if (payment.status === 'pending') {
-    const timeRemaining = payment.expires_at - Math.floor(Date.now() / 1000);
-    const hoursRemaining = Math.floor(timeRemaining / 3600);
-
-    return (
-      <main className="min-h-screen pt-32 px-4">
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-slate-900 border border-yellow-500/30 rounded-xl p-8 text-center">
-            <div className="text-6xl mb-4 animate-pulse">⏳</div>
-            <h1 className="text-3xl font-bold mb-2">Waiting for Payment</h1>
-            <p className="text-gray-400 mb-6">Root: <span className="text-green-400 font-mono text-xl">{payment.root}</span></p>
-
-            {payment.tx_hash ? (
-              <div className="bg-blue-900/20 border border-blue-500/30 rounded-lg p-6 mb-6">
-                <div className="text-blue-400 font-semibold mb-2">Transaction Detected! ✓</div>
-                <div className="text-xs text-gray-400 font-mono break-all mb-3">{payment.tx_hash}</div>
-                <div className="text-sm text-gray-300">
-                  Confirmations: <span className="text-green-400 font-bold">{payment.confirmations}</span> / <span className="text-gray-500">
-                    {payment.asset === 'BTC' ? '6' : '12'}
-                  </span>
-                </div>
-                <div className="text-xs text-gray-500 mt-2">Checking every 30 seconds...</div>
-              </div>
-            ) : (
-              <div className="bg-orange-900/20 border border-orange-500/30 rounded-lg p-6 mb-6">
-                <div className="text-orange-400 font-semibold mb-3">Send Payment Now</div>
-                <div className="text-sm text-gray-300 mb-4">
-                  Send <strong>$29 USD</strong> in <strong>{payment.asset}</strong> to:
-                </div>
-                
-                <div className="bg-black/40 p-4 rounded-lg border border-gray-700 mb-4">
-                  <div className="text-xs text-gray-500 mb-1">{payment.asset} Address:</div>
-                  <div className="font-mono text-xs text-gray-300 break-all">
-                    {payment.asset === 'BTC' 
-                      ? 'bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh'
-                      : '0x71C7656EC7ab88b098defB751B7401B5f6d8976F'
-                    }
-                  </div>
-                </div>
-
-                <div className="text-xs text-gray-500">
-                  Expires in ~{hoursRemaining} hours • Monitoring blockchain automatically
-                </div>
-              </div>
-            )}
-
-            <div className="text-xs text-gray-600">
-              This page auto-refreshes every 5 seconds. Keep it open.
-            </div>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  // Payment confirmed - generate keys!
-  if (payment.status === 'confirmed' && !keys) {
-    return (
-      <main className="min-h-screen pt-32 px-4">
-        <div className="max-w-2xl mx-auto">
-          <div className="bg-slate-900 border border-green-500/30 rounded-xl p-8 text-center">
-            <div className="text-6xl mb-4">✅</div>
-            <h1 className="text-3xl font-bold text-green-400 mb-2">Payment Confirmed!</h1>
-            <p className="text-gray-400 mb-6">Root: <span className="text-green-400 font-mono text-xl">{payment.root}</span></p>
-
-            <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-6 mb-6">
-              <div className="text-green-400 font-semibold mb-3">Transaction Verified ✓</div>
-              <div className="text-xs text-gray-400 font-mono break-all mb-2">{payment.tx_hash}</div>
-              <div className="text-sm text-gray-300">
-                {payment.confirmations} confirmations • Asset: {payment.asset}
-              </div>
-            </div>
-
-            <button
-              onClick={generateKeys}
-              className="w-full px-6 py-4 bg-green-600 hover:bg-green-700 rounded-lg font-bold text-lg shadow-lg"
-            >
-              🔐 Generate My Keys Now
-            </button>
-
-            <div className="text-xs text-gray-500 mt-4">
-              Keys are generated locally in your browser. Never transmitted to any server.
-            </div>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  // Keys generated - show paper wallet
-  if (keys) {
-    return (
-      <main className="min-h-screen pt-32 px-4">
-        <div className="max-w-3xl mx-auto">
-          <div className="bg-slate-900 border border-green-500/30 rounded-xl p-8">
-            <div className="text-center mb-8">
-              <div className="text-6xl mb-4">🎉</div>
-              <h1 className="text-3xl font-bold text-green-400 mb-2">Genesis Root Secured!</h1>
-              <p className="text-gray-400">Root: <span className="text-green-400 font-mono text-2xl">{payment.root}</span></p>
-            </div>
-
-            <div className="bg-amber-900/20 border border-amber-500/30 rounded-lg p-6 mb-6">
-              <div className="flex items-start gap-3 mb-3">
-                <span className="text-3xl">⚠️</span>
-                <div>
-                  <div className="text-amber-400 font-bold text-lg mb-2">CRITICAL: Save Your Private Key</div>
-                  <div className="text-sm text-gray-300 space-y-1">
-                    <div>• Write it down on paper immediately</div>
-                    <div>• Store in a secure location (safe, vault)</div>
-                    <div>• <strong className="text-amber-400">If you lose this, your root is GONE FOREVER</strong></div>
-                    <div>• Y3K cannot recover lost keys</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-4 mb-6">
-              <div className="bg-red-900/20 border border-red-500/30 rounded-lg p-4">
-                <div className="text-red-400 font-bold mb-2 flex items-center gap-2">
-                  <span>☢️</span> Private Key (KEEP SECRET)
-                </div>
-                <div className="bg-black/60 p-3 rounded font-mono text-xs text-red-300 break-all mb-2">
-                  {keys.privateKey}
-                </div>
-                <button
-                  onClick={() => copyToClipboard(keys.privateKey, 'Private Key')}
-                  className="text-xs px-3 py-1 bg-red-600 hover:bg-red-700 rounded"
-                >
-                  Copy Private Key
-                </button>
-              </div>
-
-              <div className="bg-green-900/20 border border-green-500/30 rounded-lg p-4">
-                <div className="text-green-400 font-bold mb-2">Public Key (Safe to Share)</div>
-                <div className="bg-black/60 p-3 rounded font-mono text-xs text-green-300 break-all mb-2">
-                  {keys.publicKey}
-                </div>
-                <button
-                  onClick={() => copyToClipboard(keys.publicKey, 'Public Key')}
-                  className="text-xs px-3 py-1 bg-green-600 hover:bg-green-700 rounded"
-                >
-                  Copy Public Key
-                </button>
-              </div>
-            </div>
-
-            {copyFeedback && (
-              <div className="text-center text-sm text-green-400 mb-4 animate-pulse">
-                ✓ {copyFeedback}
-              </div>
-            )}
-
-            <div className="flex items-center gap-3 mb-6">
-              <input
-                type="checkbox"
-                id="saved"
-                checked={isSaved}
-                onChange={(e) => setIsSaved(e.target.checked)}
-                className="w-5 h-5"
-              />
-              <label htmlFor="saved" className="text-sm text-gray-300">
-                I have saved my private key in a secure location
-              </label>
-            </div>
-
-            <Link
-              href="/mint/ownership"
-              className={`block w-full px-6 py-4 rounded-lg font-bold text-center transition ${
-                isSaved
-                  ? 'bg-blue-600 hover:bg-blue-700'
-                  : 'bg-gray-700 cursor-not-allowed opacity-50'
-              }`}
-              onClick={(e) => !isSaved && e.preventDefault()}
-            >
-              Continue to Ownership Guide →
-            </Link>
-
-            <div className="text-center mt-4 text-xs text-gray-500">
-              Certificate will be published to IPFS shortly
-            </div>
-          </div>
-        </div>
-      </main>
-    );
-  }
-
-  return null;
+  // ── Crypto payment fallback (existing flow) ────────────────────────────
+  return (
+    <main className="min-h-screen pt-32 px-4">
+      <div className="max-w-2xl mx-auto text-center">
+        <div className="text-5xl mb-4">🔗</div>
+        <h1 className="text-2xl font-bold mb-2">Crypto Payment Initiated</h1>
+        <p className="text-gray-400 mb-4">Payment ID: {paymentId}</p>
+        <p className="text-sm text-gray-500 mb-6">
+          Your root will be registered once the transaction confirms.
+        </p>
+        <Link
+          href="/"
+          className="inline-block px-6 py-3 bg-purple-700 hover:bg-purple-800 rounded-lg font-semibold"
+        >
+          Back to Home
+        </Link>
+      </div>
+    </main>
+  );
 }
+
